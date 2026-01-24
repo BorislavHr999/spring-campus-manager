@@ -10,4 +10,4 @@ A backend REST API for university administration designed with **Java & Spring B
 * **Stack:** Spring Boot 3, Spring Data JPA, H2 Database (In-Memory), Maven.
 * **Run:** Execute `./mvnw spring-boot:run` in the terminal. The API starts at `localhost:8080`.
 
-**Author:** [Your Name] | **Faculty No:** [Your Number]
+**Author:** Borislav Hristov
