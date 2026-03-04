@@ -1,0 +1,26 @@
+stages:
+  - build
+  - test
+  - package
+
+compile_code:
+  stage: build
+  script:
+    - echo "Compiling code..."
+    - mvn clean compile
+
+run_tests:
+  stage: test
+  script:
+    - echo "Running tests..."
+    - mvn test
+
+create_jar:
+  stage: package
+  script:
+    - echo "Creating JAR file..."
+    - mvn package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 week
