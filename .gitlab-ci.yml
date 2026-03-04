@@ -38,3 +38,5 @@ deploy_app:
   environment:
     name: production
     url: http://10.72.0.140:8081
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
