@@ -30,7 +30,7 @@ deploy_app:
   stage: deploy
   script:
     - echo "Stopping existing application..."
-    - sudo fuser -k 8080/tcp || true
+    - pkill -f "java -jar" || true
     - echo "Deploying new application..."
     - nohup java -jar target/*.jar > app.log 2>&1 &
     - sleep 10
