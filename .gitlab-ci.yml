@@ -32,11 +32,11 @@ deploy_app:
     - echo "Stopping existing application..."
     - sudo fuser -k 8080/tcp || true
     - echo "Deploying new application..."
-    - nohup java -jar target/*.jar > app.log 2>&1 &
+    - nohup java -jar target/*.jar --server.port=$PROD_PORT> app.log 2>&1 &
     - sleep 10
     - echo "Application deployed successfully!"
   environment:
     name: production
-    url: http://10.72.0.140:8081
+    url: http://$PROD_SERVER_IP:$PROD_PORT
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
