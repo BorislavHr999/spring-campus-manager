@@ -35,6 +35,8 @@ deploy_dev:
     - pkill -f "server.port=$DEV_PORT" || true
     - echo "Staring DEV..."
     - nohup java -jar target/*.jar --server.port=$DEV_PORT > dev.log 2>&1 &
+    - sleep 20
+    - cat dev.log
   environment:
     name: development
     url: http://$PROD_SERVER_IP:$DEV_PORT
