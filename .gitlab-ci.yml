@@ -24,7 +24,7 @@ create_jar:
   artifacts:
     paths:
       - target/*.jar
-    expire_in: 1 week
+    expire_in: 1 hour
 
 deploy_app:
   stage: deploy
