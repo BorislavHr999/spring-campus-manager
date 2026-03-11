@@ -1,9 +1,11 @@
 package com.campus.campus_management_system.controller;
 
 import com.campus.campus_management_system.model.entity.Student;
-import com.campus.campus_management_system.model.entity.Course; // Внасяме модела Course
+import com.campus.campus_management_system.model.entity.Course;
+import com.campus.campus_management_system.model.entity.Professor; // Добавен Professor
 import com.campus.campus_management_system.repository.StudentRepository;
 import com.campus.campus_management_system.repository.CourseRepository;
+import com.campus.campus_management_system.repository.ProfessorRepository; // Добавено ProfessorRepository
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,14 +18,15 @@ public class DashboardController {
 
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
+    private final ProfessorRepository professorRepository;
 
-    public DashboardController(StudentRepository studentRepository, CourseRepository courseRepository) {
+    public DashboardController(StudentRepository studentRepository, CourseRepository courseRepository, ProfessorRepository professorRepository) {
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
+        this.professorRepository = professorRepository;
     }
 
-    // --- МЕТОДИ ЗА ТАБЛОТО И СТУДЕНТИТЕ ---
-
+    // --- СТАТИСТИКА ЗА ТАБЛОТО ---
     @GetMapping("/stats")
     public Map<String, Object> getStats() {
         return Map.of(
@@ -32,6 +35,7 @@ public class DashboardController {
         );
     }
 
+    // --- СТУДЕНТИ ---
     @PostMapping("/add-demo-student")
     public Map<String, String> addDemoStudent() {
         Random rand = new Random();
@@ -64,8 +68,7 @@ public class DashboardController {
         return Map.of("status", "error");
     }
 
-    // --- НОВИ МЕТОДИ ЗА КУРСОВЕТЕ (СПЕЦИАЛНОСТИ) ---
-
+    // --- КУРСОВЕ ---
     @GetMapping("/all-courses")
     public List<Course> getAllCourses() {
         return courseRepository.findAll();
@@ -75,13 +78,9 @@ public class DashboardController {
     public Map<String, String> addDemoCourse() {
         String[] subjects = {"Основи на Java", "Spring Boot Masterclass", "DevOps Практики", "Алгоритми", "Бази данни"};
         Random rand = new Random();
-        
         Course course = new Course();
-        // Генерираме име от масива + случайно число за уникалност
         course.setName(subjects[rand.nextInt(subjects.length)] + " " + rand.nextInt(100, 999));
-        course.setCredits(rand.nextInt(2, 10)); // Кредити между 2 и 9
-        // Оставяме Professor null за сега
-        
+        course.setCredits(rand.nextInt(2, 10));
         courseRepository.save(course);
         return Map.of("status", "success");
     }
@@ -90,6 +89,32 @@ public class DashboardController {
     public Map<String, String> deleteCourse(@PathVariable Long id) {
         if (courseRepository.existsById(id)) {
             courseRepository.deleteById(id);
+            return Map.of("status", "deleted");
+        }
+        return Map.of("status", "error");
+    }
+
+    // --- ПРЕПОДАВАТЕЛИ (СПРИНТ 4) ---
+    @GetMapping("/all-professors")
+    public List<Professor> getAllProfessors() {
+        return professorRepository.findAll();
+    }
+
+    @PostMapping("/add-demo-professor")
+    public Map<String, String> addDemoProfessor() {
+        Random rand = new Random();
+        Professor prof = new Professor();
+        prof.setFirstName("Д-р Тест");
+        prof.setLastName("Преподавател " + rand.nextInt(100, 999));
+        prof.setEmail("prof" + rand.nextInt(100, 999) + "@campus.bg");
+        professorRepository.save(prof);
+        return Map.of("status", "success");
+    }
+
+    @DeleteMapping("/delete-professor/{id}")
+    public Map<String, String> deleteProfessor(@PathVariable Long id) {
+        if (professorRepository.existsById(id)) {
+            professorRepository.deleteById(id);
             return Map.of("status", "deleted");
         }
         return Map.of("status", "error");
