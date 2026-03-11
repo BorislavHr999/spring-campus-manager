@@ -68,6 +68,12 @@ public class DashboardController {
         return Map.of("status", "error");
     }
 
+    @PostMapping("/add-real-student")
+    public Map<String, String> addRealStudent(@RequestBody Student student) {
+        studentRepository.save(student);
+        return Map.of("status", "success");
+    }
+
     // --- КУРСОВЕ ---
     @GetMapping("/all-courses")
     public List<Course> getAllCourses() {
