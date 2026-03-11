@@ -100,6 +100,13 @@ public class DashboardController {
         return Map.of("status", "error");
     }
 
+    // НОВ МЕТОД: Добавяне на реален курс от потребителя
+    @PostMapping("/add-real-course")
+    public Map<String, String> addRealCourse(@RequestBody Course course) {
+        courseRepository.save(course);
+        return Map.of("status", "success");
+    }
+
     // --- ПРЕПОДАВАТЕЛИ (СПРИНТ 4) ---
     @GetMapping("/all-professors")
     public List<Professor> getAllProfessors() {
