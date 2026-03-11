@@ -138,4 +138,20 @@ public class DashboardController {
         }
         return Map.of("status", "error");
     }
+
+    @PutMapping("/update-course/{id}")
+    public Map<String, String> updateCourse(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+        return courseRepository.findById(id).map(course -> {
+            if (updates.containsKey("name")) course.setName((String) updates.get("name"));
+            if (updates.containsKey("credits")) course.setCredits(Integer.parseInt(updates.get("credits").toString()));
+            
+            if (updates.containsKey("professorId") && updates.get("professorId") != null) {
+                Long profId = Long.parseLong(updates.get("professorId").toString());
+                professorRepository.findById(profId).ifPresent(course::setProfessor);
+            }
+
+            courseRepository.save(course);
+            return Map.of("status", "success");
+        }).orElse(Map.of("status", "error"));
+    }
 }
