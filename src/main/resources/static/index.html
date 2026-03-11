@@ -13,6 +13,9 @@
         .card-custom:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
         .text-gradient { background: linear-gradient(45deg, #0d6efd, #0dcaf0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
         .table-custom { background-color: #1e1e1e; border-radius: 10px; overflow: hidden; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .new-row { animation: fadeIn 0.5s ease-out; }
     </style>
 </head>
 <body>
@@ -33,7 +36,7 @@
                     <h1 class="h2 fw-light">Аналитичен Център</h1>
                     <div class="btn-toolbar mb-2 mb-md-0 d-flex gap-2">
                         <button id="add-student-btn" class="btn btn-outline-success btn-sm rounded-pill px-3 shadow-sm">
-                            <i class="bi bi-person-plus-fill me-1"></i> Записване
+                            <i class="bi bi-person-plus-fill me-1"></i> Симулирай записване
                         </button>
                         <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill d-flex align-items-center"><i class="bi bi-rocket-takeoff me-2"></i> Версия 2.0 (DEV)</span>
                     </div>
@@ -77,30 +80,17 @@
                     <table class="table table-dark table-hover table-borderless align-middle mb-0">
                         <thead class="border-bottom border-secondary text-muted">
                             <tr>
-                                <th class="py-3 px-4">Потребител</th>
-                                <th class="py-3">Действие</th>
-                                <th class="py-3">Време</th>
+                                <th class="py-3 px-4">Студент</th>
+                                <th class="py-3">Фак. Номер</th>
+                                <th class="py-3">Имейл</th>
                                 <th class="py-3">Статус</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="latest-students-tbody">
                             <tr>
-                                <td class="px-4 py-3"><i class="bi bi-person-circle me-2 text-secondary"></i> Иван Иванов</td>
-                                <td>Записване за "Основи на Java"</td>
-                                <td class="text-muted">Преди 5 мин</td>
-                                <td><span class="badge bg-success bg-opacity-75 px-2 py-1 rounded-pill">Успешно</span></td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-3"><i class="bi bi-person-circle me-2 text-secondary"></i> Мария Георгиева</td>
-                                <td>Плащане на семестриална такса</td>
-                                <td class="text-muted">Преди 12 мин</td>
-                                <td><span class="badge bg-warning text-dark bg-opacity-75 px-2 py-1 rounded-pill">Обработва се</span></td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-3"><i class="bi bi-robot me-2 text-info"></i> Система (CI/CD)</td>
-                                <td>Автоматичен деплой на версия 2.0</td>
-                                <td class="text-muted">Току що</td>
-                                <td><span class="badge bg-primary bg-opacity-75 px-2 py-1 rounded-pill">Завършено</span></td>
+                                <td colspan="4" class="text-center py-4">
+                                    <span class="spinner-border spinner-border-sm text-secondary me-2"></span> Зареждане на данни...
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -112,46 +102,67 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // Функция за зареждане на данните от базата
+            
             function loadStats() {
-                // Показваме лоудър, докато чакаме отговора
-                document.getElementById('total-students').innerHTML = '<span class="spinner-border spinner-border-sm text-primary"></span>';
                 
                 fetch('/api/dashboard/stats')
                     .then(response => response.json())
                     .then(data => {
-                        // Опресняваме картите с реалните данни
                         document.getElementById('total-students').innerText = data.totalStudents;
                         document.getElementById('active-courses').innerText = data.activeCourses;
                     })
-                    .catch(error => {
-                        console.error('Грешка:', error);
-                        document.getElementById('total-students').innerText = 'Грешка';
-                        document.getElementById('active-courses').innerText = 'Грешка';
-                    });
+                    .catch(error => console.error('Грешка при зареждане на статистика:', error));
+
+                
+                fetch('/api/dashboard/latest-students')
+                    .then(response => response.json())
+                    .then(students => {
+                        let tableBody = document.getElementById('latest-students-tbody');
+                        tableBody.innerHTML = ''; 
+                        
+                        
+                        if (students.length === 0) {
+                            tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Няма записани студенти все още.</td></tr>';
+                            return;
+                        }
+
+                        
+                        students.forEach(student => {
+                            let row = `
+                            <tr class="new-row">
+                                <td class="px-4 py-3"><i class="bi bi-person-circle me-2 text-secondary"></i> ${student.firstName} ${student.lastName}</td>
+                                <td><span class="text-info">${student.facultyNumber}</span></td>
+                                <td class="text-muted">${student.email}</td>
+                                <td><span class="badge bg-success bg-opacity-75 px-2 py-1 rounded-pill">Нов запис</span></td>
+                            </tr>
+                            `;
+                            tableBody.innerHTML += row; 
+                        });
+                    })
+                    .catch(error => console.error('Грешка при зареждане на таблицата:', error));
             }
 
-            // Зареждаме данните веднага при отваряне на страницата
+            
             loadStats();
 
-            // Логика за бутона "Симулирай записване"
+            
             document.getElementById('add-student-btn').addEventListener('click', function() {
                 let btn = this;
                 let originalText = btn.innerHTML;
                 
-                // Променяме вида на бутона, докато записва
+                
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Обработка...';
                 btn.disabled = true;
 
-                // Изпращаме POST заявка към бекенда
+                
                 fetch('/api/dashboard/add-demo-student', { method: 'POST' })
                     .then(response => response.json())
                     .then(data => {
-                        // Щом бекендът е готов и е записал студента в базата, презареждаме статистиката!
+                        
                         loadStats();
                     })
                     .finally(() => {
-                        // Връщаме бутона в нормално състояние
+                        
                         btn.innerHTML = originalText;
                         btn.disabled = false;
                     });

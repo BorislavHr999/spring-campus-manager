@@ -49,5 +49,9 @@ public class DashboardController {
         studentRepository.save(student);
 
         return Map.of("status", "success");
+
+        @GetMapping("/latest-students")
+    public java.util.List<Student> getLatestStudents() {
+        return studentRepository.findTop5ByOrderByIdDesc();
     }
 }
