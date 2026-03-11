@@ -12,7 +12,8 @@
         .text-gradient { background: linear-gradient(45deg, #0d6efd, #0dcaf0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
         .table-custom { background-color: #1e1e1e; border-radius: 10px; overflow: hidden; }
         .modal-content { background-color: #1e1e1e; border: 1px solid #3d3d3d; }
-        .form-control { background-color: #2d2d2d; color: #fff; border: 1px solid #4d4d4d; }
+        .form-control, .form-select { background-color: #2d2d2d; color: #fff; border: 1px solid #4d4d4d; }
+        .form-control:focus, .form-select:focus { background-color: #3d3d3d; color: #fff; border-color: #0d6efd; box-shadow: none; }
     </style>
 </head>
 <body>
@@ -30,8 +31,8 @@
 
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom border-secondary">
-                    <h1 class="h2 fw-light">Управление на курсове</h1>
-                    <button class="btn btn-outline-info btn-sm rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#courseModal">
+                    <h1 class="h2 fw-light">Управление на курсове и връзки</h1>
+                    <button class="btn btn-outline-info btn-sm rounded-pill px-3 shadow-sm" onclick="openCreateModal()">
                         <i class="bi bi-plus-circle-fill me-1"></i> Нов Курс
                     </button>
                 </div>
@@ -43,6 +44,7 @@
                                 <th class="py-3 px-4">ID</th>
                                 <th class="py-3">Дисциплина</th>
                                 <th class="py-3">Кредити</th>
+                                <th class="py-3">Преподавател</th>
                                 <th class="py-3 text-end px-4">Управление</th>
                             </tr>
                         </thead>
@@ -57,24 +59,30 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header border-secondary">
-                    <h5 class="modal-title">Добавяне на нова дисциплина</h5>
+                    <h5 class="modal-title" id="modalTitle">Курс</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="courseForm">
-                        <div class="mb-3">
+                        <input type="hidden" id="courseId"> <div class="mb-3">
                             <label class="form-label text-muted small">Име на курса</label>
-                            <input type="text" class="form-control" id="courseName" required placeholder="Напр. Структури от данни">
+                            <input type="text" class="form-control" id="courseName" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label text-muted small">Брой кредити (ECTS)</label>
-                            <input type="number" class="form-control" id="courseCredits" required placeholder="Напр. 6">
+                            <input type="number" class="form-control" id="courseCredits" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Назначен преподавател</label>
+                            <select class="form-select" id="professorSelect">
+                                <option value="">-- Без преподавател --</option>
+                            </select>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer border-secondary">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отказ</button>
-                    <button type="button" class="btn btn-info text-white" id="save-course-btn">Запази курса</button>
+                    <button type="button" class="btn btn-info text-white" id="save-course-btn">Запази промените</button>
                 </div>
             </div>
         </div>
@@ -83,7 +91,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Зареждане на курсове
+            const courseModal = new bootstrap.Modal(document.getElementById('courseModal'));
+
+            // 1. Зареждане на всички курсове
             window.loadAllCourses = function() {
                 fetch('/api/dashboard/all-courses')
                     .then(r => r.json())
@@ -91,47 +101,103 @@
                         let tableBody = document.getElementById('all-courses-tbody');
                         tableBody.innerHTML = '';
                         courses.forEach(c => {
+                            let profName = c.professor ? `${c.professor.firstName} ${c.professor.lastName}` : '<span class="text-muted">Няма</span>';
+                            let profId = c.professor ? c.professor.id : "";
+                            
                             tableBody.innerHTML += `
                             <tr>
                                 <td class="px-4 py-3 text-secondary">#${c.id}</td>
                                 <td><i class="bi bi-book me-2 text-info"></i> ${c.name}</td>
                                 <td><span class="badge bg-info bg-opacity-25 text-info">${c.credits} ECTS</span></td>
+                                <td><i class="bi bi-person-badge me-1 text-muted"></i> ${profName}</td>
                                 <td class="text-end px-4">
-                                    <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteCourse(${c.id})"><i class="bi bi-trash"></i></button>
+                                    <button class="btn btn-outline-light btn-sm rounded-circle me-2" 
+                                            onclick="openEditModal(${c.id}, '${c.name}', ${c.credits}, '${profId}')">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteCourse(${c.id})">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </td>
                             </tr>`;
                         });
                     });
             };
 
-            window.loadAllCourses();
-
-            // Триене
-            window.deleteCourse = function(id) {
-                if(confirm('Изтриване на курса?')) {
-                    fetch('/api/dashboard/delete-course/' + id, { method: 'DELETE' }).then(() => loadAllCourses());
-                }
+            // 2. Зареждане на професорите в падащото меню
+            window.loadProfessorsToSelect = function() {
+                fetch('/api/dashboard/all-professors')
+                    .then(r => r.json())
+                    .then(profs => {
+                        let select = document.getElementById('professorSelect');
+                        select.innerHTML = '<option value="">-- Без преподавател --</option>';
+                        profs.forEach(p => {
+                            select.innerHTML += `<option value="${p.id}">${p.firstName} ${p.lastName}</option>`;
+                        });
+                    });
             };
 
-            // ЗАПАЗВАНЕ НА РЕАЛЕН КУРС
+            // 3. Отваряне за Създаване
+            window.openCreateModal = function() {
+                document.getElementById('modalTitle').innerText = "Добавяне на нов курс";
+                document.getElementById('courseId').value = "";
+                document.getElementById('courseForm').reset();
+                loadProfessorsToSelect();
+                courseModal.show();
+            };
+
+            // 4. Отваряне за Редактиране
+            window.openEditModal = function(id, name, credits, profId) {
+                document.getElementById('modalTitle').innerText = "Редактиране на курс";
+                document.getElementById('courseId').value = id;
+                document.getElementById('courseName').value = name;
+                document.getElementById('courseCredits').value = credits;
+                
+                // Зареждаме професорите и след това селектираме правилния
+                fetch('/api/dashboard/all-professors')
+                    .then(r => r.json())
+                    .then(profs => {
+                        let select = document.getElementById('professorSelect');
+                        select.innerHTML = '<option value="">-- Без преподавател --</option>';
+                        profs.forEach(p => {
+                            select.innerHTML += `<option value="${p.id}">${p.firstName} ${p.lastName}</option>`;
+                        });
+                        select.value = profId;
+                        courseModal.show();
+                    });
+            };
+
+            // 5. Запис (POST или PUT)
             document.getElementById('save-course-btn').addEventListener('click', function() {
-                let newCourse = {
+                let id = document.getElementById('courseId').value;
+                let data = {
                     name: document.getElementById('courseName').value,
-                    credits: document.getElementById('courseCredits').value
+                    credits: document.getElementById('courseCredits').value,
+                    professorId: document.getElementById('professorSelect').value
                 };
 
-                fetch('/api/dashboard/add-real-course', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newCourse)
-                })
-                .then(() => {
-                    bootstrap.Modal.getInstance(document.getElementById('courseModal')).hide();
-                    document.getElementById('courseForm').reset();
+                let url = id ? `/api/dashboard/update-course/${id}` : '/api/dashboard/add-real-course';
+                let method = id ? 'PUT' : 'POST';
+
+                fetch(url, {
+                    method: method,
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                }).then(() => {
+                    courseModal.hide();
                     loadAllCourses();
                 });
             });
+
+            // Първоначално зареждане
+            loadAllCourses();
         });
+
+        window.deleteCourse = function(id) {
+            if(confirm('Изтриване на курса?')) {
+                fetch('/api/dashboard/delete-course/' + id, { method: 'DELETE' }).then(() => loadAllCourses());
+            }
+        };
     </script>
 </body>
 </html>
