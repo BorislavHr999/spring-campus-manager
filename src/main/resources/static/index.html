@@ -31,8 +31,11 @@
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
                     <h1 class="h2 fw-light">Аналитичен Център</h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill"><i class="bi bi-rocket-takeoff me-2"></i> Версия 2.0 (DEV)</span>
+                    <div class="btn-toolbar mb-2 mb-md-0 d-flex gap-2">
+                        <button id="add-student-btn" class="btn btn-outline-success btn-sm rounded-pill px-3 shadow-sm">
+                            <i class="bi bi-person-plus-fill me-1"></i> Симулирай записване
+                        </button>
+                        <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill d-flex align-items-center"><i class="bi bi-rocket-takeoff me-2"></i> Версия 2.0 (DEV)</span>
                     </div>
                 </div>
 
@@ -108,19 +111,51 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Извикваме нашия нов REST контролер
-            fetch('/api/dashboard/stats')
-                .then(response => response.json()) // Превръщаме отговора в JSON
-                .then(data => {
-                    // Взимаме данните и ги слагаме в HTML картите
-                    document.getElementById('total-students').innerText = data.totalStudents;
-                    document.getElementById('active-courses').innerText = data.activeCourses;
-                })
-                .catch(error => {
-                    console.error('Грешка при зареждане на данните:', error);
-                    document.getElementById('total-students').innerText = 'Грешка';
-                    document.getElementById('active-courses').innerText = 'Грешка';
-                });
+            
+            // Функция за зареждане на данните от базата
+            function loadStats() {
+                // Показваме лоудър, докато чакаме отговора
+                document.getElementById('total-students').innerHTML = '<span class="spinner-border spinner-border-sm text-primary"></span>';
+                
+                fetch('/api/dashboard/stats')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Опресняваме картите с реалните данни
+                        document.getElementById('total-students').innerText = data.totalStudents;
+                        document.getElementById('active-courses').innerText = data.activeCourses;
+                    })
+                    .catch(error => {
+                        console.error('Грешка:', error);
+                        document.getElementById('total-students').innerText = 'Грешка';
+                        document.getElementById('active-courses').innerText = 'Грешка';
+                    });
+            }
+
+            // Зареждаме данните веднага при отваряне на страницата
+            loadStats();
+
+            // Логика за бутона "Симулирай записване"
+            document.getElementById('add-student-btn').addEventListener('click', function() {
+                let btn = this;
+                let originalText = btn.innerHTML;
+                
+                // Променяме вида на бутона, докато записва
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Обработка...';
+                btn.disabled = true;
+
+                // Изпращаме POST заявка към бекенда
+                fetch('/api/dashboard/add-demo-student', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Щом бекендът е готов и е записал студента в базата, презареждаме статистиката!
+                        loadStats();
+                    })
+                    .finally(() => {
+                        // Връщаме бутона в нормално състояние
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
+            });
         });
     </script>
 </body>
