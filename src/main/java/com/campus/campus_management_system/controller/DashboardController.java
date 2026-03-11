@@ -124,6 +124,12 @@ public class DashboardController {
         return Map.of("status", "success");
     }
 
+    @PostMapping("/add-real-professor")
+    public Map<String, String> addRealProfessor(@RequestBody Professor professor) {
+        professorRepository.save(professor);
+        return Map.of("status", "success");
+    }
+
     @DeleteMapping("/delete-professor/{id}")
     public Map<String, String> deleteProfessor(@PathVariable Long id) {
         if (professorRepository.existsById(id)) {
