@@ -62,4 +62,8 @@ public class DashboardController {
         }
         return Map.of("status", "error");
     }
+
+    @GetMapping("/all-students")
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
 }
