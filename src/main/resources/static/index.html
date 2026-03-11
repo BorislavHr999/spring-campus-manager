@@ -31,8 +31,11 @@
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
                     <h1 class="h2 fw-light">Аналитичен Център</h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill"><i class="bi bi-rocket-takeoff me-2"></i> Версия 2.0 (DEV)</span>
+                    <div class="btn-toolbar mb-2 mb-md-0 d-flex gap-2">
+                        <button id="add-student-btn" class="btn btn-outline-success btn-sm rounded-pill px-3 shadow-sm">
+                            <i class="bi bi-person-plus-fill me-1"></i> Записване
+                        </button>
+                        <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill d-flex align-items-center"><i class="bi bi-rocket-takeoff me-2"></i> Версия 2.0 (DEV)</span>
                     </div>
                 </div>
 
@@ -42,7 +45,9 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted text-uppercase mb-1">Регистрирани студенти</h6>
-                                    <h2 class="mb-0 fw-bold">2,048</h2>
+                                    <h2 class="mb-0 fw-bold" id="total-students">
+                                        <span class="spinner-border spinner-border-sm text-primary"></span>
+                                    </h2>
                                 </div>
                                 <div class="bg-primary bg-opacity-25 p-3 rounded-circle">
                                     <i class="bi bi-people-fill fs-3 text-primary"></i>
@@ -55,7 +60,9 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted text-uppercase mb-1">Активни курсове</h6>
-                                    <h2 class="mb-0 fw-bold">128</h2>
+                                    <h2 class="mb-0 fw-bold" id="active-courses">
+                                        <span class="spinner-border spinner-border-sm text-success"></span>
+                                    </h2>
                                 </div>
                                 <div class="bg-success bg-opacity-25 p-3 rounded-circle">
                                     <i class="bi bi-journal-bookmark-fill fs-3 text-success"></i>
@@ -101,5 +108,55 @@
             </main>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // Функция за зареждане на данните от базата
+            function loadStats() {
+                // Показваме лоудър, докато чакаме отговора
+                document.getElementById('total-students').innerHTML = '<span class="spinner-border spinner-border-sm text-primary"></span>';
+                
+                fetch('/api/dashboard/stats')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Опресняваме картите с реалните данни
+                        document.getElementById('total-students').innerText = data.totalStudents;
+                        document.getElementById('active-courses').innerText = data.activeCourses;
+                    })
+                    .catch(error => {
+                        console.error('Грешка:', error);
+                        document.getElementById('total-students').innerText = 'Грешка';
+                        document.getElementById('active-courses').innerText = 'Грешка';
+                    });
+            }
+
+            // Зареждаме данните веднага при отваряне на страницата
+            loadStats();
+
+            // Логика за бутона "Симулирай записване"
+            document.getElementById('add-student-btn').addEventListener('click', function() {
+                let btn = this;
+                let originalText = btn.innerHTML;
+                
+                // Променяме вида на бутона, докато записва
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Обработка...';
+                btn.disabled = true;
+
+                // Изпращаме POST заявка към бекенда
+                fetch('/api/dashboard/add-demo-student', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Щом бекендът е готов и е записал студента в базата, презареждаме статистиката!
+                        loadStats();
+                    })
+                    .finally(() => {
+                        // Връщаме бутона в нормално състояние
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
+            });
+        });
+    </script>
 </body>
 </html>
