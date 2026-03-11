@@ -66,4 +66,5 @@ public class DashboardController {
     @GetMapping("/all-students")
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
+    }
 }
