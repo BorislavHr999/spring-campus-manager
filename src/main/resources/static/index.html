@@ -103,15 +103,16 @@
         document.addEventListener("DOMContentLoaded", function() {
             
             
-            function loadStats() {
+            window.loadStats = function() {
+                document.getElementById('total-students').innerHTML = '<span class="spinner-border spinner-border-sm text-primary"></span>';
+                
                 
                 fetch('/api/dashboard/stats')
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById('total-students').innerText = data.totalStudents;
                         document.getElementById('active-courses').innerText = data.activeCourses;
-                    })
-                    .catch(error => console.error('Грешка при зареждане на статистика:', error));
+                    });
 
                 
                 fetch('/api/dashboard/latest-students')
@@ -120,49 +121,58 @@
                         let tableBody = document.getElementById('latest-students-tbody');
                         tableBody.innerHTML = ''; 
                         
-                        
                         if (students.length === 0) {
-                            tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Няма записани студенти все още.</td></tr>';
+                            tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Няма записани студенти все още.</td></tr>';
                             return;
                         }
 
-                        
                         students.forEach(student => {
                             let row = `
                             <tr class="new-row">
                                 <td class="px-4 py-3"><i class="bi bi-person-circle me-2 text-secondary"></i> ${student.firstName} ${student.lastName}</td>
                                 <td><span class="text-info">${student.facultyNumber}</span></td>
                                 <td class="text-muted">${student.email}</td>
-                                <td><span class="badge bg-success bg-opacity-75 px-2 py-1 rounded-pill">Нов запис</span></td>
+                                <td><span class="badge bg-success bg-opacity-75 px-2 py-1 rounded-pill">Активен</span></td>
+                                <td class="text-end px-4">
+                                    <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteStudent(${student.id})" title="Изтрий">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </td>
                             </tr>
                             `;
-                            tableBody.innerHTML += row; 
+                            tableBody.innerHTML += row;
                         });
-                    })
-                    .catch(error => console.error('Грешка при зареждане на таблицата:', error));
-            }
+                    });
+            };
+
+           
+            window.loadStats();
 
             
-            loadStats();
+            window.deleteStudent = function(id) {
+                if(confirm('Сигурен ли си, че искаш да изтриеш този студент?')) {
+                    fetch('/api/dashboard/delete-student/' + id, { method: 'DELETE' })
+                        .then(response => response.json())
+                        .then(data => {
+                            window.loadStats(); 
+                        })
+                        .catch(error => console.error('Грешка при изтриване:', error));
+                }
+            };
 
             
             document.getElementById('add-student-btn').addEventListener('click', function() {
                 let btn = this;
                 let originalText = btn.innerHTML;
-                
-                
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Обработка...';
                 btn.disabled = true;
 
-                
                 fetch('/api/dashboard/add-demo-student', { method: 'POST' })
                     .then(response => response.json())
                     .then(data => {
-                        
-                        loadStats();
+                        window.loadStats();
                     })
                     .finally(() => {
-                        
                         btn.innerHTML = originalText;
                         btn.disabled = false;
                     });

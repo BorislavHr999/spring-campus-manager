@@ -2,10 +2,8 @@ package com.campus.campus_management_system.controller;
 
 import com.campus.campus_management_system.model.entity.Student;
 import com.campus.campus_management_system.repository.StudentRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.campus.campus_management_system.repository.CourseRepository;
+import org.springframework.web.bind.annotation.*; 
 
 import java.util.List;
 import java.util.Map;
@@ -16,29 +14,29 @@ import java.util.Random;
 public class DashboardController {
 
     private final StudentRepository studentRepository;
+    private final CourseRepository courseRepository; 
 
-    public DashboardController(StudentRepository studentRepository) {
+    public DashboardController(StudentRepository studentRepository, CourseRepository courseRepository) {
         this.studentRepository = studentRepository;
+        this.courseRepository = courseRepository;
     }
 
-    // 1. Взимане на статистиката за таблото
     @GetMapping("/stats")
     public Map<String, Object> getStats() {
         long studentCount = studentRepository.count(); 
+        long courseCount = courseRepository.count(); 
         
         return Map.of(
             "totalStudents", studentCount,
-            "activeCourses", 42
+            "activeCourses", courseCount
         );
     }
 
-    // 2. Симулиране на записване (създава нов студент в базата)
     @PostMapping("/add-demo-student")
     public Map<String, String> addDemoStudent() {
         Random rand = new Random();
         int randomId = rand.nextInt(1000, 9999);
 
-        // Създаваме реален обект
         Student student = new Student();
         student.setFirstName("Тест");
         student.setLastName("Студент " + randomId);
@@ -46,15 +44,22 @@ public class DashboardController {
         student.setFacultyNumber("FAC" + randomId);
         student.setAge(20 + rand.nextInt(5));
 
-        // Запазваме го в базата
         studentRepository.save(student);
 
         return Map.of("status", "success");
     }
 
-    // 3. Взимане на последните 5 студента за таблицата
     @GetMapping("/latest-students")
     public List<Student> getLatestStudents() {
         return studentRepository.findTop5ByOrderByIdDesc();
+    }
+
+    @DeleteMapping("/delete-student/{id}")
+    public Map<String, String> deleteStudent(@PathVariable Long id) {
+        if (studentRepository.existsById(id)) {
+            studentRepository.deleteById(id);
+            return Map.of("status", "deleted");
+        }
+        return Map.of("status", "error");
     }
 }
