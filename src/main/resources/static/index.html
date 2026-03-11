@@ -42,7 +42,9 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted text-uppercase mb-1">Регистрирани студенти</h6>
-                                    <h2 class="mb-0 fw-bold">2,048</h2>
+                                    <h2 class="mb-0 fw-bold" id="total-students">
+                                        <span class="spinner-border spinner-border-sm text-primary"></span>
+                                    </h2>
                                 </div>
                                 <div class="bg-primary bg-opacity-25 p-3 rounded-circle">
                                     <i class="bi bi-people-fill fs-3 text-primary"></i>
@@ -55,7 +57,9 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="text-muted text-uppercase mb-1">Активни курсове</h6>
-                                    <h2 class="mb-0 fw-bold">128</h2>
+                                    <h2 class="mb-0 fw-bold" id="active-courses">
+                                        <span class="spinner-border spinner-border-sm text-success"></span>
+                                    </h2>
                                 </div>
                                 <div class="bg-success bg-opacity-25 p-3 rounded-circle">
                                     <i class="bi bi-journal-bookmark-fill fs-3 text-success"></i>
@@ -101,5 +105,23 @@
             </main>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Извикваме нашия нов REST контролер
+            fetch('/api/dashboard/stats')
+                .then(response => response.json()) // Превръщаме отговора в JSON
+                .then(data => {
+                    // Взимаме данните и ги слагаме в HTML картите
+                    document.getElementById('total-students').innerText = data.totalStudents;
+                    document.getElementById('active-courses').innerText = data.activeCourses;
+                })
+                .catch(error => {
+                    console.error('Грешка при зареждане на данните:', error);
+                    document.getElementById('total-students').innerText = 'Грешка';
+                    document.getElementById('active-courses').innerText = 'Грешка';
+                });
+        });
+    </script>
 </body>
 </html>

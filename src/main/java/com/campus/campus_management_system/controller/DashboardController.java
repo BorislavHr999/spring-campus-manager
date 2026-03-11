@@ -18,7 +18,6 @@ public class DashboardController {
 
     @GetMapping("/stats")
     public Map<String, Object> getStats() {
-        
         long studentCount = studentRepository.count(); 
         
         return Map.of(
