@@ -4,13 +4,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.EqualsAndHashCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import lombok.ToString;
-import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
@@ -29,18 +28,23 @@ public class Student {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Address address;
 
     @ManyToOne
     @JoinColumn(name = "department_id")
     @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Department department;
 
     @ManyToMany(mappedBy = "student", cascade = CascadeType.ALL)
     @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<Club> clubs;
 
-    // Релацията, която добавяме сега
     @ManyToMany
     @JoinTable(
         name = "student_course",
