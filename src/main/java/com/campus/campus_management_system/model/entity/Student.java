@@ -46,5 +46,7 @@ public class Student {
         inverseJoinColumns = @JoinColumn(name = "course_id")
     )
     @JsonIgnoreProperties("students")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Course> courses = new ArrayList<>();
 }

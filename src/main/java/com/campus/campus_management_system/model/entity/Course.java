@@ -25,5 +25,7 @@ public class Course {
 
     @ManyToMany(mappedBy = "courses")
     @JsonIgnoreProperties("courses")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Student> students = new ArrayList<>();
 }
