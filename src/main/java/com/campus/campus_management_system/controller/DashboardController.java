@@ -133,6 +133,13 @@ public class DashboardController {
     @DeleteMapping("/delete-professor/{id}")
     public Map<String, String> deleteProfessor(@PathVariable Long id) {
         if (professorRepository.existsById(id)) {
+            List<Course> allCourses = courseRepository.findAll();
+            for (Course course : allCourses) {
+                if (course.getProfessor() != null && course.getProfessor().getId().equals(id)) {
+                    course.setProfessor(null); 
+                    courseRepository.save(course);
+                }
+            }
             professorRepository.deleteById(id);
             return Map.of("status", "deleted");
         }
