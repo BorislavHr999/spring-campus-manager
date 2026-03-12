@@ -91,6 +91,12 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label text-muted small">Възраст</label>
                                 <input type="number" class="form-control" id="age" required placeholder="Напр. 21">
+                                <div class="mb-3">
+                            <label class="form-label text-muted small">Записани курсове (Мулти-избор)</label>
+                            <select multiple class="form-control" id="courses" style="height: 100px;">
+                                </select>
+                            <div class="form-text text-secondary small">Задръжте Ctrl/Cmd за избор на няколко курса.</div>
+                        </div>
                             </div>
                         </div>
                     </form>
@@ -137,6 +143,25 @@
                     });
             };
 
+            window.loadCoursesForDropdown = function() {
+                
+                fetch('/api/courses') 
+                    .then(response => response.json())
+                    .then(courses => {
+                        let selectElement = document.getElementById('courses');
+                        selectElement.innerHTML = ''; 
+                        courses.forEach(course => {
+                            let option = document.createElement('option');
+                            option.value = course.id;
+                            option.text = `${course.name} (${course.credits} кр.)`;
+                            selectElement.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Грешка при зареждане на курсове:', error));
+            };
+
+            window.loadCoursesForDropdown();
+
             window.loadAllStudents();
 
             // 2. Триене
@@ -148,14 +173,30 @@
             };
 
             // 3. НОВОТО: Запазване на реален студент от формата
+            
+                // Обновено: Триене
+            window.deleteStudent = function(id) {
+                if(confirm('Сигурен ли си, че искаш да изтриеш този студент завинаги?')) {
+                    fetch('/api/dashboard/delete-student/' + id, { method: 'DELETE' })
+                        .then(() => window.loadAllStudents());
+                }
+            };
+
+            // Обновено: Запазване на реален студент от формата (вкл. курсове)
             document.getElementById('save-student-btn').addEventListener('click', function() {
+                
+                // Взимаме избраните ID-та на курсове от падащото меню
+                let selectedCoursesIds = Array.from(document.getElementById('courses').selectedOptions)
+                                             .map(option => ({ id: option.value }));
+
                 // Събираме данните от полетата в JavaScript обект
                 let newStudent = {
                     firstName: document.getElementById('firstName').value,
                     lastName: document.getElementById('lastName').value,
                     email: document.getElementById('email').value,
                     facultyNumber: document.getElementById('facultyNumber').value,
-                    age: document.getElementById('age').value
+                    age: document.getElementById('age').value,
+                    courses: selectedCoursesIds // НОВО: Добавяме масива с курсове
                 };
 
                 // Изпращаме ги като JSON към новия бекенд метод
@@ -164,7 +205,10 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newStudent)
                 })
-                .then(response => response.json())
+                .then(response => {
+                     if (!response.ok) throw new Error('Грешка при запис на сървъра');
+                     return response.json();
+                })
                 .then(data => {
                     // Скриваме модала
                     let modalElement = document.getElementById('studentModal');
@@ -177,7 +221,10 @@
                     // Презареждаме таблицата, за да видим новия запис
                     window.loadAllStudents();
                 })
-                .catch(error => console.error('Грешка при запис:', error));
+                .catch(error => {
+                    console.error('Грешка при запис:', error);
+                    alert("Възникна грешка при запазването. Проверете конзолата.");
+                });
             });
         });
     </script>
