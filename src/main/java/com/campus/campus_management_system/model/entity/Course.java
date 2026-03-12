@@ -3,6 +3,9 @@ package com.campus.campus_management_system.model.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.ArrayList;
+import java util.List;
 
 @Entity
 @Data
