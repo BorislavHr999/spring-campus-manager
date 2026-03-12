@@ -20,4 +20,9 @@ public class Professor {
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
+
+    private String title;
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) {this.title = title;}
 }

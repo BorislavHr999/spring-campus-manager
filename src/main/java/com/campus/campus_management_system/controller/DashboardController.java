@@ -139,6 +139,18 @@ public class DashboardController {
         return Map.of("status", "error");
     }
 
+    @PutMapping("/update-professor/{id}")
+    public Map<String, String> updateProfessor(@PathVariable Long id, @RequestBody Professor updatedProf) {
+        return professorRepository.findById(id).map(prof -> {
+            prof.setTitle(updatedProf.getTitle());
+            prof.setFirstName(updatedProf.getFirstName());
+            prof.setLastName(updatedProf.getLastName());
+            prof.setEmail(updatedProf.getEmail());
+            professorRepository.save(prof);
+            return Map.of("status", "success");
+        }).orElse(Map.of("status", "error"));
+    }
+
     @PutMapping("/update-course/{id}")
     public Map<String, String> updateCourse(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         return courseRepository.findById(id).map(course -> {
