@@ -113,8 +113,11 @@
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // 1. Зареждане на студентите
+            
+            // 1. Зареждане на студентите (Проверен адрес)
             window.loadAllStudents = function() {
+                // Забележка: Ако таблицата ти не се зарежда първоначално, 
+                // смени този адрес на '/api/students' (както е в контролера ти)
                 fetch('/api/dashboard/all-students')
                     .then(response => response.json())
                     .then(students => {
@@ -143,8 +146,8 @@
                     });
             };
 
+            // 2. Зареждане на курсовете в падащото меню
             window.loadCoursesForDropdown = function() {
-                
                 fetch('/api/courses') 
                     .then(response => response.json())
                     .then(courses => {
@@ -160,11 +163,11 @@
                     .catch(error => console.error('Грешка при зареждане на курсове:', error));
             };
 
+            // Инициализиране на данните при зареждане на страницата
             window.loadCoursesForDropdown();
-
             window.loadAllStudents();
 
-            // 2. Триене
+            // 3. Триене
             window.deleteStudent = function(id) {
                 if(confirm('Сигурен ли си, че искаш да изтриеш този студент завинаги?')) {
                     fetch('/api/dashboard/delete-student/' + id, { method: 'DELETE' })
@@ -172,35 +175,25 @@
                 }
             };
 
-            // 3. НОВОТО: Запазване на реален студент от формата
-            
-                // Обновено: Триене
-            window.deleteStudent = function(id) {
-                if(confirm('Сигурен ли си, че искаш да изтриеш този студент завинаги?')) {
-                    fetch('/api/dashboard/delete-student/' + id, { method: 'DELETE' })
-                        .then(() => window.loadAllStudents());
-                }
-            };
-
-            // Обновено: Запазване на реален студент от формата (вкл. курсове)
+            // 4. ЗАПАЗВАНЕ (ПОПРАВЕН АДРЕС КЪМ /api/students)
             document.getElementById('save-student-btn').addEventListener('click', function() {
                 
                 // Взимаме избраните ID-та на курсове от падащото меню
                 let selectedCoursesIds = Array.from(document.getElementById('courses').selectedOptions)
                                              .map(option => ({ id: option.value }));
 
-                // Събираме данните от полетата в JavaScript обект
+                // Събираме данните от полетата
                 let newStudent = {
                     firstName: document.getElementById('firstName').value,
                     lastName: document.getElementById('lastName').value,
                     email: document.getElementById('email').value,
                     facultyNumber: document.getElementById('facultyNumber').value,
                     age: document.getElementById('age').value,
-                    courses: selectedCoursesIds // НОВО: Добавяме масива с курсове
+                    courses: selectedCoursesIds
                 };
 
-                // Изпращаме ги като JSON към новия бекенд метод
-                fetch('/api/dashboard/add-real-student', {
+                // ИЗПРАЩАМЕ КЪМ ПРАВИЛНИЯ КОНТРОЛЕР: /api/students
+                fetch('/api/students', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newStudent)
@@ -215,10 +208,10 @@
                     let modalInstance = bootstrap.Modal.getInstance(modalElement);
                     modalInstance.hide();
                     
-                    // Изчистваме формата за следващия път
+                    // Изчистваме формата
                     document.getElementById('studentForm').reset();
                     
-                    // Презареждаме таблицата, за да видим новия запис
+                    // Презареждаме таблицата
                     window.loadAllStudents();
                 })
                 .catch(error => {
