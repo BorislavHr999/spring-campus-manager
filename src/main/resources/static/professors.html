@@ -123,8 +123,8 @@
                             return;
                         }
 
-                        data.forEach(p => {
-                            // Проверяваме дали има титла, за да не пише "null" при старите записи
+                       data.forEach((p, index) => {
+                            let rowNumber = index + 1;
                             let displayTitle = p.title ? p.title + ' ' : '';
                             
                             let row = `
