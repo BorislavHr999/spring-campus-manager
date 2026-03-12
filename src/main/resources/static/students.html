@@ -43,15 +43,16 @@
 
                 <div class="table-custom p-1 shadow">
                     <table class="table table-dark table-hover table-borderless align-middle mb-0">
-                        <thead class="border-bottom border-secondary text-muted">
-                            <tr>
-                                <th class="py-3 px-4">ID</th>
-                                <th class="py-3">Студент</th>
-                                <th class="py-3">Фак. Номер</th>
-                                <th class="py-3">Имейл</th>
-                                <th class="py-3 text-end px-4">Управление</th>
-                            </tr>
-                        </thead>
+                       <thead class="border-bottom border-secondary text-muted">
+                <tr>
+                    <th class="py-3 px-4">ID</th>
+                    <th class="py-3">Студент</th>
+                    <th class="py-3">Фак. Номер</th>
+                    <th class="py-3">Имейл</th>
+                    <th class="py-3">Записани курсове</th>
+                    <th class="py-3 text-end px-4">Управление</th>
+                </tr>
+                     </thead>
                         <tbody id="all-students-tbody">
                             </tbody>
                     </table>
@@ -128,12 +129,25 @@
                             return;
                         }
                         students.forEach(student => {
+                            // 1. Подготвяме HTML-а за курсовете (баджчета)
+                            let coursesHtml = '';
+                            if (student.courses && student.courses.length > 0) {
+                                student.courses.forEach(course => {
+                                    // Създаваме син бадж за всеки курс
+                                    coursesHtml += `<span class="badge bg-info text-dark me-1 mb-1 shadow-sm">${course.name}</span>`;
+                                });
+                            } else {
+                                coursesHtml = '<span class="text-muted small fst-italic">Няма курсове</span>';
+                            }
+
+                            // 2. Рисуваме целия ред, като добавяме coursesHtml в новата колона
                             let row = `
                             <tr class="new-row">
                                 <td class="px-4 py-3 text-secondary">#${student.id}</td>
                                 <td><i class="bi bi-person-circle me-2 text-primary"></i> ${student.firstName} ${student.lastName}</td>
                                 <td><span class="text-info">${student.facultyNumber}</span></td>
                                 <td class="text-muted">${student.email}</td>
+                                <td>${coursesHtml}</td>
                                 <td class="text-end px-4">
                                     <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteStudent(${student.id})" title="Изтрий">
                                         <i class="bi bi-trash-fill"></i>
