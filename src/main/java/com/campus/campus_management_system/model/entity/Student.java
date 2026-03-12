@@ -7,6 +7,7 @@ import lombok.ToString;
 import lombok.EqualsAndHashCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -39,12 +40,26 @@ public class Student {
     @EqualsAndHashCode.Exclude
     private Department department;
 
-    @ManyToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    // --- ТОВА ИЗТРИХ БЕЗ ДА ИСКАМ ---
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @JsonIgnore
+    private Set<Enrollment> enrollments;
+
+    // --- ТОВА БЕХ СЧУПИЛ, СЕГА Е ОПРАВЕНО ---
+    @ManyToMany
+    @JoinTable(
+        name = "student_club",
+        joinColumns = @JoinColumn(name = "student_id"),
+        inverseJoinColumns = @JoinColumn(name = "club_id")
+    )
     @JsonIgnore
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<Club> clubs;
 
+    // --- ВРЪЗКАТА С КУРСОВЕТЕ ---
     @ManyToMany
     @JoinTable(
         name = "student_course",
