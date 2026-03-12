@@ -5,14 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
 @NoArgsConstructor
 public class Student {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,20 +34,11 @@ public class Student {
     @JsonIgnore
     private Department department;
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @JsonIgnore
-    private Set<Enrollment> enrollments;
-
-    @ManyToMany
-    @JoinTable(
-            name = "student_club",
-            joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "club_id")
-    )
+    @ManyToMany(mappedBy = "student", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<Club> clubs;
 
+    // Релацията, която добавяме сега
     @ManyToMany
     @JoinTable(
         name = "student_course",
