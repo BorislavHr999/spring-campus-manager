@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -43,4 +45,13 @@ public class Student {
     )
     @JsonIgnore
     private Set<Club> clubs;
+
+    @ManyToMany
+    @JoinTable(
+        name = "student_course",
+        joinColumns = @JoinColumn(name = "student_id"),
+        inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    @JsonIgnoreProperties("students")
+    private List<Course> courses = new ArrayList<>();
 }

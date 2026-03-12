@@ -19,4 +19,8 @@ public class Course {
     @ManyToOne
     @JoinColumn(name = "professor_id")
     private Professor professor;
+
+    @ManyToMany(mappedBy = "courses")
+    @JsonIgnoreProperties("courses")
+    private List<Student> students = new ArrayList<>();
 }
