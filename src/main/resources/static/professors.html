@@ -11,11 +11,11 @@
         .sidebar { background-color: #1e1e1e; min-height: 100vh; box-shadow: 2px 0 5px rgba(0,0,0,0.5); }
         .text-gradient { background: linear-gradient(45deg, #0d6efd, #0dcaf0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
         .table-custom { background-color: #1e1e1e; border-radius: 10px; overflow: hidden; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .new-row { animation: fadeIn 0.5s ease-out; }
         .modal-content { background-color: #1e1e1e; border: 1px solid #3d3d3d; }
         .form-control, .form-select { background-color: #2d2d2d; color: #fff; border: 1px solid #4d4d4d; }
         .form-control:focus, .form-select:focus { background-color: #3d3d3d; color: #fff; border-color: #0d6efd; box-shadow: none; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .new-row { animation: fadeIn 0.5s ease-out; }
     </style>
 </head>
 <body>
@@ -32,9 +32,10 @@
             </nav>
 
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
-                <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom border-secondary">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
                     <h1 class="h2 fw-light"><i class="bi bi-person-workspace me-2"></i> Академичен състав</h1>
-                    <button class="btn btn-outline-warning btn-sm rounded-pill px-3 shadow-sm text-white" onclick="openCreateModal()">
+                    
+                    <button class="btn btn-outline-warning btn-sm rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#professorModal">
                         <i class="bi bi-person-plus-fill me-1"></i> Нов Преподавател
                     </button>
                 </div>
@@ -45,17 +46,12 @@
                             <tr>
                                 <th class="py-3 px-4">ID</th>
                                 <th class="py-3">Преподавател</th>
-                                <th class="py-3">Служебен Имейл</th>
+                                <th class="py-3">Имейл</th>
                                 <th class="py-3 text-end px-4">Управление</th>
                             </tr>
                         </thead>
                         <tbody id="all-professors-tbody">
-                            <tr>
-                                <td colspan="4" class="text-center py-4">
-                                    <span class="spinner-border spinner-border-sm text-secondary me-2"></span> Зареждане на данни...
-                                </td>
-                            </tr>
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </main>
@@ -66,137 +62,121 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header border-secondary">
-                    <h5 class="modal-title" id="modalTitle">Регистрация на преподавател</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title"><i class="bi bi-person-badge me-2"></i> Регистрация на преподавател</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="professorForm">
-                        <input type="hidden" id="profId"> <div class="mb-3">
-                            <label class="form-label text-muted small">Академична титла</label>
-                            <select class="form-select" id="profTitle" required>
-                                <option value="ас.">асистент (ас.)</option>
-                                <option value="гл. ас. д-р">главен асистент (гл. ас. д-р)</option>
-                                <option value="доц. д-р">доцент (доц. д-р)</option>
-                                <option value="проф. д-р">професор (проф. д-р)</option>
-                                <option value="акад.">академик (акад.)</option>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Титла</label>
+                            <select class="form-select" id="title">
+                                <option value="Асистент">Асистент</option>
+                                <option value="Гл. Асистент">Гл. Асистент</option>
+                                <option value="Доцент">Доцент</option>
+                                <option value="Професор">Професор</option>
                             </select>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label text-muted small">Име</label>
-                                <input type="text" class="form-control" id="profFirstName" required>
+                                <input type="text" class="form-control" id="firstName" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label text-muted small">Фамилия</label>
-                                <input type="text" class="form-control" id="profLastName" required>
+                                <input type="text" class="form-control" id="lastName" required>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label text-muted small">Служебен имейл</label>
-                            <input type="email" class="form-control" id="profEmail" required>
+                            <input type="email" class="form-control" id="email" required placeholder="name@campus.bg">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer border-secondary">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отказ</button>
-                    <button type="button" class="btn btn-warning" id="save-professor-btn">Запази</button>
+                    <button type="button" class="btn btn-warning text-dark fw-bold" id="save-professor-btn">Запиши в базата</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const professorModal = new bootstrap.Modal(document.getElementById('professorModal'));
-
-            // 1. Зареждане на преподавателите
-            window.loadProfessors = function() {
-                fetch('/api/dashboard/all-professors')
-                    .then(r => r.json())
-                    .then(data => {
+            
+            // 1. Зареждане
+            window.loadAllProfessors = function() {
+                fetch('/api/professors')
+                    .then(response => response.json())
+                    .then(professors => {
                         let tableBody = document.getElementById('all-professors-tbody');
-                        tableBody.innerHTML = '';
-                        
-                        if (data.length === 0) {
-                            tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Няма въведени преподаватели.</td></tr>';
+                        tableBody.innerHTML = ''; 
+                        if (professors.length === 0) {
+                            tableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Няма регистрирани преподаватели.</td></tr>';
                             return;
                         }
-
-                       data.forEach((p, index) => {
-                            let rowNumber = index + 1;
-                            let displayTitle = p.title ? p.title + ' ' : '';
+                        professors.forEach(prof => {
+                            // Ако няма титла (title) в Entity-то ти, просто ще пише 'undefined', можеш да го махнеш отдолу
+                            let titleStr = prof.title ? `<span class="badge bg-secondary me-1">${prof.title}</span>` : '';
                             
                             let row = `
                             <tr class="new-row">
-                                <td class="px-4 py-3 text-secondary">#${p.id}</td>
-                                <td><i class="bi bi-person-badge-fill me-2 text-warning"></i> <strong>${displayTitle}${p.firstName} ${p.lastName}</strong></td>
-                                <td class="text-info"><a href="mailto:${p.email}" class="text-decoration-none text-info">${p.email}</a></td>
+                                <td class="px-4 py-3 text-secondary">#${prof.id}</td>
+                                <td class="fw-bold text-light">${titleStr} ${prof.firstName} ${prof.lastName}</td>
+                                <td class="text-muted"><i class="bi bi-envelope me-1"></i> ${prof.email}</td>
                                 <td class="text-end px-4">
-                                    <button class="btn btn-outline-light btn-sm rounded-circle me-2" 
-                                            onclick="openEditModal(${p.id}, '${p.title || 'ас.'}', '${p.firstName}', '${p.lastName}', '${p.email}')" title="Редактирай">
-                                        <i class="bi bi-pencil-fill"></i>
-                                    </button>
-                                    <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteProf(${p.id})" title="Изтрий">
+                                    <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteProfessor(${prof.id})" title="Изтрий">
                                         <i class="bi bi-trash-fill"></i>
                                     </button>
                                 </td>
-                            </tr>`;
+                            </tr>
+                            `;
                             tableBody.innerHTML += row;
                         });
                     });
             };
 
-            window.loadProfessors();
+            window.loadAllProfessors();
 
             // 2. Триене
-            window.deleteProf = function(id) {
+            window.deleteProfessor = function(id) {
                 if(confirm('Сигурен ли си, че искаш да изтриеш този преподавател?')) {
-                    fetch('/api/dashboard/delete-professor/' + id, { method: 'DELETE' })
-                        .then(() => loadProfessors());
+                    fetch('/api/professors/' + id, { method: 'DELETE' })
+                        .then(() => window.loadAllProfessors());
                 }
             };
 
-            // 3. Отваряне за ДОБАВЯНЕ
-            window.openCreateModal = function() {
-                document.getElementById('modalTitle').innerText = "Добавяне на нов преподавател";
-                document.getElementById('profId').value = "";
-                document.getElementById('professorForm').reset();
-                professorModal.show();
-            };
-
-            // 4. Отваряне за РЕДАКТИРАНЕ
-            window.openEditModal = function(id, title, firstName, lastName, email) {
-                document.getElementById('modalTitle').innerText = "Редактиране на преподавател";
-                document.getElementById('profId').value = id;
-                document.getElementById('profTitle').value = title;
-                document.getElementById('profFirstName').value = firstName;
-                document.getElementById('profLastName').value = lastName;
-                document.getElementById('profEmail').value = email;
-                professorModal.show();
-            };
-
-            // 5. Записване (POST за нов, PUT за съществуващ)
+            // 3. Запазване
             document.getElementById('save-professor-btn').addEventListener('click', function() {
-                let id = document.getElementById('profId').value;
-                let profData = {
-                    title: document.getElementById('profTitle').value,
-                    firstName: document.getElementById('profFirstName').value,
-                    lastName: document.getElementById('profLastName').value,
-                    email: document.getElementById('profEmail').value
+                let newProf = {
+                    title: document.getElementById('title').value,
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value
                 };
 
-                let url = id ? '/api/dashboard/update-professor/' + id : '/api/dashboard/add-real-professor';
-                let method = id ? 'PUT' : 'POST';
-
-                fetch(url, {
-                    method: method,
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(profData)
-                }).then(() => {
-                    professorModal.hide();
-                    loadProfessors();
-                }).catch(error => console.error('Грешка:', error));
+                fetch('/api/professors', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newProf)
+                })
+                .then(response => {
+                     if (!response.ok) throw new Error('Грешка при запис на сървъра');
+                     return response.json();
+                })
+                .then(data => {
+                    let modalElement = document.getElementById('professorModal');
+                    let modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+                    
+                    document.getElementById('professorForm').reset();
+                    window.loadAllProfessors();
+                })
+                .catch(error => {
+                    console.error('Грешка при запис:', error);
+                    alert("Възникна грешка при запазването на преподавателя.");
+                });
             });
         });
     </script>
