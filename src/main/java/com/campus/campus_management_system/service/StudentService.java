@@ -5,6 +5,8 @@ import com.campus.campus_management_system.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -16,10 +18,6 @@ public class StudentService {
 
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
-    }
-
-    public Student createStudent(Student student) {
-        return studentRepository.save(student);
     }
 
     public Student updateStudent(Long id, Student studentDetails) {
@@ -42,4 +40,14 @@ public class StudentService {
     public List<Student> search(Specification<Student> spec) {
         return studentRepository.findAll(spec);
     }
+
+    public Student createStudent(Student student) {
+            if (studentRepository.existsByEmail(student.getEmail())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Този имейл вече е регистриран!");
+            }
+            if (studentRepository.existsByFacultyNumber(student.getFacultyNumber())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Този факултетен номер вече съществува!");
+            }
+            return studentRepository.save(student);
+        }
 }
