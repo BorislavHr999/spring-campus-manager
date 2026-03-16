@@ -8,55 +8,35 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         body { background-color: #121212; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { background-color: #1e1e1e; min-height: 100vh; box-shadow: 2px 0 5px rgba(0,0,0,0.5); }
+        .sidebar { background-color: #1e1e1e; box-shadow: 2px 0 5px rgba(0,0,0,0.5); }
         .text-gradient { background: linear-gradient(45deg, #0d6efd, #0dcaf0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
         .table-custom { background-color: #1e1e1e; border-radius: 10px; overflow: hidden; }
-        
-        .stat-card {
-            border: none;
-            border-radius: 15px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-        }
+        .stat-card { border: none; border-radius: 15px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
         .bg-gradient-students { background: linear-gradient(135deg, #0d6efd 0%, #0043a8 100%); }
         .bg-gradient-courses { background: linear-gradient(135deg, #0dcaf0 0%, #057a92 100%); }
         .bg-gradient-profs { background: linear-gradient(135deg, #ffc107 0%, #b38600 100%); }
-        
-        .stat-icon {
-            font-size: 3rem;
-            opacity: 0.5;
-            position: absolute;
-            right: 20px;
-            bottom: 10px;
-        }
-
-        /* Тъмен контейнер за графиката */
-        .chart-container {
-            background-color: #1e1e1e;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
+        .stat-icon { font-size: 3rem; opacity: 0.5; position: absolute; right: 20px; bottom: 10px; }
+        .chart-container { background-color: #1e1e1e; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
+            
             <nav class="col-md-2 d-none d-md-block sidebar py-4 d-flex flex-column justify-content-between" style="min-height: 100vh;">
                 <div>
                     <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
                     <div class="list-group list-group-flush gap-2 px-2">
-                        <a href="index.html" class="list-group-item list-group-item-action bg-transparent border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
-                        <a href="students.html" class="list-group-item list-group-item-action bg-transparent border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
-                        <a href="courses.html" class="list-group-item list-group-item-action bg-transparent border-0"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
-                        <a href="professors.html" class="list-group-item list-group-item-action bg-transparent border-0"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
+                        <a href="index.html" class="list-group-item list-group-item-action bg-primary text-white rounded border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
+                        <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
+                        <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
+                        <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
                     </div>
                 </div>
 
-                <div class="px-3 mt-auto pb-3"> <hr class="border-secondary">
+                <div class="px-3 mt-auto pb-3">
+                    <hr class="border-secondary">
                     
                     <div class="dropup mb-2">
                         <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -82,27 +62,12 @@
                         </ul>
                     </div>
                 </div>
-
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-globe me-1"></i> <span data-i18n="lang_title">Език</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-dark w-100 shadow">
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('bg')">🇧🇬 Български</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('en')">🇬🇧 English</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('fr')">🇫🇷 Français</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('de')">🇩🇪 Deutsch</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('it')">🇮🇹 Italiano</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('ru')">🇷🇺 Русский</a></li>
-                        </ul>
-                    </div>
-                </div>
             </nav>
+
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
                     <div>
-                        <h1 class="h2 fw-light"><i class="bi bi-speedometer2 me-2"></i> Общ преглед</h1>
-                        <p class="text-muted mb-0">Анализи и данни в реално време.</p>
+                        <h1 class="h2 fw-light"><i class="bi bi-speedometer2 me-2"></i> <span data-i18n="nav_dashboard">Главно табло</span></h1>
                     </div>
                 </div>
 
@@ -110,7 +75,7 @@
                     <div class="col-md-4 mb-3">
                         <div class="card stat-card bg-gradient-students text-white h-100 shadow">
                             <div class="card-body position-relative p-4">
-                                <h5 class="card-title fw-light mb-1">Общо Студенти</h5>
+                                <h5 class="card-title fw-light mb-1" data-i18n="nav_students">Студенти</h5>
                                 <h1 class="display-4 fw-bold mb-0" id="total-students"><span class="spinner-border spinner-border-sm" role="status"></span></h1>
                                 <i class="bi bi-people-fill stat-icon"></i>
                             </div>
@@ -119,7 +84,7 @@
                     <div class="col-md-4 mb-3">
                         <div class="card stat-card bg-gradient-courses text-white h-100 shadow">
                             <div class="card-body position-relative p-4">
-                                <h5 class="card-title fw-light mb-1">Активни Курсове</h5>
+                                <h5 class="card-title fw-light mb-1" data-i18n="nav_courses">Специалности</h5>
                                 <h1 class="display-4 fw-bold mb-0" id="total-courses"><span class="spinner-border spinner-border-sm" role="status"></span></h1>
                                 <i class="bi bi-journal-code stat-icon"></i>
                             </div>
@@ -128,7 +93,7 @@
                     <div class="col-md-4 mb-3">
                         <div class="card stat-card bg-gradient-profs text-white h-100 shadow">
                             <div class="card-body position-relative p-4">
-                                <h5 class="card-title fw-light text-dark mb-1">Преподаватели</h5>
+                                <h5 class="card-title fw-light text-dark mb-1" data-i18n="nav_prof">Преподаватели</h5>
                                 <h1 class="display-4 fw-bold text-dark mb-0" id="total-professors"><span class="spinner-border spinner-border-sm text-dark" role="status"></span></h1>
                                 <i class="bi bi-person-workspace stat-icon text-dark"></i>
                             </div>
@@ -139,7 +104,7 @@
                 <div class="row">
                     <div class="col-md-7 mb-4">
                         <div class="chart-container h-100">
-                            <h5 class="fw-light mb-4"><i class="bi bi-bar-chart-fill me-2 text-info"></i> Разпределение на студентите по курсове</h5>
+                            <h5 class="fw-light mb-4"><i class="bi bi-bar-chart-fill me-2 text-info"></i> Разпределение на студентите</h5>
                             <canvas id="studentsChart"></canvas>
                         </div>
                     </div>
@@ -154,26 +119,18 @@
                                     </tbody>
                                 </table>
                             </div>
-                            
-                            <h5 class="fw-light mt-4 mb-3"><i class="bi bi-lightning-charge me-2"></i> Бързи действия</h5>
-                            <div class="d-grid gap-2">
-                                <a href="students.html" class="btn btn-outline-primary text-start py-2"><i class="bi bi-person-plus me-2"></i> Нов студент</a>
-                                <a href="courses.html" class="btn btn-outline-info text-start py-2"><i class="bi bi-journal-plus me-2"></i> Нов курс</a>
-                            </div>
                         </div>
                     </div>
                 </div>
-
             </main>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <script>
+    <script src="app.js"></script> <script>
+        // Логика за теглене на данните и рисуване на графиката
         document.addEventListener("DOMContentLoaded", function() {
-            
             Promise.all([
                 fetch('/api/students').then(res => res.json()),
                 fetch('/api/courses').then(res => res.json()),
@@ -181,12 +138,10 @@
             ])
             .then(([students, courses, professors]) => {
                 
-                // 1. Попълваме броячите
                 document.getElementById('total-students').textContent = students.length;
                 document.getElementById('total-courses').textContent = courses.length;
                 document.getElementById('total-professors').textContent = professors.length;
 
-                // 2. Попълваме таблицата с последните 4 студента
                 let recentStudents = students.slice(-4).reverse();
                 let tableBody = document.getElementById('recent-students-tbody');
                 tableBody.innerHTML = ''; 
@@ -195,91 +150,50 @@
                     tableBody.innerHTML = '<tr><td colspan="2" class="text-center text-muted py-4">Няма студенти.</td></tr>';
                 } else {
                     recentStudents.forEach(student => {
-                        let row = `
-                        <tr>
-                            <td class="fw-bold text-light"><i class="bi bi-person-circle me-2 text-primary"></i> ${student.firstName} ${student.lastName}</td>
+                        let row = `<tr>
+                            <td class="fw-bold"><i class="bi bi-person-circle me-2 text-primary"></i> ${student.firstName} ${student.lastName}</td>
                             <td class="text-end"><span class="badge bg-secondary">${student.facultyNumber}</span></td>
-                        </tr>
-                        `;
+                        </tr>`;
                         tableBody.innerHTML += row;
                     });
                 }
 
-                // ==========================================
-                // 3. ЧЕРТАНЕ НА ГРАФИКАТА С CHART.JS
-                // ==========================================
-
-                // Подготвяме обект, в който ще броим { "Име на курс": Брой студенти }
                 let courseCounts = {};
-                
-                // Слагаме всички курсове на 0 в началото
-                courses.forEach(c => {
-                    courseCounts[c.name] = 0;
-                });
-
-                // Броим колко студенти са записани във всеки курс
+                courses.forEach(c => courseCounts[c.name] = 0);
                 students.forEach(student => {
-                    if (student.courses && student.courses.length > 0) {
+                    if (student.courses) {
                         student.courses.forEach(course => {
-                            if (courseCounts[course.name] !== undefined) {
-                                courseCounts[course.name]++;
-                            }
+                            if (courseCounts[course.name] !== undefined) courseCounts[course.name]++;
                         });
                     }
                 });
 
-                // Извличаме имената за X оста и числата за Y оста
-                let chartLabels = Object.keys(courseCounts);
-                let chartData = Object.values(courseCounts);
-
-                // Рисуваме!
                 const ctx = document.getElementById('studentsChart').getContext('2d');
                 new Chart(ctx, {
-                    type: 'bar', // Вид на графиката: стълбове
+                    type: 'bar',
                     data: {
-                        labels: chartLabels,
+                        labels: Object.keys(courseCounts),
                         datasets: [{
-                            label: 'Брой записани студенти',
-                            data: chartData,
-                            backgroundColor: 'rgba(13, 202, 240, 0.6)', // Синьо-зелен (Info) цвят, леко прозрачен
+                            label: 'Студенти',
+                            data: Object.values(courseCounts),
+                            backgroundColor: 'rgba(13, 202, 240, 0.6)',
                             borderColor: 'rgba(13, 202, 240, 1)',
                             borderWidth: 1,
-                            borderRadius: 6 // Леко заоблени ръбове на стълбовете
+                            borderRadius: 6
                         }]
                     },
                     options: {
                         responsive: true,
                         scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: { 
-                                    stepSize: 1, // Да показва само цели числа (1, 2, 3 студента)
-                                    color: '#adb5bd' // Сив цвят на текста
-                                },
-                                grid: { color: 'rgba(255, 255, 255, 0.1)' } // Лека мрежа отзад
-                            },
-                            x: {
-                                ticks: { color: '#adb5bd' },
-                                grid: { display: false } // Скриваме вертикалните линии
-                            }
+                            y: { beginAtZero: true, ticks: { stepSize: 1, color: '#adb5bd' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                            x: { ticks: { color: '#adb5bd' }, grid: { display: false } }
                         },
-                        plugins: {
-                            legend: {
-                                labels: { color: '#ffffff' } // Бял цвят на легендата
-                            }
-                        }
+                        plugins: { legend: { labels: { color: '#ffffff' } } }
                     }
                 });
             })
-            .catch(error => {
-                console.error("Грешка:", error);
-                document.getElementById('total-students').textContent = "!";
-                document.getElementById('total-courses').textContent = "!";
-                document.getElementById('total-professors').textContent = "!";
-            });
+            .catch(err => console.error("Грешка:", err));
         });
     </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="app.js"></script>
 </body>
 </html>
