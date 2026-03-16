@@ -14,7 +14,6 @@
         .modal-content { background-color: #1e1e1e; border: 1px solid #3d3d3d; }
         .form-control, .form-select { background-color: #2d2d2d; color: #fff; border: 1px solid #4d4d4d; }
         .form-control:focus, .form-select:focus { background-color: #3d3d3d; color: #fff; border-color: #0d6efd; box-shadow: none; }
-        /* Анимация за редовете в таблицата */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .new-row { animation: fadeIn 0.3s ease-out; }
     </style>
@@ -22,21 +21,22 @@
 <body>
     <div class="container-fluid">
         <div class="row">
+            
             <nav class="col-md-2 d-none d-md-block sidebar py-4">
                 <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
                 <div class="list-group list-group-flush gap-2 px-2">
-                    <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> Главно табло</a>
-                    <a href="students.html" class="list-group-item list-group-item-action bg-primary text-white rounded border-0"><i class="bi bi-people me-3"></i> Студенти</a>
-                    <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> Специалности</a>
-                    <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> Преподаватели</a>
+                    <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
+                    <a href="students.html" class="list-group-item list-group-item-action bg-primary text-white rounded border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
+                    <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
+                    <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
                 </div>
             </nav>
 
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
-                    <h1 class="h2 fw-light"><i class="bi bi-people me-2"></i> Всички студенти</h1>
+                    <h1 class="h2 fw-light"><i class="bi bi-people me-2"></i> <span data-i18n="nav_students">Всички студенти</span></h1>
                     <button class="btn btn-outline-success btn-sm rounded-pill px-3 shadow-sm" onclick="openCreateModal()">
-                        <i class="bi bi-person-plus-fill me-1"></i> Нов Студент
+                        <i class="bi bi-person-plus-fill me-1"></i> <span data-i18n="btn_new_student">Нов Студент</span>
                     </button>
                 </div>
 
@@ -44,7 +44,7 @@
                     <div class="col-md-5">
                         <div class="input-group shadow-sm">
                             <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
-                            <input type="text" id="searchInput" class="form-control border-secondary" placeholder="Търси по име, фак. номер или мейл...">
+                            <input type="text" id="searchInput" class="form-control border-secondary" placeholder="Търси..." data-i18n="search_student">
                         </div>
                     </div>
                 </div>
@@ -53,12 +53,12 @@
                     <table class="table table-dark table-hover table-borderless align-middle mb-0">
                         <thead class="border-bottom border-secondary text-muted">
                             <tr>
-                                <th class="py-3 px-4">ID</th>
-                                <th class="py-3">Студент</th>
-                                <th class="py-3">Фак. Номер</th>
-                                <th class="py-3">Имейл</th>
-                                <th class="py-3">Записани курсове</th>
-                                <th class="py-3 text-end px-4">Управление</th>
+                                <th class="py-3 px-4" data-i18n="th_id">ID</th>
+                                <th class="py-3" data-i18n="th_name">Студент</th>
+                                <th class="py-3" data-i18n="th_fac">Фак. Номер</th>
+                                <th class="py-3" data-i18n="th_email">Имейл</th>
+                                <th class="py-3" data-i18n="th_courses">Записани курсове</th>
+                                <th class="py-3 text-end px-4" data-i18n="th_action">Управление</th>
                             </tr>
                         </thead>
                         <tbody id="all-students-tbody">
@@ -73,14 +73,15 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg">
                 <div class="modal-header border-secondary">
-                    <h5 class="modal-title" id="modalTitle"><i class="bi bi-person-badge me-2"></i> Управление на студент</h5>
+                    <h5 class="modal-title" id="modalTitle"><i class="bi bi-person-badge me-2"></i> <span data-i18n="nav_students">Студенти</span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div id="errorAlert" class="alert alert-danger d-none small py-2 mb-3" role="alert"></div>
                     
                     <form id="studentForm">
-                        <input type="hidden" id="studentId"> <div class="row">
+                        <input type="hidden" id="studentId">
+                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="text-muted small mb-1">Име</label>
                                 <input type="text" class="form-control" id="firstName" required>
@@ -91,11 +92,11 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="text-muted small mb-1">Факултетен номер</label>
+                            <label class="text-muted small mb-1" data-i18n="th_fac">Факултетен номер</label>
                             <input type="text" class="form-control" id="facultyNumber" required>
                         </div>
                         <div class="mb-3">
-                            <label class="text-muted small mb-1">Имейл</label>
+                            <label class="text-muted small mb-1" data-i18n="th_email">Имейл</label>
                             <input type="email" class="form-control" id="email" required>
                         </div>
                     </form>
@@ -109,29 +110,28 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script> 
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            
-            window.allStudentsData = []; // Пазим всички студенти в паметта за бързата търсачка
+            window.allStudentsData = []; 
 
-            // 1. Зареждане на студентите
             window.loadAllStudents = function() {
                 fetch('/api/students')
                     .then(res => res.json())
                     .then(students => {
-                        window.allStudentsData = students; // Запазваме ги глобално
+                        window.allStudentsData = students;
                         renderTable(students);
                     })
-                    .catch(err => console.error("Грешка при зареждане:", err));
+                    .catch(err => console.error("Грешка:", err));
             };
 
-            // 2. Рисуване на таблицата (отделена функция, за да работи търсачката)
             function renderTable(studentsToRender) {
                 let tableBody = document.getElementById('all-students-tbody');
                 tableBody.innerHTML = ''; 
                 
                 if (studentsToRender.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Няма намерени студенти.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Няма данни</td></tr>';
                     return;
                 }
 
@@ -142,10 +142,9 @@
                             coursesHtml += `<span class="badge bg-info text-dark me-1 mb-1 shadow-sm">${c.name}</span>`;
                         });
                     } else {
-                        coursesHtml = '<span class="text-muted small fst-italic">Няма курсове</span>';
+                        coursesHtml = '<span class="text-muted small fst-italic">-</span>';
                     }
 
-                    // Данните се запазват като безопасен JSON стринг в бутона за редакция
                     let studentJson = encodeURIComponent(JSON.stringify(student));
 
                     let row = `
@@ -168,10 +167,8 @@
                 });
             }
 
-            // Първоначално зареждане
             window.loadAllStudents();
 
-            // 3. ТЪРСАЧКА (Live Search)
             document.getElementById('searchInput').addEventListener('input', function(e) {
                 let searchTerm = e.target.value.toLowerCase();
                 let filteredStudents = window.allStudentsData.filter(s => {
@@ -183,32 +180,24 @@
                 renderTable(filteredStudents);
             });
 
-            // 4. Отваряне на модал за СЪЗДАВАНЕ
             window.openCreateModal = function() {
                 document.getElementById('studentForm').reset();
-                document.getElementById('studentId').value = ''; // Празно ID означава, че създаваме нов запис
-                document.getElementById('modalTitle').innerHTML = '<i class="bi bi-person-plus me-2 text-success"></i> Добавяне на нов студент';
-                document.getElementById('errorAlert').classList.add('d-none'); // Скриваме старите грешки
+                document.getElementById('studentId').value = ''; 
+                document.getElementById('errorAlert').classList.add('d-none');
                 new bootstrap.Modal(document.getElementById('studentModal')).show();
             };
 
-            // 5. Отваряне на модал за РЕДАКТИРАНЕ
             window.openEditModal = function(encodedStudent) {
                 let student = JSON.parse(decodeURIComponent(encodedStudent));
-                
-                // Пълним полетата с данните на студента
                 document.getElementById('studentId').value = student.id;
                 document.getElementById('firstName').value = student.firstName;
                 document.getElementById('lastName').value = student.lastName;
                 document.getElementById('facultyNumber').value = student.facultyNumber;
                 document.getElementById('email').value = student.email;
-                
-                document.getElementById('modalTitle').innerHTML = '<i class="bi bi-pencil-square me-2 text-warning"></i> Редакция на данни';
                 document.getElementById('errorAlert').classList.add('d-none');
                 new bootstrap.Modal(document.getElementById('studentModal')).show();
             };
 
-            // 6. ЗАПАЗВАНЕ (Обединява Създаване и Редакция)
             document.getElementById('save-student-btn').addEventListener('click', async function() {
                 let id = document.getElementById('studentId').value;
                 let studentData = {
@@ -218,7 +207,7 @@
                     email: document.getElementById('email').value
                 };
 
-                let url = id ? `/api/students/${id}` : '/api/students'; // Ако има ID -> правим PUT (редакция), ако няма -> POST (създаване)
+                let url = id ? `/api/students/${id}` : '/api/students'; 
                 let method = id ? 'PUT' : 'POST';
 
                 try {
@@ -229,21 +218,16 @@
                     });
 
                     if (!response.ok) {
-                        // Ако бекендът хвърли грешка (напр. дублиран имейл/фак. номер)
                         let errorMsg = await response.text(); 
-                        throw new Error(errorMsg || "Възникна сървърна грешка.");
+                        throw new Error(errorMsg || "Сървърна грешка.");
                     }
 
-                    // Ако всичко е наред:
                     bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
-                    window.loadAllStudents(); // Презареждаме таблицата
-                    document.getElementById('searchInput').value = ''; // Изчистваме търсачката
+                    window.loadAllStudents(); 
+                    document.getElementById('searchInput').value = ''; 
 
                 } catch (error) {
-                    // Показваме грешката в червеното поле вътре в модала
                     let errorDiv = document.getElementById('errorAlert');
-                    
-                    // Понякога Spring връща голям JSON при грешка, затова чистим съобщението малко
                     let cleanMsg = error.message;
                     try {
                         let parsed = JSON.parse(error.message);
@@ -255,11 +239,9 @@
                 }
             });
 
-            // 7. Изтриване
             window.deleteStudent = function(id) {
-                if(confirm('Сигурен ли си, че искаш да изтриеш този студент? Тази операция е необратима!')) {
-                    fetch('/api/students/' + id, { method: 'DELETE' })
-                        .then(() => window.loadAllStudents());
+                if(confirm('Сигурен ли си?')) {
+                    fetch('/api/students/' + id, { method: 'DELETE' }).then(() => window.loadAllStudents());
                 }
             };
         });
