@@ -5,7 +5,9 @@ import com.campus.campus_management_system.model.entity.Professor;
 import com.campus.campus_management_system.repository.CourseRepository;
 import com.campus.campus_management_system.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,11 +24,6 @@ public class CourseService {
     // Взимане на всички курсове
     public List<Course> getAllCourses() {
         return courseRepository.findAll();
-    }
-
-    // Създаване на нов курс
-    public Course createCourse(Course course) {
-        return courseRepository.save(course);
     }
 
     // Изтриване на курс
@@ -68,5 +65,27 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
+    public Course createCourse(Course course){
+        if (courseRepository.existsByName(course.getName())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Специалност с това име вече съществува!");
+
+     }
+       return courseRepository.save(course);
+    }
+
+    public Course updateCourse(Long id, Course updatedData) {
+        Course existingCourse = courseRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Курсът не е намерен!"));
+
+        // Проверяваме дали не се опитваме да сложим име, което вече е заето от друг курс
+        if (!existingCourse.getName().equals(updatedData.getName()) && courseRepository.existsByName(updatedData.getName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Специалност с това име вече съществува!");
+        }
+
+        existingCourse.setName(updatedData.getName());
+        existingCourse.setCredits(updatedData.getCredits());
+
+        return courseRepository.save(existingCourse);
+    }
     
 }
