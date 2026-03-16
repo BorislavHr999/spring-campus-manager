@@ -47,5 +47,12 @@ public class CourseController {
     public Course removeProfessorFromCourse(@PathVariable Long courseId) {
         return courseService.removeProfessor(courseId);
     }
+
+    @PutMapping("/{id}")
+    public Course updateCourse(@PathVariable Long id, @RequestBody Course courseDetails) {
+        return courseService.updateCourse(id, courseDetails);
+    }
 }
+    
+
 
