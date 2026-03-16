@@ -6,6 +6,8 @@ import com.campus.campus_management_system.service.StudentSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -21,8 +23,12 @@ public class StudentController {
     }
 
     @GetMapping
-    public List<Student> getAllStudents() {
-        return studentService.getAllStudents();
+    public Page<Student> getAllStudents(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword) {
+        
+        return studentService.getAllStudents(page, size, keyword);
     }
 
     @PostMapping
@@ -33,17 +39,6 @@ public class StudentController {
     @PutMapping("/{id}")
     public Student updateStudent(@PathVariable Long id, @RequestBody Student studentDetails) {
         return studentService.updateStudent(id, studentDetails);
-    }
-
-    @GetMapping("/search")
-    public List<Student> searchStudents(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String city,
-            @RequestParam(required = false) String club) {
-
-        Specification<Student> spec = StudentSpecification.getStudentsByCriteria(name, city, club);
-
-        return studentService.search(spec);
     }
 
 }

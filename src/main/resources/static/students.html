@@ -49,7 +49,7 @@
                     </div>
                 </div>
 
-                <div class="table-custom p-1 shadow">
+                <div class="table-custom p-1 shadow mb-3">
                     <table class="table table-dark table-hover table-borderless align-middle mb-0">
                         <thead class="border-bottom border-secondary text-muted">
                             <tr>
@@ -64,6 +64,18 @@
                         <tbody id="all-students-tbody">
                             </tbody>
                     </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <span id="page-info" class="text-muted small fw-bold">Страница 1 от 1</span>
+                    <div class="btn-group shadow-sm">
+                        <button class="btn btn-outline-secondary btn-sm" id="prev-btn" onclick="changePage(-1)">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" id="next-btn" onclick="changePage(1)">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
             </main>
         </div>
@@ -99,6 +111,12 @@
                             <label class="text-muted small mb-1" data-i18n="th_email">Имейл</label>
                             <input type="email" class="form-control" id="email" required>
                         </div>
+                        
+                        <div class="mb-3">
+                            <label class="text-muted small mb-1" data-i18n="th_courses">Записани курсове (Задръж Ctrl за избор на няколко)</label>
+                            <select multiple class="form-select border-secondary" id="studentCourses" style="height: 100px;">
+                                </select>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer border-secondary">
@@ -114,24 +132,58 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            window.allStudentsData = []; 
+            
+            // ПРОМЕНЛИВИ ЗА ПАГИНАЦИЯТА И КУРСОВЕТЕ
+            let currentPage = 0;
+            const pageSize = 10; 
+            let currentKeyword = '';
+            let allAvailableCourses = []; 
 
-            window.loadAllStudents = function() {
-                fetch('/api/students')
+            // Изтегляме всички курсове веднъж при зареждане на страницата
+            fetch('/api/courses')
+                .then(res => res.json())
+                .then(data => allAvailableCourses = data)
+                .catch(err => console.error("Грешка при зареждане на курсове:", err));
+
+            // ФУНКЦИЯ ЗА ЗАРЕЖДАНЕ ОТ СЪРВЪРА (Пагинация)
+            window.loadAllStudents = function(page = 0) {
+                let url = `/api/students?page=${page}&size=${pageSize}`;
+                if (currentKeyword) {
+                    url += `&keyword=${encodeURIComponent(currentKeyword)}`;
+                }
+
+                fetch(url)
                     .then(res => res.json())
-                    .then(students => {
-                        window.allStudentsData = students;
-                        renderTable(students);
+                    .then(data => {
+                        currentPage = data.number; 
+                        renderTable(data.content); 
+                        updatePaginationControls(data.totalPages);
                     })
                     .catch(err => console.error("Грешка:", err));
             };
 
+            // ОБНОВЯВАНЕ НА БУТОНИТЕ ЗА СТРАНИЦИТЕ
+            function updatePaginationControls(totalPages) {
+                let displayPage = totalPages === 0 ? 0 : currentPage + 1;
+                document.getElementById('page-info').innerHTML = `<i class="bi bi-file-earmark-text me-1"></i> ${displayPage} / ${totalPages}`;
+                
+                document.getElementById('prev-btn').disabled = (currentPage === 0);
+                document.getElementById('next-btn').disabled = (currentPage >= totalPages - 1 || totalPages === 0);
+            }
+
+            // СМЯНА НА СТРАНИЦАТА
+            window.changePage = function(offset) {
+                loadAllStudents(currentPage + offset);
+            };
+
+            // РИСУВАНЕ НА ТАБЛИЦАТА
             function renderTable(studentsToRender) {
                 let tableBody = document.getElementById('all-students-tbody');
                 tableBody.innerHTML = ''; 
                 
-                if (studentsToRender.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Няма данни</td></tr>';
+                if (!studentsToRender || studentsToRender.length === 0) {
+                    let noDataText = typeof t === 'function' ? t('no_data') : 'Няма данни';
+                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">${noDataText}</td></tr>`;
                     return;
                 }
 
@@ -167,26 +219,32 @@
                 });
             }
 
-            window.loadAllStudents();
+            // ПЪРВОНАЧАЛНО ЗАРЕЖДАНЕ
+            window.loadAllStudents(0);
 
+            // ТЪРСАЧКА НА ЖИВО
             document.getElementById('searchInput').addEventListener('input', function(e) {
-                let searchTerm = e.target.value.toLowerCase();
-                let filteredStudents = window.allStudentsData.filter(s => {
-                    let fullName = (s.firstName + " " + s.lastName).toLowerCase();
-                    return fullName.includes(searchTerm) || 
-                           (s.facultyNumber && s.facultyNumber.toLowerCase().includes(searchTerm)) || 
-                           (s.email && s.email.toLowerCase().includes(searchTerm));
-                });
-                renderTable(filteredStudents);
+                currentKeyword = e.target.value;
+                window.loadAllStudents(0); 
             });
 
+            // МОДАЛ ЗА СЪЗДАВАНЕ
             window.openCreateModal = function() {
                 document.getElementById('studentForm').reset();
                 document.getElementById('studentId').value = ''; 
                 document.getElementById('errorAlert').classList.add('d-none');
+                
+                // Пълним менюто с курсове (празно)
+                let courseSelect = document.getElementById('studentCourses');
+                courseSelect.innerHTML = '';
+                allAvailableCourses.forEach(c => {
+                    courseSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+                });
+
                 new bootstrap.Modal(document.getElementById('studentModal')).show();
             };
 
+            // МОДАЛ ЗА РЕДАКТИРАНЕ
             window.openEditModal = function(encodedStudent) {
                 let student = JSON.parse(decodeURIComponent(encodedStudent));
                 document.getElementById('studentId').value = student.id;
@@ -194,17 +252,33 @@
                 document.getElementById('lastName').value = student.lastName;
                 document.getElementById('facultyNumber').value = student.facultyNumber;
                 document.getElementById('email').value = student.email;
+                
+                // Пълним менюто и маркираме курсовете на студента
+                let courseSelect = document.getElementById('studentCourses');
+                courseSelect.innerHTML = '';
+                allAvailableCourses.forEach(c => {
+                    let isSelected = student.courses && student.courses.some(sc => sc.id === c.id);
+                    courseSelect.innerHTML += `<option value="${c.id}" ${isSelected ? 'selected' : ''}>${c.name}</option>`;
+                });
+
                 document.getElementById('errorAlert').classList.add('d-none');
                 new bootstrap.Modal(document.getElementById('studentModal')).show();
             };
 
+            // ЗАПАЗВАНЕ НА СТУДЕНТ В БАЗАТА
             document.getElementById('save-student-btn').addEventListener('click', async function() {
                 let id = document.getElementById('studentId').value;
+                
+                // Взимаме избраните курсове
+                let selectedCourses = Array.from(document.getElementById('studentCourses').selectedOptions)
+                                           .map(opt => ({ id: parseInt(opt.value) }));
+
                 let studentData = {
                     firstName: document.getElementById('firstName').value,
                     lastName: document.getElementById('lastName').value,
                     facultyNumber: document.getElementById('facultyNumber').value,
-                    email: document.getElementById('email').value
+                    email: document.getElementById('email').value,
+                    courses: selectedCourses // Изпращаме ги към сървъра!
                 };
 
                 let url = id ? `/api/students/${id}` : '/api/students'; 
@@ -223,9 +297,8 @@
                     }
 
                     bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
-                    window.loadAllStudents(); 
-                    document.getElementById('searchInput').value = ''; 
-
+                    window.loadAllStudents(currentPage); 
+                    
                 } catch (error) {
                     let errorDiv = document.getElementById('errorAlert');
                     let cleanMsg = error.message;
@@ -239,9 +312,12 @@
                 }
             });
 
+            // ИЗТРИВАНЕ НА СТУДЕНТ
             window.deleteStudent = function(id) {
                 if(confirm('Сигурен ли си?')) {
-                    fetch('/api/students/' + id, { method: 'DELETE' }).then(() => window.loadAllStudents());
+                    fetch('/api/students/' + id, { method: 'DELETE' }).then(() => {
+                        window.loadAllStudents(currentPage);
+                    });
                 }
             };
         });

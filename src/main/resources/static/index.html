@@ -130,19 +130,24 @@
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // Взимаме size=100 за да имаме достатъчно данни за графиката
             Promise.all([
-                fetch('/api/students').then(res => res.json()),
+                fetch('/api/students?size=100').then(res => res.json()),
                 fetch('/api/courses').then(res => res.json()),
                 fetch('/api/professors').then(res => res.json())
             ])
-            .then(([students, courses, professors]) => {
+            .then(([studentsData, courses, professors]) => {
                 
-                document.getElementById('total-students').textContent = students.length;
+                // ТУК Е МАГИЯТА ЗА ПАГИНАЦИЯТА: Разопаковаме Page обекта
+                let students = studentsData.content ? studentsData.content : studentsData;
+                let totalStudentsCount = studentsData.totalElements !== undefined ? studentsData.totalElements : students.length;
+
+                document.getElementById('total-students').textContent = totalStudentsCount;
                 document.getElementById('total-courses').textContent = courses.length;
                 document.getElementById('total-professors').textContent = professors.length;
 
-                // Пълнене на таблицата (Използваме t() за превод!)
-                let recentStudents = students.slice(-4).reverse();
+                // Пълнене на таблицата
+                let recentStudents = students.slice(0, 4); // Взимаме първите 4
                 let tableBody = document.getElementById('recent-students-tbody');
                 tableBody.innerHTML = ''; 
 
@@ -169,14 +174,14 @@
                     }
                 });
 
-                // Рисуване на графиката (Използваме t() за превод на етикета!)
+                // Рисуване на графиката
                 const ctx = document.getElementById('studentsChart').getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: Object.keys(courseCounts),
                         datasets: [{
-                            label: t('chart_label'), // Динамичен превод тук!
+                            label: typeof t === 'function' ? t('chart_label') : 'Брой студенти',
                             data: Object.values(courseCounts),
                             backgroundColor: 'rgba(13, 202, 240, 0.6)',
                             borderColor: 'rgba(13, 202, 240, 1)',
