@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpecificationExecutor<Student> {
     List<Student> findTop5ByOrderByIdDesc();
+    boolean existsByEmail(String email);
+    boolean existsByFacultyNumber(String facultyNumber);
 }
