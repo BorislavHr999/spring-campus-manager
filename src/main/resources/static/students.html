@@ -111,6 +111,12 @@
                             <label class="text-muted small mb-1" data-i18n="th_email">Имейл</label>
                             <input type="email" class="form-control" id="email" required>
                         </div>
+                        
+                        <div class="mb-3">
+                            <label class="text-muted small mb-1" data-i18n="th_courses">Записани курсове (Задръж Ctrl за избор на няколко)</label>
+                            <select multiple class="form-select border-secondary" id="studentCourses" style="height: 100px;">
+                                </select>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer border-secondary">
@@ -127,12 +133,19 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // ПРОМЕНЛИВИ ЗА ПАГИНАЦИЯТА
+            // ПРОМЕНЛИВИ ЗА ПАГИНАЦИЯТА И КУРСОВЕТЕ
             let currentPage = 0;
-            const pageSize = 10; // Колко студента да показваме на страница
+            const pageSize = 10; 
             let currentKeyword = '';
+            let allAvailableCourses = []; 
 
-            // НОВАТА ФУНКЦИЯ ЗА ЗАРЕЖДАНЕ ОТ СЪРВЪРА
+            // Изтегляме всички курсове веднъж при зареждане на страницата
+            fetch('/api/courses')
+                .then(res => res.json())
+                .then(data => allAvailableCourses = data)
+                .catch(err => console.error("Грешка при зареждане на курсове:", err));
+
+            // ФУНКЦИЯ ЗА ЗАРЕЖДАНЕ ОТ СЪРВЪРА (Пагинация)
             window.loadAllStudents = function(page = 0) {
                 let url = `/api/students?page=${page}&size=${pageSize}`;
                 if (currentKeyword) {
@@ -142,9 +155,8 @@
                 fetch(url)
                     .then(res => res.json())
                     .then(data => {
-                        // data вече е обект от тип Page
                         currentPage = data.number; 
-                        renderTable(data.content); // Данните са в data.content
+                        renderTable(data.content); 
                         updatePaginationControls(data.totalPages);
                     })
                     .catch(err => console.error("Грешка:", err));
@@ -153,8 +165,6 @@
             // ОБНОВЯВАНЕ НА БУТОНИТЕ ЗА СТРАНИЦИТЕ
             function updatePaginationControls(totalPages) {
                 let displayPage = totalPages === 0 ? 0 : currentPage + 1;
-                
-                // Прост трик да показваме "Страница 1 / 5", без да добавяме нови ключове в речника
                 document.getElementById('page-info').innerHTML = `<i class="bi bi-file-earmark-text me-1"></i> ${displayPage} / ${totalPages}`;
                 
                 document.getElementById('prev-btn').disabled = (currentPage === 0);
@@ -212,20 +222,29 @@
             // ПЪРВОНАЧАЛНО ЗАРЕЖДАНЕ
             window.loadAllStudents(0);
 
-            // ТЪРСАЧКА НА ЖИВО (Сървърно търсене!)
+            // ТЪРСАЧКА НА ЖИВО
             document.getElementById('searchInput').addEventListener('input', function(e) {
                 currentKeyword = e.target.value;
-                window.loadAllStudents(0); // Връщаме се на първа страница при ново търсене
+                window.loadAllStudents(0); 
             });
 
-            // МОДАЛИ И УПРАВЛЕНИЕ
+            // МОДАЛ ЗА СЪЗДАВАНЕ
             window.openCreateModal = function() {
                 document.getElementById('studentForm').reset();
                 document.getElementById('studentId').value = ''; 
                 document.getElementById('errorAlert').classList.add('d-none');
+                
+                // Пълним менюто с курсове (празно)
+                let courseSelect = document.getElementById('studentCourses');
+                courseSelect.innerHTML = '';
+                allAvailableCourses.forEach(c => {
+                    courseSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+                });
+
                 new bootstrap.Modal(document.getElementById('studentModal')).show();
             };
 
+            // МОДАЛ ЗА РЕДАКТИРАНЕ
             window.openEditModal = function(encodedStudent) {
                 let student = JSON.parse(decodeURIComponent(encodedStudent));
                 document.getElementById('studentId').value = student.id;
@@ -233,17 +252,33 @@
                 document.getElementById('lastName').value = student.lastName;
                 document.getElementById('facultyNumber').value = student.facultyNumber;
                 document.getElementById('email').value = student.email;
+                
+                // Пълним менюто и маркираме курсовете на студента
+                let courseSelect = document.getElementById('studentCourses');
+                courseSelect.innerHTML = '';
+                allAvailableCourses.forEach(c => {
+                    let isSelected = student.courses && student.courses.some(sc => sc.id === c.id);
+                    courseSelect.innerHTML += `<option value="${c.id}" ${isSelected ? 'selected' : ''}>${c.name}</option>`;
+                });
+
                 document.getElementById('errorAlert').classList.add('d-none');
                 new bootstrap.Modal(document.getElementById('studentModal')).show();
             };
 
+            // ЗАПАЗВАНЕ НА СТУДЕНТ В БАЗАТА
             document.getElementById('save-student-btn').addEventListener('click', async function() {
                 let id = document.getElementById('studentId').value;
+                
+                // Взимаме избраните курсове
+                let selectedCourses = Array.from(document.getElementById('studentCourses').selectedOptions)
+                                           .map(opt => ({ id: parseInt(opt.value) }));
+
                 let studentData = {
                     firstName: document.getElementById('firstName').value,
                     lastName: document.getElementById('lastName').value,
                     facultyNumber: document.getElementById('facultyNumber').value,
-                    email: document.getElementById('email').value
+                    email: document.getElementById('email').value,
+                    courses: selectedCourses // Изпращаме ги към сървъра!
                 };
 
                 let url = id ? `/api/students/${id}` : '/api/students'; 
@@ -262,7 +297,6 @@
                     }
 
                     bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
-                    // Презареждаме ТЕКУЩАТА страница след запазване
                     window.loadAllStudents(currentPage); 
                     
                 } catch (error) {
@@ -278,10 +312,10 @@
                 }
             });
 
+            // ИЗТРИВАНЕ НА СТУДЕНТ
             window.deleteStudent = function(id) {
                 if(confirm('Сигурен ли си?')) {
                     fetch('/api/students/' + id, { method: 'DELETE' }).then(() => {
-                        // Презареждаме ТЕКУЩАТА страница след изтриване
                         window.loadAllStudents(currentPage);
                     });
                 }
