@@ -56,18 +56,32 @@
                     </div>
                 </div>
 
-                <div class="px-3 mt-auto">
-                    <hr class="border-secondary">
+                <div class="px-3 mt-auto pb-3"> <hr class="border-secondary">
                     
-                    <div class="dropdown mb-2">
+                    <div class="dropup mb-2">
                         <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
                             <i class="bi bi-moon-stars me-1"></i> <span data-i18n="theme_dark">Тема</span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-dark w-100 shadow">
+                        <ul class="dropdown-menu dropdown-menu-dark w-100 shadow mb-1">
                             <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="bi bi-sun me-2 text-warning"></i> <span data-i18n="theme_light">Светла тема</span></a></li>
                             <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="bi bi-moon-stars me-2 text-info"></i> <span data-i18n="theme_dark">Тъмна тема</span></a></li>
                         </ul>
                     </div>
+
+                    <div class="dropup">
+                        <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-globe me-1"></i> <span data-i18n="lang_title">Език</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark w-100 shadow mb-1">
+                            <li><a class="dropdown-item" href="#" onclick="setLanguage('bg')">🇧🇬 Български</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setLanguage('en')">🇬🇧 English</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setLanguage('fr')">🇫🇷 Français</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setLanguage('de')">🇩🇪 Deutsch</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setLanguage('it')">🇮🇹 Italiano</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setLanguage('ru')">🇷🇺 Русский</a></li>
+                        </ul>
+                    </div>
+                </div>
 
                     <div class="dropdown">
                         <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
