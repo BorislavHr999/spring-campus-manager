@@ -129,19 +129,23 @@
     <script src="app.js"></script> 
     
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function() {
             Promise.all([
                 fetch('/api/students').then(res => res.json()),
                 fetch('/api/courses').then(res => res.json()),
                 fetch('/api/professors').then(res => res.json())
             ])
-            .then(([students, courses, professors]) => {
+            .then(([studentsData, courses, professors]) => {
                 
-                document.getElementById('total-students').textContent = students.length;
+                // НОВО: Проверяваме дали бекендът ни връща Page обект (с content) или стар масив
+                let students = studentsData.content ? studentsData.content : studentsData;
+                let totalStudentsCount = studentsData.totalElements !== undefined ? studentsData.totalElements : students.length;
+
+                document.getElementById('total-students').textContent = totalStudentsCount;
                 document.getElementById('total-courses').textContent = courses.length;
                 document.getElementById('total-professors').textContent = professors.length;
 
-                // Пълнене на таблицата (Използваме t() за превод!)
+                // Пълнене на таблицата
                 let recentStudents = students.slice(-4).reverse();
                 let tableBody = document.getElementById('recent-students-tbody');
                 tableBody.innerHTML = ''; 
@@ -169,14 +173,14 @@
                     }
                 });
 
-                // Рисуване на графиката (Използваме t() за превод на етикета!)
+                // Рисуване на графиката 
                 const ctx = document.getElementById('studentsChart').getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: Object.keys(courseCounts),
                         datasets: [{
-                            label: t('chart_label'), // Динамичен превод тук!
+                            label: t('chart_label'),
                             data: Object.values(courseCounts),
                             backgroundColor: 'rgba(13, 202, 240, 0.6)',
                             borderColor: 'rgba(13, 202, 240, 1)',
@@ -196,6 +200,3 @@
             })
             .catch(err => console.error("Грешка:", err));
         });
-    </script>
-</body>
-</html>
