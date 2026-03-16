@@ -35,15 +35,4 @@ public class StudentController {
         return studentService.updateStudent(id, studentDetails);
     }
 
-    @GetMapping("/search")
-    public List<Student> searchStudents(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String city,
-            @RequestParam(required = false) String club) {
-
-        Specification<Student> spec = StudentSpecification.getStudentsByCriteria(name, city, club);
-
-        return studentService.search(spec);
-    }
-
 }
