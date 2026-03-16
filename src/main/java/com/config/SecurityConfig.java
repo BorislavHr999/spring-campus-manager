@@ -1,0 +1,58 @@
+package com.campus.campus_management_system.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    // 1. НАСТРОЙКА НА ПРАВИЛАТА (Кой до какво има достъп)
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable()) // Изключваме временно CSRF, за да работят нашите POST/PUT/DELETE заявки от JavaScript
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().authenticated() // КАЗВАМЕ: "Абсолютно всяка страница и заявка изисква потребителят да е влязъл!"
+            )
+            .formLogin(Customizer.withDefaults()); // Използваме готовия екран за вход на Spring
+
+        return http.build();
+    }
+
+    // 2. СЪЗДАВАНЕ НА ПОТРЕБИТЕЛИ (В паметта)
+    @Bean
+    public UserDetailsService userDetailsService() {
+        // Създаваме Администратор
+        UserDetails admin = User.builder()
+                .username("admin")
+                .password(passwordEncoder().encode("admin123"))
+                .roles("ADMIN")
+                .build();
+
+        // Създаваме обикновен Студент/Гост
+        UserDetails student = User.builder()
+                .username("student")
+                .password(passwordEncoder().encode("student123"))
+                .roles("USER")
+                .build();
+
+        return new InMemoryUserDetailsManager(admin, student);
+    }
+
+    // 3. КРИПТИРАНЕ НА ПАРОЛИТЕ
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
