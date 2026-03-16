@@ -49,7 +49,7 @@
                     </div>
                 </div>
 
-                <div class="table-custom p-1 shadow">
+                <div class="table-custom p-1 shadow mb-3">
                     <table class="table table-dark table-hover table-borderless align-middle mb-0">
                         <thead class="border-bottom border-secondary text-muted">
                             <tr>
@@ -64,6 +64,18 @@
                         <tbody id="all-students-tbody">
                             </tbody>
                     </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <span id="page-info" class="text-muted small fw-bold">Страница 1 от 1</span>
+                    <div class="btn-group shadow-sm">
+                        <button class="btn btn-outline-secondary btn-sm" id="prev-btn" onclick="changePage(-1)">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" id="next-btn" onclick="changePage(1)">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
             </main>
         </div>
@@ -114,24 +126,54 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            window.allStudentsData = []; 
+            
+            // ПРОМЕНЛИВИ ЗА ПАГИНАЦИЯТА
+            let currentPage = 0;
+            const pageSize = 10; // Колко студента да показваме на страница
+            let currentKeyword = '';
 
-            window.loadAllStudents = function() {
-                fetch('/api/students')
+            // НОВАТА ФУНКЦИЯ ЗА ЗАРЕЖДАНЕ ОТ СЪРВЪРА
+            window.loadAllStudents = function(page = 0) {
+                let url = `/api/students?page=${page}&size=${pageSize}`;
+                if (currentKeyword) {
+                    url += `&keyword=${encodeURIComponent(currentKeyword)}`;
+                }
+
+                fetch(url)
                     .then(res => res.json())
-                    .then(students => {
-                        window.allStudentsData = students;
-                        renderTable(students);
+                    .then(data => {
+                        // data вече е обект от тип Page
+                        currentPage = data.number; 
+                        renderTable(data.content); // Данните са в data.content
+                        updatePaginationControls(data.totalPages);
                     })
                     .catch(err => console.error("Грешка:", err));
             };
 
+            // ОБНОВЯВАНЕ НА БУТОНИТЕ ЗА СТРАНИЦИТЕ
+            function updatePaginationControls(totalPages) {
+                let displayPage = totalPages === 0 ? 0 : currentPage + 1;
+                
+                // Прост трик да показваме "Страница 1 / 5", без да добавяме нови ключове в речника
+                document.getElementById('page-info').innerHTML = `<i class="bi bi-file-earmark-text me-1"></i> ${displayPage} / ${totalPages}`;
+                
+                document.getElementById('prev-btn').disabled = (currentPage === 0);
+                document.getElementById('next-btn').disabled = (currentPage >= totalPages - 1 || totalPages === 0);
+            }
+
+            // СМЯНА НА СТРАНИЦАТА
+            window.changePage = function(offset) {
+                loadAllStudents(currentPage + offset);
+            };
+
+            // РИСУВАНЕ НА ТАБЛИЦАТА
             function renderTable(studentsToRender) {
                 let tableBody = document.getElementById('all-students-tbody');
                 tableBody.innerHTML = ''; 
                 
-                if (studentsToRender.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Няма данни</td></tr>';
+                if (!studentsToRender || studentsToRender.length === 0) {
+                    let noDataText = typeof t === 'function' ? t('no_data') : 'Няма данни';
+                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">${noDataText}</td></tr>`;
                     return;
                 }
 
@@ -167,19 +209,16 @@
                 });
             }
 
-            window.loadAllStudents();
+            // ПЪРВОНАЧАЛНО ЗАРЕЖДАНЕ
+            window.loadAllStudents(0);
 
+            // ТЪРСАЧКА НА ЖИВО (Сървърно търсене!)
             document.getElementById('searchInput').addEventListener('input', function(e) {
-                let searchTerm = e.target.value.toLowerCase();
-                let filteredStudents = window.allStudentsData.filter(s => {
-                    let fullName = (s.firstName + " " + s.lastName).toLowerCase();
-                    return fullName.includes(searchTerm) || 
-                           (s.facultyNumber && s.facultyNumber.toLowerCase().includes(searchTerm)) || 
-                           (s.email && s.email.toLowerCase().includes(searchTerm));
-                });
-                renderTable(filteredStudents);
+                currentKeyword = e.target.value;
+                window.loadAllStudents(0); // Връщаме се на първа страница при ново търсене
             });
 
+            // МОДАЛИ И УПРАВЛЕНИЕ
             window.openCreateModal = function() {
                 document.getElementById('studentForm').reset();
                 document.getElementById('studentId').value = ''; 
@@ -223,9 +262,9 @@
                     }
 
                     bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
-                    window.loadAllStudents(); 
-                    document.getElementById('searchInput').value = ''; 
-
+                    // Презареждаме ТЕКУЩАТА страница след запазване
+                    window.loadAllStudents(currentPage); 
+                    
                 } catch (error) {
                     let errorDiv = document.getElementById('errorAlert');
                     let cleanMsg = error.message;
@@ -241,7 +280,10 @@
 
             window.deleteStudent = function(id) {
                 if(confirm('Сигурен ли си?')) {
-                    fetch('/api/students/' + id, { method: 'DELETE' }).then(() => window.loadAllStudents());
+                    fetch('/api/students/' + id, { method: 'DELETE' }).then(() => {
+                        // Презареждаме ТЕКУЩАТА страница след изтриване
+                        window.loadAllStudents(currentPage);
+                    });
                 }
             };
         });
