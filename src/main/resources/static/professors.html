@@ -8,12 +8,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         body { background-color: #121212; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { background-color: #1e1e1e; min-height: 100vh; box-shadow: 2px 0 5px rgba(0,0,0,0.5); }
-        .text-gradient { background: linear-gradient(45deg, #0d6efd, #0dcaf0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
+        .sidebar { background-color: #1e1e1e; min-height: 100vh; box-shadow: 2px 0 5px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .text-gradient { background: linear-gradient(45deg, #ffc107, #fd7e14); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
         .table-custom { background-color: #1e1e1e; border-radius: 10px; overflow: hidden; }
         .modal-content { background-color: #1e1e1e; border: 1px solid #3d3d3d; }
-        .form-control, .form-select { background-color: #2d2d2d; color: #fff; border: 1px solid #4d4d4d; }
-        .form-control:focus, .form-select:focus { background-color: #3d3d3d; color: #fff; border-color: #0d6efd; box-shadow: none; }
+        .form-control { background-color: #2d2d2d; color: #fff; border: 1px solid #4d4d4d; }
+        .form-control:focus { background-color: #3d3d3d; color: #fff; border-color: #ffc107; box-shadow: none; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .new-row { animation: fadeIn 0.3s ease-out; }
     </style>
@@ -21,43 +21,39 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            
             <nav class="col-md-2 d-none d-md-block sidebar py-4">
-                <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
-                <div class="list-group list-group-flush gap-2 px-2">
-                    <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
-                    <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
-                    <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
-                    <a href="professors.html" class="list-group-item list-group-item-action bg-primary text-white rounded border-0"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
+                <div>
+                    <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
+                    <div class="list-group list-group-flush gap-2 px-2">
+                        <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
+                        <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
+                        <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
+                        <a href="professors.html" class="list-group-item list-group-item-action bg-warning text-dark rounded border-0 fw-bold"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
+                    </div>
+                </div>
+                <div class="mt-auto px-3">
+                    <hr class="border-secondary">
+                    <a href="/logout" class="btn btn-outline-danger w-100 btn-sm"><i class="bi bi-box-arrow-left me-2"></i>Изход</a>
                 </div>
             </nav>
 
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
-                    <h1 class="h2 fw-light"><i class="bi bi-person-workspace me-2"></i> <span data-i18n="nav_prof">Всички Преподаватели</span></h1>
-                    <button class="btn btn-outline-warning btn-sm rounded-pill px-3 shadow-sm text-dark fw-bold" onclick="openCreateModal()">
-                        <i class="bi bi-person-plus-fill me-1"></i> <span data-i18n="btn_new_prof">Нов Преподавател</span>
+                    <h1 class="h2 fw-light"><i class="bi bi-person-badge me-2 text-warning"></i> <span data-i18n="nav_prof">Преподаватели</span></h1>
+                    <button id="btn-new-professor" class="btn btn-outline-warning btn-sm rounded-pill px-3 shadow-sm" onclick="openCreateModal()">
+                        <i class="bi bi-plus-circle-fill me-1"></i> Нов Преподавател
                     </button>
                 </div>
 
-                <div class="row mb-3">
-                    <div class="col-md-5">
-                        <div class="input-group shadow-sm">
-                            <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
-                            <input type="text" id="searchInput" class="form-control border-secondary" placeholder="Търси..." data-i18n="search_prof">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-custom p-1 shadow">
+                <div class="table-custom p-1 shadow mb-3">
                     <table class="table table-dark table-hover table-borderless align-middle mb-0">
                         <thead class="border-bottom border-secondary text-muted">
                             <tr>
-                                <th class="py-3 px-4" data-i18n="th_id">ID</th>
-                                <th class="py-3" data-i18n="th_title">Титла</th>
-                                <th class="py-3" data-i18n="th_name">Име и Фамилия</th>
-                                <th class="py-3" data-i18n="th_email">Имейл</th>
-                                <th class="py-3 text-end px-4" data-i18n="th_action">Управление</th>
+                                <th class="py-3 px-4">ID</th>
+                                <th class="py-3">Име</th>
+                                <th class="py-3">Фамилия</th>
+                                <th class="py-3">Титла</th>
+                                <th class="py-3 text-end px-4" id="th-action">Управление</th>
                             </tr>
                         </thead>
                         <tbody id="all-professors-tbody">
@@ -68,164 +64,144 @@
         </div>
     </div>
 
-    <div class="modal fade" id="professorModal" tabindex="-1">
+    <div class="modal fade" id="profModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg">
                 <div class="modal-header border-secondary">
-                    <h5 class="modal-title" id="modalTitle"><i class="bi bi-person-vcard me-2 text-warning"></i> <span data-i18n="nav_prof">Преподаватели</span></h5>
+                    <h5 class="modal-title" id="modalTitle"><i class="bi bi-person-plus me-2 text-warning"></i> Преподавател</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="errorAlert" class="alert alert-danger d-none small py-2 mb-3" role="alert"></div>
-                    
-                    <form id="professorForm">
-                        <input type="hidden" id="professorId">
-                        
-                        <div class="mb-3">
-                            <label class="text-muted small mb-1" data-i18n="th_title">Титла (напр. Д-р, Доцент)</label>
-                            <input type="text" class="form-control" id="title">
-                        </div>
-                        
+                    <form id="profForm">
+                        <input type="hidden" id="profId">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="text-muted small mb-1">Име</label>
-                                <input type="text" class="form-control" id="firstName" required>
+                                <input type="text" class="form-control" id="profFirstName" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="text-muted small mb-1">Фамилия</label>
-                                <input type="text" class="form-control" id="lastName" required>
+                                <input type="text" class="form-control" id="profLastName" required>
                             </div>
                         </div>
-                        
                         <div class="mb-3">
-                            <label class="text-muted small mb-1" data-i18n="th_email">Имейл</label>
-                            <input type="email" class="form-control" id="email" required>
+                            <label class="text-muted small mb-1">Академична титла</label>
+                            <input type="text" class="form-control" id="profTitle" placeholder="напр. Проф., Доц., Д-р" required>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer border-secondary">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отказ</button>
-                    <button type="button" class="btn btn-warning fw-bold px-4" id="save-professor-btn">Запази</button>
+                    <button type="button" class="btn btn-warning text-dark fw-bold px-4" id="save-prof-btn">Запази</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="app.js"></script> <script>
+    <script src="app.js"></script>
+    <script>
         document.addEventListener("DOMContentLoaded", function() {
-            window.allProfessorsData = []; 
+            let isAdmin = false;
 
-            window.loadAllProfessors = function() {
+            // 1. Проверка на правата
+            fetch('/api/auth/me')
+                .then(res => res.json())
+                .then(user => {
+                    isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
+                    
+                    if (!isAdmin) {
+                        let newBtn = document.getElementById('btn-new-professor');
+                        let actionTh = document.getElementById('th-action');
+                        if(newBtn) newBtn.style.display = 'none';
+                        if(actionTh) actionTh.style.display = 'none';
+                    }
+
+                    // 2. Зареждане на таблицата
+                    window.loadProfessors();
+                })
+                .catch(err => {
+                    console.error("Грешка при проверка:", err);
+                    window.loadProfessors();
+                });
+
+            window.loadProfessors = function() {
                 fetch('/api/professors')
                     .then(res => res.json())
-                    .then(professors => {
-                        window.allProfessorsData = professors;
-                        renderTable(professors);
-                    })
-                    .catch(err => console.error("Грешка:", err));
+                    .then(data => renderTable(data))
+                    .catch(err => console.error(err));
             };
 
-            function renderTable(professorsToRender) {
-                let tableBody = document.getElementById('all-professors-tbody');
-                tableBody.innerHTML = ''; 
-                
-                if (professorsToRender.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Няма данни</td></tr>';
+            function renderTable(profs) {
+                let tbody = document.getElementById('all-professors-tbody');
+                tbody.innerHTML = '';
+                if(profs.length === 0) {
+                    let colspan = isAdmin ? 5 : 4;
+                    tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4">Няма данни</td></tr>`;
                     return;
                 }
 
-                professorsToRender.forEach(prof => {
-                    let profJson = encodeURIComponent(JSON.stringify(prof));
-                    let displayTitle = prof.title ? `<span class="badge bg-secondary">${prof.title}</span>` : '';
-
-                    let row = `
-                    <tr class="new-row">
-                        <td class="px-4 py-3 text-secondary">#${prof.id}</td>
-                        <td>${displayTitle}</td>
-                        <td class="fw-bold"><i class="bi bi-person-fill me-2 text-warning"></i> ${prof.firstName} ${prof.lastName}</td>
-                        <td class="text-muted">${prof.email || '-'}</td>
+                profs.forEach(p => {
+                    let actionColumnHtml = '';
+                    if (isAdmin) {
+                        let profJson = encodeURIComponent(JSON.stringify(p));
+                        actionColumnHtml = `
                         <td class="text-end px-4">
-                            <button class="btn btn-outline-warning btn-sm rounded-circle me-1" onclick="openEditModal('${profJson}')" title="Редактирай">
-                                <i class="bi bi-pencil-fill"></i>
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteProfessor(${prof.id})" title="Изтрий">
-                                <i class="bi bi-trash-fill"></i>
-                            </button>
-                        </td>
+                            <button class="btn btn-outline-warning btn-sm rounded-circle me-1" onclick="openEditModal('${profJson}')"><i class="bi bi-pencil-fill"></i></button>
+                            <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteProf(${p.id})"><i class="bi bi-trash-fill"></i></button>
+                        </td>`;
+                    }
+
+                    tbody.innerHTML += `
+                    <tr class="new-row">
+                        <td class="px-4 py-3 text-secondary">#${p.id}</td>
+                        <td class="fw-bold">${p.firstName}</td>
+                        <td class="fw-bold">${p.lastName}</td>
+                        <td><span class="badge bg-warning text-dark">${p.title || '-'}</span></td>
+                        ${actionColumnHtml}
                     </tr>`;
-                    tableBody.innerHTML += row;
                 });
             }
 
-            window.loadAllProfessors();
-
-            // Live Search
-            document.getElementById('searchInput').addEventListener('input', function(e) {
-                let searchTerm = e.target.value.toLowerCase();
-                let filtered = window.allProfessorsData.filter(p => {
-                    let fullName = (p.firstName + " " + p.lastName).toLowerCase();
-                    return fullName.includes(searchTerm) || 
-                           (p.title && p.title.toLowerCase().includes(searchTerm)) || 
-                           (p.email && p.email.toLowerCase().includes(searchTerm));
-                });
-                renderTable(filtered);
-            });
-
             window.openCreateModal = function() {
-                document.getElementById('professorForm').reset();
-                document.getElementById('professorId').value = ''; 
-                document.getElementById('errorAlert').classList.add('d-none');
-                new bootstrap.Modal(document.getElementById('professorModal')).show();
+                document.getElementById('profForm').reset();
+                document.getElementById('profId').value = '';
+                new bootstrap.Modal(document.getElementById('profModal')).show();
             };
 
             window.openEditModal = function(encodedProf) {
-                let prof = JSON.parse(decodeURIComponent(encodedProf));
-                document.getElementById('professorId').value = prof.id;
-                document.getElementById('title').value = prof.title || '';
-                document.getElementById('firstName').value = prof.firstName;
-                document.getElementById('lastName').value = prof.lastName;
-                document.getElementById('email').value = prof.email || '';
-                
-                document.getElementById('errorAlert').classList.add('d-none');
-                new bootstrap.Modal(document.getElementById('professorModal')).show();
+                let p = JSON.parse(decodeURIComponent(encodedProf));
+                document.getElementById('profId').value = p.id;
+                document.getElementById('profFirstName').value = p.firstName;
+                document.getElementById('profLastName').value = p.lastName;
+                document.getElementById('profTitle').value = p.title;
+                new bootstrap.Modal(document.getElementById('profModal')).show();
             };
 
-            document.getElementById('save-professor-btn').addEventListener('click', async function() {
-                let id = document.getElementById('professorId').value;
-                let profData = {
-                    title: document.getElementById('title').value,
-                    firstName: document.getElementById('firstName').value,
-                    lastName: document.getElementById('lastName').value,
-                    email: document.getElementById('email').value
+            document.getElementById('save-prof-btn').addEventListener('click', function() {
+                let id = document.getElementById('profId').value;
+                let data = {
+                    firstName: document.getElementById('profFirstName').value,
+                    lastName: document.getElementById('profLastName').value,
+                    title: document.getElementById('profTitle').value
                 };
-
-                let url = id ? `/api/professors/${id}` : '/api/professors'; 
+                let url = id ? '/api/professors/' + id : '/api/professors';
                 let method = id ? 'PUT' : 'POST';
 
-                try {
-                    let response = await fetch(url, {
-                        method: method,
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(profData)
-                    });
-
-                    if (!response.ok) throw new Error("Сървърна грешка при запазване.");
-
-                    bootstrap.Modal.getInstance(document.getElementById('professorModal')).hide();
-                    window.loadAllProfessors(); 
-                    document.getElementById('searchInput').value = ''; 
-
-                } catch (error) {
-                    let errorDiv = document.getElementById('errorAlert');
-                    errorDiv.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> ${error.message}`;
-                    errorDiv.classList.remove('d-none');
-                }
+                fetch(url, {
+                    method: method,
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                }).then(() => {
+                    bootstrap.Modal.getInstance(document.getElementById('profModal')).show();
+                    bootstrap.Modal.getInstance(document.getElementById('profModal')).hide();
+                    loadProfessors();
+                });
             });
 
-            window.deleteProfessor = function(id) {
-                if(confirm('Сигурен ли си?')) {
-                    fetch('/api/professors/' + id, { method: 'DELETE' }).then(() => window.loadAllProfessors());
+            window.deleteProf = function(id) {
+                if(confirm('Изтриване на преподавател?')) {
+                    fetch('/api/professors/' + id, { method: 'DELETE' }).then(() => loadProfessors());
                 }
             };
         });
