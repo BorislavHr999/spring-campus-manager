@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         body { background-color: #121212; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { background-color: #1e1e1e; min-height: 100vh; box-shadow: 2px 0 5px rgba(0,0,0,0.5); }
+        .sidebar { background-color: #1e1e1e; min-height: 100vh; box-shadow: 2px 0 5px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
         .text-gradient { background: linear-gradient(45deg, #0d6efd, #0dcaf0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
         .table-custom { background-color: #1e1e1e; border-radius: 10px; overflow: hidden; }
         .modal-content { background-color: #1e1e1e; border: 1px solid #3d3d3d; }
@@ -23,19 +23,25 @@
         <div class="row">
             
             <nav class="col-md-2 d-none d-md-block sidebar py-4">
-                <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
-                <div class="list-group list-group-flush gap-2 px-2">
-                    <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
-                    <a href="students.html" class="list-group-item list-group-item-action bg-primary text-white rounded border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
-                    <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
-                    <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
+                <div>
+                    <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
+                    <div class="list-group list-group-flush gap-2 px-2">
+                        <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
+                        <a href="students.html" class="list-group-item list-group-item-action bg-primary text-white rounded border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
+                        <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
+                        <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
+                    </div>
+                </div>
+                <div class="mt-auto px-3">
+                    <hr class="border-secondary">
+                    <a href="/logout" class="btn btn-outline-danger w-100 btn-sm"><i class="bi bi-box-arrow-left me-2"></i>Изход</a>
                 </div>
             </nav>
 
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
                     <h1 class="h2 fw-light"><i class="bi bi-people me-2"></i> <span data-i18n="nav_students">Всички студенти</span></h1>
-                    <button class="btn btn-outline-success btn-sm rounded-pill px-3 shadow-sm" onclick="openCreateModal()">
+                    <button id="btn-new-student" class="btn btn-outline-success btn-sm rounded-pill px-3 shadow-sm" onclick="openCreateModal()">
                         <i class="bi bi-person-plus-fill me-1"></i> <span data-i18n="btn_new_student">Нов Студент</span>
                     </button>
                 </div>
@@ -58,7 +64,7 @@
                                 <th class="py-3" data-i18n="th_fac">Фак. Номер</th>
                                 <th class="py-3" data-i18n="th_email">Имейл</th>
                                 <th class="py-3" data-i18n="th_courses">Записани курсове</th>
-                                <th class="py-3 text-end px-4" data-i18n="th_action">Управление</th>
+                                <th class="py-3 text-end px-4" id="th-action" data-i18n="th_action">Управление</th>
                             </tr>
                         </thead>
                         <tbody id="all-students-tbody">
@@ -85,7 +91,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg">
                 <div class="modal-header border-secondary">
-                    <h5 class="modal-title" id="modalTitle"><i class="bi bi-person-badge me-2"></i> <span data-i18n="nav_students">Студенти</span></h5>
+                    <h5 class="modal-title" id="modalTitle"><i class="bi bi-person-badge me-2"></i> <span data-i18n="nav_students">Студент</span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -133,17 +139,42 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // ПРОМЕНЛИВИ ЗА ПАГИНАЦИЯТА И КУРСОВЕТЕ
             let currentPage = 0;
             const pageSize = 10; 
             let currentKeyword = '';
             let allAvailableCourses = []; 
+            let isAdmin = false; // ПРОМЕНЛИВА ЗА ПРАВАТА
 
-            // Изтегляме всички курсове веднъж при зареждане на страницата
-            fetch('/api/courses')
+            // 1. ИНИЦИАЛИЗАЦИЯ: Проверка на права -> Зареждане на курсове -> Зареждане на студенти
+            fetch('/api/auth/me')
                 .then(res => res.json())
-                .then(data => allAvailableCourses = data)
-                .catch(err => console.error("Грешка при зареждане на курсове:", err));
+                .then(user => {
+                    // Проверяваме дали е админ
+                    isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
+                    
+                    // Скриваме бутоните, ако е обикновен потребител
+                    if (!isAdmin) {
+                        let newBtn = document.getElementById('btn-new-student');
+                        let actionTh = document.getElementById('th-action');
+                        if(newBtn) newBtn.style.display = 'none';
+                        if(actionTh) actionTh.style.display = 'none';
+                    }
+
+                    // След като знаем кой е, теглим курсовете
+                    return fetch('/api/courses');
+                })
+                .then(res => res.json())
+                .then(data => {
+                    allAvailableCourses = data;
+                    // Накрая чертаем таблицата
+                    window.loadAllStudents(0);
+                })
+                .catch(err => {
+                    console.error("Грешка при инициализация:", err);
+                    // Ако има проблем, все пак се опитваме да заредим студентите (в safe mode)
+                    window.loadAllStudents(0);
+                });
+
 
             // ФУНКЦИЯ ЗА ЗАРЕЖДАНЕ ОТ СЪРВЪРА (Пагинация)
             window.loadAllStudents = function(page = 0) {
@@ -176,14 +207,15 @@
                 loadAllStudents(currentPage + offset);
             };
 
-            // РИСУВАНЕ НА ТАБЛИЦАТА
+            // РИСУВАНЕ НА ТАБЛИЦАТА С ПРОВЕРКА ЗА ПРАВА
             function renderTable(studentsToRender) {
                 let tableBody = document.getElementById('all-students-tbody');
                 tableBody.innerHTML = ''; 
                 
                 if (!studentsToRender || studentsToRender.length === 0) {
+                    let colspan = isAdmin ? 6 : 5;
                     let noDataText = typeof t === 'function' ? t('no_data') : 'Няма данни';
-                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">${noDataText}</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4">${noDataText}</td></tr>`;
                     return;
                 }
 
@@ -199,13 +231,10 @@
 
                     let studentJson = encodeURIComponent(JSON.stringify(student));
 
-                    let row = `
-                    <tr class="new-row">
-                        <td class="px-4 py-3 text-secondary">#${student.id}</td>
-                        <td class="fw-bold"><i class="bi bi-person-circle me-2 text-primary"></i> ${student.firstName} ${student.lastName}</td>
-                        <td><span class="text-info">${student.facultyNumber}</span></td>
-                        <td class="text-muted">${student.email}</td>
-                        <td>${coursesHtml}</td>
+                    // Динамична колона за управление: показва се само на Админ
+                    let actionColumnHtml = '';
+                    if (isAdmin) {
+                        actionColumnHtml = `
                         <td class="text-end px-4">
                             <button class="btn btn-outline-warning btn-sm rounded-circle me-1" onclick="openEditModal('${studentJson}')" title="Редактирай">
                                 <i class="bi bi-pencil-fill"></i>
@@ -213,14 +242,21 @@
                             <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteStudent(${student.id})" title="Изтрий">
                                 <i class="bi bi-trash-fill"></i>
                             </button>
-                        </td>
+                        </td>`;
+                    }
+
+                    let row = `
+                    <tr class="new-row">
+                        <td class="px-4 py-3 text-secondary">#${student.id}</td>
+                        <td class="fw-bold"><i class="bi bi-person-circle me-2 text-primary"></i> ${student.firstName} ${student.lastName}</td>
+                        <td><span class="text-info">${student.facultyNumber}</span></td>
+                        <td class="text-muted">${student.email}</td>
+                        <td>${coursesHtml}</td>
+                        ${actionColumnHtml}
                     </tr>`;
                     tableBody.innerHTML += row;
                 });
             }
-
-            // ПЪРВОНАЧАЛНО ЗАРЕЖДАНЕ
-            window.loadAllStudents(0);
 
             // ТЪРСАЧКА НА ЖИВО
             document.getElementById('searchInput').addEventListener('input', function(e) {
@@ -234,7 +270,6 @@
                 document.getElementById('studentId').value = ''; 
                 document.getElementById('errorAlert').classList.add('d-none');
                 
-                // Пълним менюто с курсове (празно)
                 let courseSelect = document.getElementById('studentCourses');
                 courseSelect.innerHTML = '';
                 allAvailableCourses.forEach(c => {
@@ -253,7 +288,6 @@
                 document.getElementById('facultyNumber').value = student.facultyNumber;
                 document.getElementById('email').value = student.email;
                 
-                // Пълним менюто и маркираме курсовете на студента
                 let courseSelect = document.getElementById('studentCourses');
                 courseSelect.innerHTML = '';
                 allAvailableCourses.forEach(c => {
@@ -269,7 +303,6 @@
             document.getElementById('save-student-btn').addEventListener('click', async function() {
                 let id = document.getElementById('studentId').value;
                 
-                // Взимаме избраните курсове
                 let selectedCourses = Array.from(document.getElementById('studentCourses').selectedOptions)
                                            .map(opt => ({ id: parseInt(opt.value) }));
 
@@ -278,7 +311,7 @@
                     lastName: document.getElementById('lastName').value,
                     facultyNumber: document.getElementById('facultyNumber').value,
                     email: document.getElementById('email').value,
-                    courses: selectedCourses // Изпращаме ги към сървъра!
+                    courses: selectedCourses
                 };
 
                 let url = id ? `/api/students/${id}` : '/api/students'; 
