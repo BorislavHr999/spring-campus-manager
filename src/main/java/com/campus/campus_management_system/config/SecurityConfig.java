@@ -19,7 +19,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login.html").permitAll() // РАЗРЕШАВАМЕ на всички да виждат страницата за вход
+                .requestMatchers("/login.html", "/register.html", "/api/auth/register", "/css/**", "/js/**").permitAll()
                 .anyRequest().authenticated() 
             )
             .formLogin(form -> form
