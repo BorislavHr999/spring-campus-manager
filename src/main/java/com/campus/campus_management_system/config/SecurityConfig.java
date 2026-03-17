@@ -19,9 +19,15 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/login.html").permitAll() // РАЗРЕШАВАМЕ на всички да виждат страницата за вход
                 .anyRequest().authenticated() 
             )
-            .formLogin(Customizer.withDefaults()); 
+            .formLogin(form -> form
+                .loginPage("/login.html") // КАЗВАМЕ: Използвай този HTML файл за логин
+                .loginProcessingUrl("/login") // КАЗВАМЕ: Обработвай данните на този адрес (както е във формата)
+                .defaultSuccessUrl("/index.html", true) // КАЗВАМЕ: При успех, прати човека в Главното табло
+                .permitAll()
+            ); 
 
         return http.build();
     }
