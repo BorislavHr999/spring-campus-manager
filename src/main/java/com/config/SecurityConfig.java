@@ -13,6 +13,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+
 
 @Configuration
 @EnableWebSecurity
@@ -38,11 +41,12 @@ public class SecurityConfig {
     }
 
     // 2. СВЪРЗВАНЕ С БАЗАТА ДАННИ
+    // 2. СВЪРЗВАНЕ С БАЗАТА ДАННИ
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService); // Използваме нашия сервиз
-        authProvider.setPasswordEncoder(passwordEncoder()); // Използваме нашия енкодер
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(); // Празни скоби тук!
+        authProvider.setUserDetailsService(userDetailsService); 
+        authProvider.setPasswordEncoder(passwordEncoder()); 
         return authProvider;
     }
 
