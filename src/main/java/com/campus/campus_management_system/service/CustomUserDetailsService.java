@@ -19,7 +19,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Опитваме се да намерим потребителя. Ако го няма - хвърляме грешка, която Spring ще покаже като "Грешно име или парола"
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Потребителят не е намерен: " + username));
     }
