@@ -1,5 +1,6 @@
 package com.campus.campus_management_system.controller;
 
+import com.campus.campus_management_system.model.entity.Student;
 import com.campus.campus_management_system.model.entity.User;
 import com.campus.campus_management_system.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,14 @@ public class AuthController {
                 .password(passwordEncoder.encode(password)) // КРИПТИРАМЕ паролата!
                 .role("ROLE_USER") // По подразбиране всички нови са обикновени потребители
                 .build();
+
+        Student newStudent = new Student();
+        newStudent.setFirstName("Нов");
+        newStudent.setLastName("Студент");
+        newStudent.setEmail(username + "@campus.com");
+
+        newStudent.setUser(newUser);
+        newUser.setStudent(newStudent);
         
         userRepository.save(newUser);
 

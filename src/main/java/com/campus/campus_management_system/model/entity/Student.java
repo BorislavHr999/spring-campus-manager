@@ -7,6 +7,8 @@ import lombok.ToString;
 import lombok.EqualsAndHashCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,4 +72,8 @@ public class Student {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Course> courses = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "used_id", referencedColumnName = "id")
+    private User user;
 }
