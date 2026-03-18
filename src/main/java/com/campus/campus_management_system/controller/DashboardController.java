@@ -20,17 +20,21 @@ import java.util.Random;
 @RequestMapping("/api/dashboard")
 public class DashboardController {
 
-    @Autowired
-private EnrollmentRepository enrollmentRepository;
-
+  // 1. Дефинираш всички полета като final
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
     private final ProfessorRepository professorRepository;
+    private final EnrollmentRepository enrollmentRepository; // ТОВА БЕШЕ ЛИПСВАЩОТО
 
-    public DashboardController(StudentRepository studentRepository, CourseRepository courseRepository, ProfessorRepository professorRepository) {
+    // 2. Конструкторът трябва да приеме ВСИЧКИ четири репозиторита
+    public DashboardController(StudentRepository studentRepository, 
+                               CourseRepository courseRepository, 
+                               ProfessorRepository professorRepository,
+                               EnrollmentRepository enrollmentRepository) {
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
         this.professorRepository = professorRepository;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     @GetMapping("/stats") // или както е твоят Endpoint
