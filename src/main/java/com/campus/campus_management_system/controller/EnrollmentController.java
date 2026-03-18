@@ -12,8 +12,9 @@ public class EnrollmentController {
     @Autowired
     private EnrollmentService enrollmentService;
 
-    @PostMapping
-    public Enrollment savEnrollment(@RequestParam Long studentId, @RequestParam Long courseId) {
+    @PostMapping("/enroll")
+    public Enrollment saveEnrollment(@RequestParam Long studentId, @RequestParam Long courseId) {
+        // Вече типовете съвпадат (Long, Long)
         return enrollmentService.enrollStudent(studentId, courseId);
     }
 }
