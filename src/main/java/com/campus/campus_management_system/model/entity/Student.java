@@ -75,7 +75,6 @@ public class Student {
     @JsonIgnoreProperties("students")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private List<Course> courses = new ArrayList<>();
 
     @JsonIgnore
     @OneToOne
