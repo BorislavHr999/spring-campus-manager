@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -72,8 +74,8 @@ public class StudentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Student>> getAllStudents(){
-        List<Student> allStudents = studentRepository.findAll();
-        return ResponseEntity.ok(allStudents);
+    public ResponseEntity<Page<Student>> getAllStudents(Pageable pageable){
+        Page<Student> studentPage = studentRepository.findAll(pageable);
+        return ResponseEntity.ok(studentPage);
     }
 }
