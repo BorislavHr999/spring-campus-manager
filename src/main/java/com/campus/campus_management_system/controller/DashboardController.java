@@ -5,9 +5,13 @@ import com.campus.campus_management_system.model.entity.Course;
 import com.campus.campus_management_system.model.entity.Professor; // Добавен Professor
 import com.campus.campus_management_system.repository.StudentRepository;
 import com.campus.campus_management_system.repository.CourseRepository;
+import com.campus.campus_management_system.repository.EnrollmentRepository;
 import com.campus.campus_management_system.repository.ProfessorRepository; // Добавено ProfessorRepository
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -15,6 +19,9 @@ import java.util.Random;
 @RestController
 @RequestMapping("/api/dashboard")
 public class DashboardController {
+
+    @Autowired
+private EnrollmentRepository enrollmentRepository;
 
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
@@ -26,14 +33,17 @@ public class DashboardController {
         this.professorRepository = professorRepository;
     }
 
-    // --- СТАТИСТИКА ЗА ТАБЛОТО ---
-    @GetMapping("/stats")
-    public Map<String, Object> getStats() {
-        return Map.of(
-            "totalStudents", studentRepository.count(),
-            "activeCourses", courseRepository.count()
-        );
-    }
+    @GetMapping("/stats") // или както е твоят Endpoint
+public Map<String, Object> getStats() {
+    Map<String, Object> stats = new HashMap<>();
+    stats.put("totalStudents", studentRepository.count());
+    stats.put("activeCourses", courseRepository.count());
+    
+    // Взимаме данните за графиката от новата таблица!
+    stats.put("studentsPerCourse", enrollmentRepository.countStudentsPerCourse());
+    
+    return stats;
+}
 
     // --- СТУДЕНТИ ---
     @PostMapping("/add-demo-student")

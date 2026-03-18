@@ -80,5 +80,4 @@ public class Student {
     @OneToOne
     @JoinColumn(name = "used_id", referencedColumnName = "id")
     private User user;
-
 }
