@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.JoinColumn;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +74,7 @@ public class Student {
     @EqualsAndHashCode.Exclude
     private List<Course> courses = new ArrayList<>();
 
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "used_id", referencedColumnName = "id")
     private User user;
