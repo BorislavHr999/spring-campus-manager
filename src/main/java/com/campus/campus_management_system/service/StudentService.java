@@ -43,15 +43,6 @@ public class StudentService {
             throw new RuntimeException("Този факултетен номер вече съществува!");
         }
 
-        // Превръщане на ID-тата от фронтенда в реални курсове от базата
-        if (student.getCourses() != null && !student.getCourses().isEmpty()) {
-            List<Course> realCourses = new ArrayList<>();
-            for (Course c : student.getCourses()) {
-                courseRepository.findById(c.getId()).ifPresent(realCourses::add);
-            }
-            student.setCourses(realCourses);
-        }
-
         return studentRepository.save(student);
     }
 
@@ -64,17 +55,6 @@ public class StudentService {
         existingStudent.setLastName(studentDetails.getLastName());
         existingStudent.setEmail(studentDetails.getEmail());
         existingStudent.setFacultyNumber(studentDetails.getFacultyNumber());
-
-        // Обновяване на курсовете
-        if (studentDetails.getCourses() != null) {
-            List<Course> realCourses = new ArrayList<>();
-            for (Course c : studentDetails.getCourses()) {
-                courseRepository.findById(c.getId()).ifPresent(realCourses::add);
-            }
-            existingStudent.setCourses(realCourses);
-        } else {
-            existingStudent.getCourses().clear();
-        }
 
         return studentRepository.save(existingStudent);
     }
