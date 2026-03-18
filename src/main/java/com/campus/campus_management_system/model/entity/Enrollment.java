@@ -27,10 +27,11 @@ public class Enrollment {
 
     private Double grade;
 
-    private LocalDateTime enrollmentDate;
+    private LocalDateTime enrollmentDate; 
 
     @PrePersist
     protected void onCreate() {
+        this.enrollmentDate = LocalDateTime.now(); 
     }
 
     public Enrollment(Student student, Course course) {
