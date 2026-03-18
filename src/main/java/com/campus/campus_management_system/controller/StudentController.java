@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -68,5 +69,11 @@ public class StudentController {
         enrollmentRepository.save(enrollment);
 
         return ResponseEntity.ok("Успешно се записахте за курс: " + course.getName());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Student>> getAllStudents(){
+        List<Student> allStudents = studentRepository.findAll();
+        return ResponseEntity.ok(allStudents);
     }
 }
