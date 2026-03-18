@@ -13,7 +13,7 @@ public class EnrollmentController {
     private EnrollmentService enrollmentService;
 
     @PostMapping
-    public Enrollment enrollStudent(@RequestParam Long studentId, @RequestParam Long courseId) {
+    public Enrollment savEnrollment(@RequestParam Long studentId, @RequestParam Long courseId) {
         return enrollmentService.enrollStudent(studentId, courseId);
     }
 }
