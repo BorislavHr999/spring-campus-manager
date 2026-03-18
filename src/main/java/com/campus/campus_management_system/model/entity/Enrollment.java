@@ -31,7 +31,6 @@ public class Enrollment {
 
     @PrePersist
     protected void onCreate() {
-        enrollmentDate = LocalDateTime.now();
     }
 
     public Enrollment(Student student, Course course) {
