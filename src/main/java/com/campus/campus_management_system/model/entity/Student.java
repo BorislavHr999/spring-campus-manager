@@ -10,6 +10,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.JoinColumn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.JoinColumn;
+import java.util.Set;
+import java.util.HashSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,14 +48,12 @@ public class Student {
     @EqualsAndHashCode.Exclude
     private Department department;
 
-    // --- ТОВА ИЗТРИХ БЕЗ ДА ИСКАМ ---
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @JsonIgnore
     private Set<Enrollment> enrollments;
 
-    // --- ТОВА БЕХ СЧУПИЛ, СЕГА Е ОПРАВЕНО ---
     @ManyToMany
     @JoinTable(
         name = "student_club",
@@ -62,13 +65,13 @@ public class Student {
     @EqualsAndHashCode.Exclude
     private Set<Club> clubs;
 
-    // --- ВРЪЗКАТА С КУРСОВЕТЕ ---
-    @ManyToMany
-    @JoinTable(
-        name = "student_course",
-        joinColumns = @JoinColumn(name = "student_id"),
-        inverseJoinColumns = @JoinColumn(name = "course_id")
-    )
+    //@ManyToMany
+    //@JoinTable(
+    //    name = "student_course",
+    //    joinColumns = @JoinColumn(name = "student_id"),
+    //    inverseJoinColumns = @JoinColumn(name = "course_id")
+    //)
+
     @JsonIgnoreProperties("students")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
@@ -78,4 +81,5 @@ public class Student {
     @OneToOne
     @JoinColumn(name = "used_id", referencedColumnName = "id")
     private User user;
+
 }

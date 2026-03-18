@@ -1,12 +1,15 @@
 package com.campus.campus_management_system.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.time.LocalDate;
+import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Table(name = "enrollments")
+@Getter
+@Setter
 @NoArgsConstructor
 public class Enrollment {
 
@@ -14,14 +17,25 @@ public class Enrollment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate enrollmentDate = LocalDate.now();
-    Integer grade;
-
-    @ManyToOne
-    @JoinColumn(name = "student_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id", nullable = false)
     private Course course;
+
+    private Double grade;
+
+    private LocalDateTime enrollmentDate;
+
+    @PrePersist
+    protected void onCreate() {
+        enrollmentDate = LocalDateTime.now();
+    }
+
+    public Enrollment(Student student, Course course) {
+        this.student = student;
+        this.course = course;
+    }
 }

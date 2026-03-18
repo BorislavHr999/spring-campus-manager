@@ -1,7 +1,11 @@
 package com.campus.campus_management_system.controller;
 
+import com.campus.campus_management_system.model.entity.Course;
+import com.campus.campus_management_system.model.entity.Enrollment;
 import com.campus.campus_management_system.model.entity.Student;
 import com.campus.campus_management_system.model.entity.User;
+import com.campus.campus_management_system.repository.CourseRepository;
+import com.campus.campus_management_system.repository.EnrollmentRepository;
 import com.campus.campus_management_system.repository.StudentRepository;
 import com.campus.campus_management_system.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -18,76 +21,52 @@ public class StudentController {
 
     private final StudentRepository studentRepository;
     private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
     @Autowired
-    public StudentController(StudentRepository studentRepository, UserRepository userRepository) {
+    public StudentController(StudentRepository studentRepository, 
+                             UserRepository userRepository,
+                             CourseRepository courseRepository,
+                             EnrollmentRepository enrollmentRepository) {
         this.studentRepository = studentRepository;
         this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     @GetMapping("/me")
     public ResponseEntity<?> getMyProfile(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(401).body("Моля, влезте в профила си!");
-        }
-
         String currentUsername = authentication.getName();
-        Optional<User> currentUserOpt = userRepository.findByUsername(currentUsername);
-
-        if (currentUserOpt.isPresent()) {
-            Student myProfile = currentUserOpt.get().getStudent();
-            if (myProfile != null) {
-                return ResponseEntity.ok(myProfile);
-            }
-            return ResponseEntity.status(404).body("Студентският профил не е намерен.");
-        }
-        return ResponseEntity.status(404).body("Потребителят не е намерен.");
-    }
-
-    @PutMapping("/me")
-    public ResponseEntity<?> updateMyProfile(Authentication authentication, @RequestBody Student updatedData) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(401).body("Моля, влезте в профила си!");
-        }
-
-        String currentUsername = authentication.getName();
-        Optional<User> currentUserOpt = userRepository.findByUsername(currentUsername);
-
-        if (currentUserOpt.isPresent()) {
-            Student myProfile = currentUserOpt.get().getStudent();
-            if (myProfile != null) {
-                myProfile.setFirstName(updatedData.getFirstName());
-                myProfile.setLastName(updatedData.getLastName());
-                myProfile.setAge(updatedData.getAge());
-                myProfile.setFacultyNumber(updatedData.getFacultyNumber());
-                
-                studentRepository.save(myProfile);
-                return ResponseEntity.ok(myProfile);
-            }
+        User user = userRepository.findByUsername(currentUsername).orElse(null);
+        if (user != null && user.getStudent() != null) {
+            return ResponseEntity.ok(user.getStudent());
         }
         return ResponseEntity.status(404).body("Профилът не е намерен.");
     }
 
-    @GetMapping
-    public ResponseEntity<List<Student>> getAllStudents() {
-        return ResponseEntity.ok(studentRepository.findAll());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getStudentById(@PathVariable Long id) {
-        Optional<Student> student = studentRepository.findById(id);
-        if (student.isPresent()) {
-            return ResponseEntity.ok(student.get());
+    @PostMapping("/enroll/{courseId}")
+    public ResponseEntity<?> enrollInCourse(@PathVariable Long courseId, Authentication authentication) {
+        
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Потребителят не е намерен"));
+        
+        Student student = user.getStudent();
+        if (student == null) {
+            return ResponseEntity.badRequest().body("Само студенти могат да се записват за курсове.");
         }
-        return ResponseEntity.status(404).body("Студентът не е намерен.");
-    }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteStudent(@PathVariable Long id) {
-        if (studentRepository.existsById(id)) {
-            studentRepository.deleteById(id);
-            return ResponseEntity.ok("Студентът е изтрит успешно.");
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Курсът не е намерен"));
+
+        if (enrollmentRepository.existsByStudentIdAndCourseId(student.getId(), courseId)) {
+            return ResponseEntity.badRequest().body("Вече сте записани за този курс!");
         }
-        return ResponseEntity.status(404).body("Студентът не е намерен.");
+
+        Enrollment enrollment = new Enrollment(student, course);
+        enrollmentRepository.save(enrollment);
+
+        return ResponseEntity.ok("Успешно се записахте за курс: " + course.getName());
     }
 }
