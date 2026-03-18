@@ -29,11 +29,5 @@ public class Course {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Professor professor;
-
-    @ManyToMany(mappedBy = "courses")
-    @JsonIgnoreProperties("courses")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Student> students = new ArrayList<>();
-
+   
 }

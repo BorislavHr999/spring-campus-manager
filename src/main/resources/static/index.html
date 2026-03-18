@@ -167,44 +167,43 @@
                     });
                 }
 
-                // Изчисляване на данните за графиката
-                let courseCounts = {};
-                courses.forEach(c => courseCounts[c.name] = 0);
-                students.forEach(student => {
-                    if (student.courses) {
-                        student.courses.forEach(course => {
-                            if (courseCounts[course.name] !== undefined) courseCounts[course.name]++;
-                        });
-                    }
-                });
+                // --- ЗАМЕСТИ ОТ ТУК ---
+                const token = localStorage.getItem('token');
+                fetch('/api/dashboard/stats', {
+                    headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+                })
+                .then(res => res.json())
+                .then(statsData => {
+                    const labels = statsData.studentsPerCourse.map(item => item[0]);
+                    const counts = statsData.studentsPerCourse.map(item => item[1]);
 
-                // Рисуване на графиката
-                const ctx = document.getElementById('studentsChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(courseCounts),
-                        datasets: [{
-                            label: typeof t === 'function' ? t('chart_label') : 'Брой студенти',
-                            data: Object.values(courseCounts),
-                            backgroundColor: 'rgba(13, 202, 240, 0.6)',
-                            borderColor: 'rgba(13, 202, 240, 1)',
-                            borderWidth: 1,
-                            borderRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: { beginAtZero: true, ticks: { stepSize: 1, color: '#adb5bd' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
-                            x: { ticks: { color: '#adb5bd' }, grid: { display: false } }
+                    const ctx = document.getElementById('studentsChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Брой студенти',
+                                data: counts,
+                                backgroundColor: 'rgba(13, 202, 240, 0.6)',
+                                borderColor: 'rgba(13, 202, 240, 1)',
+                                borderWidth: 1,
+                                borderRadius: 6
+                            }]
                         },
-                        plugins: { legend: { labels: { color: '#ffffff' } } }
-                    }
-                });
-            })
-            .catch(err => console.error("Грешка:", err));
-        });
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: { beginAtZero: true, ticks: { stepSize: 1, color: '#adb5bd' } },
+                                x: { ticks: { color: '#adb5bd' }, grid: { display: false } }
+                            },
+                            plugins: { legend: { labels: { color: '#ffffff' } } }
+                        }
+                    })
+            .catch(err => console.error("Грешка при статистика:", err));
+        })
+        .catch(err => console.error("Грешка:", err));
+    }); });
     </script>
 </body>
 </html>
