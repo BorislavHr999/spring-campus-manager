@@ -224,14 +224,14 @@
                     return;
                 }
 
-                studentsToRender.forEach(student => {
-                    let coursesHtml = student.courseCount > 0 
-        ? `<span class="badge bg-info text-dark rounded-pill px-3 shadow-sm">${student.courseCount} курса</span>`
-        : `<span class="text-muted small fst-italic">Няма курсове</span>`;
+        studentsToRender.forEach(student => {
+            
+            let studentJson = encodeURIComponent(JSON.stringify(student));
 
-                    let studentJson = encodeURIComponent(JSON.stringify(student));
+            let coursesHtml = student.courseCount > 0 
+                ? `<span class="badge bg-info text-dark rounded-pill px-3 shadow-sm" style="cursor: pointer;" onclick="showStudentCourses('${student.firstName} ${student.lastName}', '${studentJson}')" title="Кликни за списък">${student.courseCount} курса</span>`
+                : `<span class="text-muted small fst-italic">Няма курсове</span>`;
 
-                    // Динамична колона за управление: показва се само на Админ
                     let actionColumnHtml = '';
                     if (isAdmin) {
                         actionColumnHtml = `
@@ -355,5 +355,20 @@
             };
         });
     </script>
+
+    <div class="modal fade" id="coursesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-dark">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title">Курсове на <span id="modalStudentName" class="fw-bold text-primary"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul id="modalCoursesList" class="list-group list-group-flush">
+                        </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
