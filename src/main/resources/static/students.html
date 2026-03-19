@@ -153,217 +153,234 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            let isAdmin = false;
-            let currentPage = 0;
-            const pageSize = 10;
-            let currentKeyword = '';
-            
-            // Променливи за данните от падащите менюта
-            let allAvailableDepartments = [];
-            let allAvailableAddresses = [];
+   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let isAdmin = false;
+        let currentPage = 0;
+        const pageSize = 10;
+        let currentKeyword = '';
 
-            // ИНИЦИАЛИЗАЦИЯ: Взимаме всичко наведнъж
-            Promise.all([
-                fetch('/api/auth/me').then(res => res.json()),
-                fetch('/api/departments').then(res => res.json()),
-                fetch('/api/addresses').then(res => res.json())
-            ])
-            .then(([user, depts, addrs]) => {
+        // 1. ВЕДНАГА зареждаме таблицата със студентите (за да не стои празна!)
+        loadAllStudents(0);
+
+        // 2. Проверяваме кой е логнат (за да скрием/покажем бутоните)
+        fetch('/api/auth/me')
+            .then(res => res.json())
+            .then(user => {
                 isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
                 if (!isAdmin) {
-                    document.getElementById('btn-new-student').style.display = 'none';
-                    document.getElementById('th-action').style.display = 'none';
+                    let newBtn = document.getElementById('btn-new-student');
+                    let thAction = document.getElementById('th-action');
+                    if(newBtn) newBtn.style.display = 'none';
+                    if(thAction) thAction.style.display = 'none';
                 }
-
-                // Записваме списъците
-                allAvailableDepartments = depts.content || depts;
-                allAvailableAddresses = addrs.content || addrs;
-
-                // Пълним падащите менюта в модала
-                let deptSelect = document.getElementById('departmentId');
-                allAvailableDepartments.forEach(d => {
-                    deptSelect.innerHTML += `<option value="${d.id}">${d.name} (Офис: ${d.office})</option>`;
-                });
-
-                let addrSelect = document.getElementById('addressId');
-                allAvailableAddresses.forEach(a => {
-                    addrSelect.innerHTML += `<option value="${a.id}">${a.city}, ${a.street} (${a.country})</option>`;
-                });
-
-                loadAllStudents(0);
             })
-            .catch(err => console.error("Грешка при зареждане на ресурси:", err));
+            .catch(err => console.error("Грешка при проверка на права:", err));
 
-            window.loadAllStudents = function(page = 0) {
-                let url = `/api/students?page=${page}&size=${pageSize}`;
-                if (currentKeyword) url += `&keyword=${encodeURIComponent(currentKeyword)}`;
-                fetch(url).then(res => res.json()).then(data => {
-                    currentPage = data.number;
-                    renderTable(data.content);
-                    document.getElementById('page-info').innerText = `Страница ${data.number + 1} от ${data.totalPages}`;
-                });
-            };
+        // 3. Зареждаме Катедрите за падащото меню в модала
+        fetch('/api/departments')
+            .then(res => res.json())
+            .then(depts => {
+                let deptSelect = document.getElementById('departmentId');
+                let data = depts.content || depts;
+                if(data && Array.isArray(data)) {
+                    data.forEach(d => {
+                        deptSelect.innerHTML += `<option value="${d.id}">${d.name} (Офис: ${d.office})</option>`;
+                    });
+                }
+            })
+            .catch(err => console.warn("Не успях да заредя катедрите:", err));
 
-            function renderTable(students) {
-                let tbody = document.getElementById('all-students-tbody');
-                tbody.innerHTML = '';
-                students.forEach(s => {
-                    let studentJson = encodeURIComponent(JSON.stringify(s));
-                    
-                    // Показване на Катедра и Адрес в таблицата (с проверка дали ги има)
-                    let deptName = s.department ? s.department.name : '<span class="text-danger small">Няма</span>';
-                    let addrCity = s.address ? s.address.city : '<span class="text-danger small">Няма</span>';
-                    
-                    let row = `
-                    <tr>
-                        <td class="px-4 py-3 text-secondary">#${s.id}</td>
-                        <td class="fw-bold"><i class="bi bi-person-circle me-2 text-primary"></i> ${s.firstName} ${s.lastName}<br><small class="text-muted fw-normal">${s.email}</small></td>
-                        <td>
-                            <div class="small"><i class="bi bi-building text-info me-1"></i> ${deptName}</div>
-                            <div class="small"><i class="bi bi-geo-alt text-warning me-1"></i> ${addrCity}</div>
-                        </td>
-                        <td><span class="text-info">${s.facultyNumber}</span></td>
-                        <td class="text-center">
-                            <span class="badge bg-info text-dark rounded-pill px-3 view-courses-btn" style="cursor: pointer;" data-student-id="${s.id}" data-name="${s.firstName} ${s.lastName}">${s.courseCount || 0} курса</span>
-                        </td>
-                        ${isAdmin ? `
-                        <td class="text-end px-4">
-                            <button class="btn btn-outline-warning btn-sm rounded-circle me-1" onclick="openEditModal('${studentJson}')"><i class="bi bi-pencil"></i></button>
-                            <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteStudent(${s.id})"><i class="bi bi-trash"></i></button>
-                        </td>` : ''}
-                    </tr>`;
-                    tbody.innerHTML += row;
-                });
+        // 4. Зареждаме Адресите за падащото меню в модала
+        fetch('/api/addresses')
+            .then(res => res.json())
+            .then(addrs => {
+                let addrSelect = document.getElementById('addressId');
+                let data = addrs.content || addrs;
+                if(data && Array.isArray(data)) {
+                    data.forEach(a => {
+                        addrSelect.innerHTML += `<option value="${a.id}">${a.city}, ${a.street}</option>`;
+                    });
+                }
+            })
+            .catch(err => console.warn("Не успях да заредя адресите:", err));
+
+        // --- ФУНКЦИИ ЗА ТАБЛИЦАТА ---
+        window.loadAllStudents = function(page = 0) {
+            let url = `/api/students?page=${page}&size=${pageSize}`;
+            if (currentKeyword) url += `&keyword=${encodeURIComponent(currentKeyword)}`;
+            
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    currentPage = data.number || 0;
+                    renderTable(data.content || data);
+                    let pageInfo = document.getElementById('page-info');
+                    if(pageInfo) pageInfo.innerText = `Страница ${(data.number || 0) + 1} от ${data.totalPages || 1}`;
+                })
+                .catch(err => console.error("Грешка при зареждане на студентите:", err));
+        };
+
+        function renderTable(students) {
+            let tbody = document.getElementById('all-students-tbody');
+            tbody.innerHTML = '';
+            
+            if (!students || students.length === 0) {
+                let colSpan = isAdmin ? 6 : 5;
+                tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center py-4 text-muted">Няма намерени студенти</td></tr>`;
+                return;
             }
 
-            // ОТВАРЯНЕ НА МОДАЛ ЗА СЪЗДАВАНЕ
-            window.openCreateModal = function() {
-                document.getElementById('studentForm').reset();
-                document.getElementById('studentId').value = '';
-                document.getElementById('errorAlert').classList.add('d-none');
-                new bootstrap.Modal(document.getElementById('studentModal')).show();
-            };
-
-            // ОТВАРЯНЕ НА МОДАЛ ЗА РЕДАКТИРАНЕ
-            window.openEditModal = function(encodedStudent) {
-                let student = JSON.parse(decodeURIComponent(encodedStudent));
-                document.getElementById('studentId').value = student.id;
-                document.getElementById('firstName').value = student.firstName;
-                document.getElementById('lastName').value = student.lastName;
-                document.getElementById('facultyNumber').value = student.facultyNumber;
-                document.getElementById('email').value = student.email;
+            students.forEach(s => {
+                let studentJson = encodeURIComponent(JSON.stringify(s));
                 
-                // Избираме правилната катедра и адрес от списъка
-                document.getElementById('departmentId').value = student.department ? student.department.id : '';
-                document.getElementById('addressId').value = student.address ? student.address.id : '';
-
-                document.getElementById('errorAlert').classList.add('d-none');
-                new bootstrap.Modal(document.getElementById('studentModal')).show();
-            };
-
-            // ЗАПАЗВАНЕ (POST или PUT)
-            document.getElementById('save-student-btn').addEventListener('click', async function() {
-                let id = document.getElementById('studentId').value;
-                let deptId = document.getElementById('departmentId').value;
-                let addrId = document.getElementById('addressId').value;
-
-                if(!deptId || !addrId) {
-                    let err = document.getElementById('errorAlert');
-                    err.innerText = "Моля, изберете Катедра и Адрес!";
-                    err.classList.remove('d-none');
-                    return;
-                }
-
-                // Сглобяваме JSON-а точно както го очаква Java
-                let studentData = {
-                    firstName: document.getElementById('firstName').value,
-                    lastName: document.getElementById('lastName').value,
-                    facultyNumber: document.getElementById('facultyNumber').value,
-                    email: document.getElementById('email').value,
-                    department: { id: parseInt(deptId) },
-                    address: { id: parseInt(addrId) }
-                };
-
-                let url = id ? `/api/students/${id}` : '/api/students';
-                let method = id ? 'PUT' : 'POST';
-
-                try {
-                    let response = await fetch(url, {
-                        method: method,
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(studentData)
-                    });
-
-                    if (!response.ok) {
-                        let errorMsg = await response.text();
-                        throw new Error(errorMsg || "Сървърна грешка.");
-                    }
-
-                    bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
-                    loadAllStudents(currentPage);
-                } catch (error) {
-                    let errorDiv = document.getElementById('errorAlert');
-                    errorDiv.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> ${error.message}`;
-                    errorDiv.classList.remove('d-none');
-                }
+                let deptName = s.department && s.department.name ? s.department.name : '<span class="text-danger small">Няма</span>';
+                let addrCity = s.address && s.address.city ? s.address.city : '<span class="text-danger small">Няма</span>';
+                
+                let row = `
+                <tr>
+                    <td class="px-4 py-3 text-secondary">#${s.id}</td>
+                    <td class="fw-bold"><i class="bi bi-person-circle me-2 text-primary"></i> ${s.firstName} ${s.lastName}<br><small class="text-muted fw-normal">${s.email}</small></td>
+                    <td>
+                        <div class="small"><i class="bi bi-building text-info me-1"></i> ${deptName}</div>
+                        <div class="small"><i class="bi bi-geo-alt text-warning me-1"></i> ${addrCity}</div>
+                    </td>
+                    <td><span class="text-info">${s.facultyNumber}</span></td>
+                    <td class="text-center">
+                        <span class="badge bg-info text-dark rounded-pill px-3 view-courses-btn" style="cursor: pointer;" data-student-id="${s.id}" data-name="${s.firstName} ${s.lastName}">${s.courseCount || 0} курса</span>
+                    </td>
+                    ${isAdmin ? `
+                    <td class="text-end px-4">
+                        <button class="btn btn-outline-warning btn-sm rounded-circle me-1" onclick="openEditModal('${studentJson}')"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteStudent(${s.id})"><i class="bi bi-trash"></i></button>
+                    </td>` : ''}
+                </tr>`;
+                tbody.innerHTML += row;
             });
+        }
 
-            // Търсачка
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                currentKeyword = e.target.value;
-                loadAllStudents(0);
-            });
+        // --- МОДАЛИ И ЗАПАЗВАНЕ ---
+        window.openCreateModal = function() {
+            document.getElementById('studentForm').reset();
+            document.getElementById('studentId').value = '';
+            document.getElementById('errorAlert').classList.add('d-none');
+            new bootstrap.Modal(document.getElementById('studentModal')).show();
+        };
 
-            // Изтриване
-            window.deleteStudent = function(id) {
-                if(confirm('Сигурни ли сте, че искате да изтриете този студент?')) {
-                    fetch('/api/students/' + id, { method: 'DELETE' }).then(() => loadAllStudents(currentPage));
-                }
-            };
+        window.openEditModal = function(encodedStudent) {
+            let student = JSON.parse(decodeURIComponent(encodedStudent));
+            document.getElementById('studentId').value = student.id;
+            document.getElementById('firstName').value = student.firstName;
+            document.getElementById('lastName').value = student.lastName;
+            document.getElementById('facultyNumber').value = student.facultyNumber;
+            document.getElementById('email').value = student.email;
             
-            // Смяна на страницата
-            window.changePage = function(offset) {
-                loadAllStudents(currentPage + offset);
+            document.getElementById('departmentId').value = student.department ? student.department.id : '';
+            document.getElementById('addressId').value = student.address ? student.address.id : '';
+
+            document.getElementById('errorAlert').classList.add('d-none');
+            new bootstrap.Modal(document.getElementById('studentModal')).show();
+        };
+
+        document.getElementById('save-student-btn').addEventListener('click', async function() {
+            let id = document.getElementById('studentId').value;
+            let deptId = document.getElementById('departmentId').value;
+            let addrId = document.getElementById('addressId').value;
+
+            if(!deptId || !addrId) {
+                let err = document.getElementById('errorAlert');
+                err.innerHTML = "<i class='bi bi-exclamation-triangle-fill me-2'></i> Моля, изберете Катедра и Адрес!";
+                err.classList.remove('d-none');
+                return;
+            }
+
+            let studentData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                facultyNumber: document.getElementById('facultyNumber').value,
+                email: document.getElementById('email').value,
+                department: { id: parseInt(deptId) },
+                address: { id: parseInt(addrId) }
             };
 
-            // Управление на оценки (запазваме твоята логика)
-            document.getElementById('all-students-tbody').addEventListener('click', function(e) {
-                if (e.target.classList.contains('view-courses-btn')) {
-                    const studentId = e.target.getAttribute('data-student-id');
-                    const fullName = e.target.getAttribute('data-name');
-                    document.getElementById('modalStudentName').textContent = fullName;
-                    const list = document.getElementById('modalCoursesList');
-                    list.innerHTML = '<li class="list-group-item text-center"><div class="spinner-border spinner-border-sm text-primary"></div></li>';
-                    
-                    fetch(`/api/students/${studentId}/courses`) // Адаптирай ендпойнта ако се налага
-                        .then(res => res.json())
-                        .then(enrollments => {
-                            list.innerHTML = '';
-                            if (enrollments.length === 0) list.innerHTML = '<li class="list-group-item text-muted">Няма записани курсове.</li>';
-                            enrollments.forEach(en => {
-                                list.innerHTML += `
-                                <li class="list-group-item d-flex justify-content-between align-items-center py-3">
-                                    <div><div class="fw-bold">${en.course.name}</div><small class="text-muted">Преподавател: ${en.course.professor ? en.course.professor.lastName : '---'}</small></div>
-                                    <div class="d-flex align-items-center">
-                                        <input type="number" step="0.1" min="2" max="6" id="grade-${en.course.id}" class="form-control form-control-sm me-2" style="width: 70px" value="${en.grade || ''}" ${!isAdmin ? 'disabled' : ''}>
-                                        ${isAdmin ? `<button class="btn btn-sm btn-primary" onclick="saveGrade(${studentId}, ${en.course.id})">Запиши</button>` : ''}
-                                    </div>
-                                </li>`;
-                            });
-                        });
-                    new bootstrap.Modal(document.getElementById('coursesModal')).show();
+            let url = id ? `/api/students/${id}` : '/api/students';
+            let method = id ? 'PUT' : 'POST';
+
+            try {
+                let response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(studentData)
+                });
+
+                if (!response.ok) {
+                    let errorMsg = await response.text();
+                    throw new Error(errorMsg || "Сървърна грешка.");
                 }
-            });
 
-            window.saveGrade = function(studentId, courseId) {
-                const grade = document.getElementById(`grade-${courseId}`).value;
-                fetch(`/api/students/${studentId}/courses/${courseId}/grade?grade=${grade}`, { method: 'PUT' })
-                    .then(res => res.ok ? alert("✅ Оценката е запазена!") : alert("❌ Грешка при запис на оценка."));
-            };
+                bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
+                loadAllStudents(currentPage);
+            } catch (error) {
+                let errorDiv = document.getElementById('errorAlert');
+                errorDiv.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> ${error.message}`;
+                errorDiv.classList.remove('d-none');
+            }
         });
-    </script>
+
+        // Търсачка и Смяна на страница
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            currentKeyword = e.target.value;
+            loadAllStudents(0);
+        });
+
+        window.changePage = function(offset) {
+            loadAllStudents(currentPage + offset);
+        };
+
+        window.deleteStudent = function(id) {
+            if(confirm('Сигурни ли сте?')) {
+                fetch('/api/students/' + id, { method: 'DELETE' }).then(() => loadAllStudents(currentPage));
+            }
+        };
+
+        // --- УПРАВЛЕНИЕ НА ОЦЕНКИ В МОДАЛ ---
+        document.getElementById('all-students-tbody').addEventListener('click', function(e) {
+            let badge = e.target.closest('.view-courses-btn');
+            if (badge) {
+                const studentId = badge.getAttribute('data-student-id');
+                const fullName = badge.getAttribute('data-name');
+                document.getElementById('modalStudentName').textContent = fullName;
+                const list = document.getElementById('modalCoursesList');
+                list.innerHTML = '<li class="list-group-item text-center"><div class="spinner-border spinner-border-sm text-primary"></div></li>';
+                
+                fetch(`/api/students/${studentId}/courses`) // Адаптирай ендпойнта ако се налага
+                    .then(res => res.json())
+                    .then(enrollments => {
+                        list.innerHTML = '';
+                        if (!enrollments || enrollments.length === 0) list.innerHTML = '<li class="list-group-item text-muted">Няма записани курсове.</li>';
+                        else enrollments.forEach(en => {
+                            list.innerHTML += `
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                <div><div class="fw-bold">${en.course.name}</div><small class="text-muted">Преподавател: ${en.course.professor ? en.course.professor.lastName : '---'}</small></div>
+                                <div class="d-flex align-items-center">
+                                    <input type="number" step="0.1" min="2" max="6" id="grade-${en.course.id}" class="form-control form-control-sm me-2" style="width: 70px" value="${en.grade || ''}" ${!isAdmin ? 'disabled' : ''}>
+                                    ${isAdmin ? `<button class="btn btn-sm btn-primary" onclick="saveGrade(${studentId}, ${en.course.id})">Запиши</button>` : ''}
+                                </div>
+                            </li>`;
+                        });
+                    }).catch(err => {
+                        list.innerHTML = '<li class="list-group-item text-danger">Грешка при зареждане на оценките.</li>';
+                    });
+                new bootstrap.Modal(document.getElementById('coursesModal')).show();
+            }
+        });
+
+        window.saveGrade = function(studentId, courseId) {
+            const grade = document.getElementById(`grade-${courseId}`).value;
+            fetch(`/api/students/${studentId}/courses/${courseId}/grade?grade=${grade}`, { method: 'PUT' })
+                .then(res => res.ok ? alert("✅ Оценката е запазена!") : alert("❌ Грешка при запис."));
+        };
+    });
+</script>
 </body>
 </html>
