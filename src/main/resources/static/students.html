@@ -226,12 +226,11 @@
 
         studentsToRender.forEach(student => {
             
-            let studentJson = encodeURIComponent(JSON.stringify(student));
-
             let coursesHtml = student.courseCount > 0 
-                ? `<span class="badge bg-info text-dark rounded-pill px-3 shadow-sm" style="cursor: pointer;" onclick="showStudentCourses('${student.firstName} ${student.lastName}', '${studentJson}')" title="Кликни за списък">${student.courseCount} курса</span>`
+                ? `<span class="badge bg-info text-dark rounded-pill px-3 shadow-sm view-courses-btn" style="cursor: pointer;" data-name="${student.firstName} ${student.lastName}" data-courses="${student.enrolledCourseNames ? student.enrolledCourseNames.join('|') : ''}" title="Кликни за списък">${student.courseCount} курса</span>`
                 : `<span class="text-muted small fst-italic">Няма курсове</span>`;
 
+            
                     let actionColumnHtml = '';
                     if (isAdmin) {
                         actionColumnHtml = `
@@ -257,6 +256,32 @@
                     tableBody.innerHTML += row;
                 });
             }
+
+            // --- УМЕН СЛУШАТЕЛ ЗА КЛИКОВЕ ВЪРХУ БАДЖОВЕ ---
+        document.getElementById('all-students-tbody').addEventListener('click', function(e) {
+            // Проверяваме дали сме кликнали точно върху баджа
+            if (e.target.classList.contains('view-courses-btn')) {
+                let fullName = e.target.getAttribute('data-name');
+                let coursesStr = e.target.getAttribute('data-courses');
+
+                document.getElementById('modalStudentName').textContent = fullName;
+                let list = document.getElementById('modalCoursesList');
+                list.innerHTML = '';
+
+                if (coursesStr) {
+                    let courses = coursesStr.split('|'); 
+                    courses.forEach(courseName => {
+                        list.innerHTML += `<li class="list-group-item"><i class="bi bi-journal-check me-2 text-success"></i> ${courseName}</li>`;
+                    });
+                } else {
+                    list.innerHTML = `<li class="list-group-item text-muted">Няма курсове.</li>`;
+                }
+
+                let coursesModal = new bootstrap.Modal(document.getElementById('coursesModal'));
+                coursesModal.show();
+            }
+        });
+        // --- КРАЙ НА СЛУШАТЕЛЯ ---
 
             // ТЪРСАЧКА НА ЖИВО
             document.getElementById('searchInput').addEventListener('input', function(e) {
