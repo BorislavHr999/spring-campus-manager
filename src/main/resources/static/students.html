@@ -225,14 +225,9 @@
                 }
 
                 studentsToRender.forEach(student => {
-                    let coursesHtml = '';
-                    if (student.courses && student.courses.length > 0) {
-                        student.courses.forEach(c => {
-                            coursesHtml += `<span class="badge bg-info text-dark me-1 mb-1 shadow-sm">${c.name}</span>`;
-                        });
-                    } else {
-                        coursesHtml = '<span class="text-muted small fst-italic">-</span>';
-                    }
+                    let coursesHtml = student.courseCount > 0 
+        ? `<span class="badge bg-info text-dark rounded-pill px-3 shadow-sm">${student.courseCount} курса</span>`
+        : `<span class="text-muted small fst-italic">Няма курсове</span>`;
 
                     let studentJson = encodeURIComponent(JSON.stringify(student));
 
