@@ -160,52 +160,8 @@
         const pageSize = 10;
         let currentKeyword = '';
 
-        // 1. ВЕДНАГА зареждаме таблицата със студентите (за да не стои празна!)
-        loadAllStudents(0);
+        // --- 1. ПЪРВО ДЕФИНИРАМЕ ФУНКЦИИТЕ ---
 
-        // 2. Проверяваме кой е логнат (за да скрием/покажем бутоните)
-        fetch('/api/auth/me')
-            .then(res => res.json())
-            .then(user => {
-                isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
-                if (!isAdmin) {
-                    let newBtn = document.getElementById('btn-new-student');
-                    let thAction = document.getElementById('th-action');
-                    if(newBtn) newBtn.style.display = 'none';
-                    if(thAction) thAction.style.display = 'none';
-                }
-            })
-            .catch(err => console.error("Грешка при проверка на права:", err));
-
-        // 3. Зареждаме Катедрите за падащото меню в модала
-        fetch('/api/departments')
-            .then(res => res.json())
-            .then(depts => {
-                let deptSelect = document.getElementById('departmentId');
-                let data = depts.content || depts;
-                if(data && Array.isArray(data)) {
-                    data.forEach(d => {
-                        deptSelect.innerHTML += `<option value="${d.id}">${d.name} (Офис: ${d.office})</option>`;
-                    });
-                }
-            })
-            .catch(err => console.warn("Не успях да заредя катедрите:", err));
-
-        // 4. Зареждаме Адресите за падащото меню в модала
-        fetch('/api/addresses')
-            .then(res => res.json())
-            .then(addrs => {
-                let addrSelect = document.getElementById('addressId');
-                let data = addrs.content || addrs;
-                if(data && Array.isArray(data)) {
-                    data.forEach(a => {
-                        addrSelect.innerHTML += `<option value="${a.id}">${a.city}, ${a.street}</option>`;
-                    });
-                }
-            })
-            .catch(err => console.warn("Не успях да заредя адресите:", err));
-
-        // --- ФУНКЦИИ ЗА ТАБЛИЦАТА ---
         window.loadAllStudents = function(page = 0) {
             let url = `/api/students?page=${page}&size=${pageSize}`;
             if (currentKeyword) url += `&keyword=${encodeURIComponent(currentKeyword)}`;
@@ -214,7 +170,10 @@
                 .then(res => res.json())
                 .then(data => {
                     currentPage = data.number || 0;
-                    renderTable(data.content || data);
+                    // Подсигуряваме се, че подаваме масив
+                    let studentsArray = data.content ? data.content : data;
+                    renderTable(studentsArray);
+                    
                     let pageInfo = document.getElementById('page-info');
                     if(pageInfo) pageInfo.innerText = `Страница ${(data.number || 0) + 1} от ${data.totalPages || 1}`;
                 })
@@ -259,7 +218,6 @@
             });
         }
 
-        // --- МОДАЛИ И ЗАПАЗВАНЕ ---
         window.openCreateModal = function() {
             document.getElementById('studentForm').reset();
             document.getElementById('studentId').value = '';
@@ -281,6 +239,24 @@
             document.getElementById('errorAlert').classList.add('d-none');
             new bootstrap.Modal(document.getElementById('studentModal')).show();
         };
+
+        window.changePage = function(offset) {
+            loadAllStudents(currentPage + offset);
+        };
+
+        window.deleteStudent = function(id) {
+            if(confirm('Сигурни ли сте?')) {
+                fetch('/api/students/' + id, { method: 'DELETE' }).then(() => loadAllStudents(currentPage));
+            }
+        };
+
+        window.saveGrade = function(studentId, courseId) {
+            const grade = document.getElementById(`grade-${courseId}`).value;
+            fetch(`/api/students/${studentId}/courses/${courseId}/grade?grade=${grade}`, { method: 'PUT' })
+                .then(res => res.ok ? alert("✅ Оценката е запазена!") : alert("❌ Грешка при запис."));
+        };
+
+        // --- 2. СЛЕД ТОВА СЛАГАМЕ СЛУШАТЕЛИТЕ ЗА СЪБИТИЯ ---
 
         document.getElementById('save-student-btn').addEventListener('click', async function() {
             let id = document.getElementById('studentId').value;
@@ -327,23 +303,12 @@
             }
         });
 
-        // Търсачка и Смяна на страница
         document.getElementById('searchInput').addEventListener('input', (e) => {
             currentKeyword = e.target.value;
             loadAllStudents(0);
         });
 
-        window.changePage = function(offset) {
-            loadAllStudents(currentPage + offset);
-        };
-
-        window.deleteStudent = function(id) {
-            if(confirm('Сигурни ли сте?')) {
-                fetch('/api/students/' + id, { method: 'DELETE' }).then(() => loadAllStudents(currentPage));
-            }
-        };
-
-        // --- УПРАВЛЕНИЕ НА ОЦЕНКИ В МОДАЛ ---
+        // Слушател за клик върху баджа за курсовете
         document.getElementById('all-students-tbody').addEventListener('click', function(e) {
             let badge = e.target.closest('.view-courses-btn');
             if (badge) {
@@ -353,21 +318,24 @@
                 const list = document.getElementById('modalCoursesList');
                 list.innerHTML = '<li class="list-group-item text-center"><div class="spinner-border spinner-border-sm text-primary"></div></li>';
                 
-                fetch(`/api/students/${studentId}/courses`) // Адаптирай ендпойнта ако се налага
+                fetch(`/api/students/${studentId}/courses`)
                     .then(res => res.json())
                     .then(enrollments => {
                         list.innerHTML = '';
-                        if (!enrollments || enrollments.length === 0) list.innerHTML = '<li class="list-group-item text-muted">Няма записани курсове.</li>';
-                        else enrollments.forEach(en => {
-                            list.innerHTML += `
-                            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
-                                <div><div class="fw-bold">${en.course.name}</div><small class="text-muted">Преподавател: ${en.course.professor ? en.course.professor.lastName : '---'}</small></div>
-                                <div class="d-flex align-items-center">
-                                    <input type="number" step="0.1" min="2" max="6" id="grade-${en.course.id}" class="form-control form-control-sm me-2" style="width: 70px" value="${en.grade || ''}" ${!isAdmin ? 'disabled' : ''}>
-                                    ${isAdmin ? `<button class="btn btn-sm btn-primary" onclick="saveGrade(${studentId}, ${en.course.id})">Запиши</button>` : ''}
-                                </div>
-                            </li>`;
-                        });
+                        if (!enrollments || enrollments.length === 0) {
+                            list.innerHTML = '<li class="list-group-item text-muted">Няма записани курсове.</li>';
+                        } else {
+                            enrollments.forEach(en => {
+                                list.innerHTML += `
+                                <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                    <div><div class="fw-bold">${en.course.name}</div><small class="text-muted">Преподавател: ${en.course.professor ? en.course.professor.lastName : '---'}</small></div>
+                                    <div class="d-flex align-items-center">
+                                        <input type="number" step="0.1" min="2" max="6" id="grade-${en.course.id}" class="form-control form-control-sm me-2" style="width: 70px" value="${en.grade || ''}" ${!isAdmin ? 'disabled' : ''}>
+                                        ${isAdmin ? `<button class="btn btn-sm btn-primary" onclick="saveGrade(${studentId}, ${en.course.id})">Запиши</button>` : ''}
+                                    </div>
+                                </li>`;
+                            });
+                        }
                     }).catch(err => {
                         list.innerHTML = '<li class="list-group-item text-danger">Грешка при зареждане на оценките.</li>';
                     });
@@ -375,11 +343,52 @@
             }
         });
 
-        window.saveGrade = function(studentId, courseId) {
-            const grade = document.getElementById(`grade-${courseId}`).value;
-            fetch(`/api/students/${studentId}/courses/${courseId}/grade?grade=${grade}`, { method: 'PUT' })
-                .then(res => res.ok ? alert("✅ Оценката е запазена!") : alert("❌ Грешка при запис."));
-        };
+        // --- 3. НАКРАЯ ИЗВИКВАМЕ ДАННИТЕ ОТ СЪРВЪРА ---
+
+        // Зареждаме таблицата веднага!
+        window.loadAllStudents(0);
+
+        // Проверяваме правата
+        fetch('/api/auth/me')
+            .then(res => res.json())
+            .then(user => {
+                isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
+                if (!isAdmin) {
+                    let newBtn = document.getElementById('btn-new-student');
+                    let thAction = document.getElementById('th-action');
+                    if(newBtn) newBtn.style.display = 'none';
+                    if(thAction) thAction.style.display = 'none';
+                }
+            })
+            .catch(err => console.error("Грешка при проверка на права:", err));
+
+        // Пълним менютата за Катедра
+        fetch('/api/departments')
+            .then(res => res.json())
+            .then(depts => {
+                let deptSelect = document.getElementById('departmentId');
+                let data = depts.content || depts;
+                if(data && Array.isArray(data)) {
+                    data.forEach(d => {
+                        deptSelect.innerHTML += `<option value="${d.id}">${d.name} (Офис: ${d.office})</option>`;
+                    });
+                }
+            })
+            .catch(err => console.warn("Не успях да заредя катедрите:", err));
+
+        // Пълним менютата за Адрес
+        fetch('/api/addresses')
+            .then(res => res.json())
+            .then(addrs => {
+                let addrSelect = document.getElementById('addressId');
+                let data = addrs.content || addrs;
+                if(data && Array.isArray(data)) {
+                    data.forEach(a => {
+                        addrSelect.innerHTML += `<option value="${a.id}">${a.city}, ${a.street}</option>`;
+                    });
+                }
+            })
+            .catch(err => console.warn("Не успях да заредя адресите:", err));
     });
 </script>
 </body>
