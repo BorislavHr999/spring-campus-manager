@@ -24,11 +24,9 @@
             
             <nav class="col-md-2 d-none d-md-block sidebar py-4">
                 <div>
-                    
                     <a href="index.html" class="text-decoration-none">
-    <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
-</a>
-
+                        <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
+                    </a>
 
                     <div class="list-group list-group-flush gap-2 px-2">
                         <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
@@ -68,7 +66,7 @@
                                 <th class="py-3" data-i18n="th_name">Студент</th>
                                 <th class="py-3" data-i18n="th_fac">Фак. Номер</th>
                                 <th class="py-3" data-i18n="th_email">Имейл</th>
-                                <th class="py-3" data-i18n="th_courses">Записани курсове</th>
+                                <th class="py-3 text-center" data-i18n="th_courses">Записани курсове</th>
                                 <th class="py-3 text-end px-4" id="th-action" data-i18n="th_action">Управление</th>
                             </tr>
                         </thead>
@@ -126,13 +124,28 @@
                         <div class="mb-3">
                             <label class="text-muted small mb-1" data-i18n="th_courses">Записани курсове (Задръж Ctrl за избор на няколко)</label>
                             <select multiple class="form-select border-secondary" id="studentCourses" style="height: 100px;">
-                                </select>
+                            </select>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer border-secondary">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отказ</button>
                     <button type="button" class="btn btn-success text-white fw-bold px-4" id="save-student-btn">Запази</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="coursesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-dark">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title">Курсове на <span id="modalStudentName" class="fw-bold text-primary"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul id="modalCoursesList" class="list-group list-group-flush">
+                        </ul>
                 </div>
             </div>
         </div>
@@ -148,16 +161,14 @@
             const pageSize = 10; 
             let currentKeyword = '';
             let allAvailableCourses = []; 
-            let isAdmin = false; // ПРОМЕНЛИВА ЗА ПРАВАТА
+            let isAdmin = false;
 
-            // 1. ИНИЦИАЛИЗАЦИЯ: Проверка на права -> Зареждане на курсове -> Зареждане на студенти
+            // 1. ИНИЦИАЛИЗАЦИЯ: Проверка на права
             fetch('/api/auth/me')
                 .then(res => res.json())
                 .then(user => {
-                    // Проверяваме дали е админ
                     isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
                     
-                    // Скриваме бутоните, ако е обикновен потребител
                     if (!isAdmin) {
                         let newBtn = document.getElementById('btn-new-student');
                         let actionTh = document.getElementById('th-action');
@@ -165,23 +176,21 @@
                         if(actionTh) actionTh.style.display = 'none';
                     }
 
-                    // След като знаем кой е, теглим курсовете
                     return fetch('/api/courses');
                 })
                 .then(res => res.json())
                 .then(data => {
-                    allAvailableCourses = data;
-                    // Накрая чертаем таблицата
+                    // Подсигуряваме, че взимаме масива правилно
+                    allAvailableCourses = data.content ? data.content : data;
                     window.loadAllStudents(0);
                 })
                 .catch(err => {
                     console.error("Грешка при инициализация:", err);
-                    // Ако има проблем, все пак се опитваме да заредим студентите (в safe mode)
                     window.loadAllStudents(0);
                 });
 
 
-            // ФУНКЦИЯ ЗА ЗАРЕЖДАНЕ ОТ СЪРВЪРА (Пагинация)
+            // ФУНКЦИЯ ЗА ЗАРЕЖДАНЕ ОТ СЪРВЪРА
             window.loadAllStudents = function(page = 0) {
                 let url = `/api/students?page=${page}&size=${pageSize}`;
                 if (currentKeyword) {
@@ -215,24 +224,26 @@
             // РИСУВАНЕ НА ТАБЛИЦАТА С ПРОВЕРКА ЗА ПРАВА
             function renderTable(studentsToRender) {
                 let tableBody = document.getElementById('all-students-tbody');
-                tableBody.innerHTML = ''; 
-                
+                tableBody.innerHTML = '';
+
                 if (!studentsToRender || studentsToRender.length === 0) {
                     let colspan = isAdmin ? 6 : 5;
-                    let noDataText = typeof t === 'function' ? t('no_data') : 'Няма данни';
-                    tableBody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4">${noDataText}</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4">Няма данни</td></tr>`;
                     return;
                 }
 
-        studentsToRender.forEach(student => {
-            
-            let coursesHtml = student.courseCount > 0 
-                ? `<span class="badge bg-info text-dark rounded-pill px-3 shadow-sm view-courses-btn" style="cursor: pointer;" data-name="${student.firstName} ${student.lastName}" data-courses="${student.enrolledCourseNames ? student.enrolledCourseNames.join('|') : ''}" title="Кликни за списък">${student.courseCount} курса</span>`
-                : `<span class="text-muted small fst-italic">Няма курсове</span>`;
+                studentsToRender.forEach(student => {
+                    
+                    // Генериране на синия бадж за курсовете
+                    let coursesHtml = student.courseCount > 0 
+                        ? `<span class="badge bg-info text-dark rounded-pill px-3 shadow-sm view-courses-btn" style="cursor: pointer;" data-name="${student.firstName} ${student.lastName}" data-courses="${student.enrolledCourseNames ? student.enrolledCourseNames.join('|') : ''}" title="Кликни за списък">${student.courseCount} курса</span>`
+                        : `<span class="text-muted small fst-italic">Няма курсове</span>`;
 
-            
+                    // Генериране на бутоните за управление (само за админ)
                     let actionColumnHtml = '';
                     if (isAdmin) {
+                        // Кодираме студента за модала за редакция
+                        let studentJson = encodeURIComponent(JSON.stringify(student));
                         actionColumnHtml = `
                         <td class="text-end px-4">
                             <button class="btn btn-outline-warning btn-sm rounded-circle me-1" onclick="openEditModal('${studentJson}')" title="Редактирай">
@@ -244,44 +255,44 @@
                         </td>`;
                     }
 
+                    // Сглобяване на реда
                     let row = `
                     <tr class="new-row">
                         <td class="px-4 py-3 text-secondary">#${student.id}</td>
                         <td class="fw-bold"><i class="bi bi-person-circle me-2 text-primary"></i> ${student.firstName} ${student.lastName}</td>
                         <td><span class="text-info">${student.facultyNumber}</span></td>
                         <td class="text-muted">${student.email}</td>
-                        <td>${coursesHtml}</td>
+                        <td class="text-center">${coursesHtml}</td>
                         ${actionColumnHtml}
                     </tr>`;
+                    
                     tableBody.innerHTML += row;
                 });
             }
 
             // --- УМЕН СЛУШАТЕЛ ЗА КЛИКОВЕ ВЪРХУ БАДЖОВЕ ---
-        document.getElementById('all-students-tbody').addEventListener('click', function(e) {
-            // Проверяваме дали сме кликнали точно върху баджа
-            if (e.target.classList.contains('view-courses-btn')) {
-                let fullName = e.target.getAttribute('data-name');
-                let coursesStr = e.target.getAttribute('data-courses');
+            document.getElementById('all-students-tbody').addEventListener('click', function(e) {
+                if (e.target.classList.contains('view-courses-btn')) {
+                    let fullName = e.target.getAttribute('data-name');
+                    let coursesStr = e.target.getAttribute('data-courses');
 
-                document.getElementById('modalStudentName').textContent = fullName;
-                let list = document.getElementById('modalCoursesList');
-                list.innerHTML = '';
+                    document.getElementById('modalStudentName').textContent = fullName;
+                    let list = document.getElementById('modalCoursesList');
+                    list.innerHTML = '';
 
-                if (coursesStr) {
-                    let courses = coursesStr.split('|'); 
-                    courses.forEach(courseName => {
-                        list.innerHTML += `<li class="list-group-item"><i class="bi bi-journal-check me-2 text-success"></i> ${courseName}</li>`;
-                    });
-                } else {
-                    list.innerHTML = `<li class="list-group-item text-muted">Няма курсове.</li>`;
+                    if (coursesStr) {
+                        let courses = coursesStr.split('|'); 
+                        courses.forEach(courseName => {
+                            list.innerHTML += `<li class="list-group-item"><i class="bi bi-journal-check me-2 text-success"></i> ${courseName}</li>`;
+                        });
+                    } else {
+                        list.innerHTML = `<li class="list-group-item text-muted">Няма курсове.</li>`;
+                    }
+
+                    let coursesModal = new bootstrap.Modal(document.getElementById('coursesModal'));
+                    coursesModal.show();
                 }
-
-                let coursesModal = new bootstrap.Modal(document.getElementById('coursesModal'));
-                coursesModal.show();
-            }
-        });
-        // --- КРАЙ НА СЛУШАТЕЛЯ ---
+            });
 
             // ТЪРСАЧКА НА ЖИВО
             document.getElementById('searchInput').addEventListener('input', function(e) {
@@ -313,10 +324,11 @@
                 document.getElementById('facultyNumber').value = student.facultyNumber;
                 document.getElementById('email').value = student.email;
                 
+                // Тази част може да има нужда от преработка в бъдеще, за да отразява Enrollment логиката
                 let courseSelect = document.getElementById('studentCourses');
                 courseSelect.innerHTML = '';
                 allAvailableCourses.forEach(c => {
-                    let isSelected = student.courses && student.courses.some(sc => sc.id === c.id);
+                    let isSelected = student.enrolledCourseNames && student.enrolledCourseNames.includes(c.name);
                     courseSelect.innerHTML += `<option value="${c.id}" ${isSelected ? 'selected' : ''}>${c.name}</option>`;
                 });
 
@@ -328,6 +340,8 @@
             document.getElementById('save-student-btn').addEventListener('click', async function() {
                 let id = document.getElementById('studentId').value;
                 
+                // Забележка: Това праща "courses", но ако бекендът вече работи само с Enrollments,
+                // тук ще е нужна промяна в Java логиката или във Fetch заявката по-нататък.
                 let selectedCourses = Array.from(document.getElementById('studentCourses').selectedOptions)
                                            .map(opt => ({ id: parseInt(opt.value) }));
 
@@ -336,7 +350,7 @@
                     lastName: document.getElementById('lastName').value,
                     facultyNumber: document.getElementById('facultyNumber').value,
                     email: document.getElementById('email').value,
-                    courses: selectedCourses
+                    courses: selectedCourses 
                 };
 
                 let url = id ? `/api/students/${id}` : '/api/students'; 
@@ -380,20 +394,5 @@
             };
         });
     </script>
-
-    <div class="modal fade" id="coursesModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content text-dark">
-                <div class="modal-header bg-light">
-                    <h5 class="modal-title">Курсове на <span id="modalStudentName" class="fw-bold text-primary"></span></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <ul id="modalCoursesList" class="list-group list-group-flush">
-                        </ul>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
