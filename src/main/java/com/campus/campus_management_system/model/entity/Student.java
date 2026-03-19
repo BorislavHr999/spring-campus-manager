@@ -7,12 +7,8 @@ import lombok.ToString;
 import lombok.EqualsAndHashCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.JoinColumn;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.JoinColumn;
+
 import java.util.Set;
 import java.util.HashSet;
 
@@ -80,4 +76,12 @@ public class Student {
     @OneToOne
     @JoinColumn(name = "used_id", referencedColumnName = "id")
     private User user;
+
+    // 2. Този метод създава магическото поле "courseCount" в JSON-а
+    public int getCourseCount() {
+        if (this.enrollments == null) {
+            return 0;
+        }
+        return this.enrollments.size();
+    }
 }
