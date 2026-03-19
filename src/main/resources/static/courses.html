@@ -84,6 +84,14 @@
                             <label class="text-muted small mb-1">Кредити</label>
                             <input type="number" class="form-control" id="courseCredits" required>
                         </div>
+                    
+                        <div class="mb-3">
+                            <label class="text-muted small mb-1">Преподавател</label>
+                            <select class="form-select" id="courseProfessor">
+                                <option value="">-- Изберете преподавател --</option>
+                            </select>
+                        </div>
+                    
                     </form>
                 </div>
                 <div class="modal-footer border-secondary">
@@ -100,6 +108,19 @@
         document.addEventListener("DOMContentLoaded", function() {
             let isAdmin = false;
 
+            // 0. Зареждане на преподавателите в падащото меню за модала
+        fetch('/api/professors')
+            .then(res => res.json())
+            .then(data => {
+                // В зависимост от това дали бекендът връща Page обект или обикновен масив
+                let professors = data.content ? data.content : data;
+                let select = document.getElementById('courseProfessor');
+                professors.forEach(prof => {
+                    select.innerHTML += `<option value="${prof.id}">${prof.firstName} ${prof.lastName}</option>`;
+                });
+            })
+            .catch(err => console.error("Грешка при зареждане на преподаватели:", err));
+            
             // 1. Проверка на правата
             fetch('/api/auth/me')
                 .then(res => res.json())
