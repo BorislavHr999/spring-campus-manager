@@ -17,7 +17,6 @@ public class CourseService {
     @Autowired
     private CourseRepository courseRepository;
 
-    // НОВО: Инжектираме хранилището за преподаватели, за да ги намираме в базата
     @Autowired
     private ProfessorRepository professorRepository;
 
@@ -32,60 +31,69 @@ public class CourseService {
     }
 
     // ==========================================
-    // НОВИ МЕТОДИ ЗА УПРАВЛЕНИЕ НА ПРЕПОДАВАТЕЛИ
+    // МЕТОДИ ЗА УПРАВЛЕНИЕ НА ПРЕПОДАВАТЕЛИ
     // ==========================================
 
-    // Назначаване на преподавател към курс
     public Course assignProfessor(Long courseId, Long professorId) {
-        // 1. Намираме курса
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Курсът не е намерен с ID: " + courseId));
         
-        // 2. Намираме преподавателя
         Professor professor = professorRepository.findById(professorId)
                 .orElseThrow(() -> new RuntimeException("Преподавателят не е намерен с ID: " + professorId));
         
-        // 3. Закачаме преподавателя към курса
         course.setProfessor(professor);
-        
-        // 4. Запазваме обновения курс в базата
         return courseRepository.save(course);
     }
 
-    // Премахване на преподавател от курс
     public Course removeProfessor(Long courseId) {
-        // 1. Намираме курса
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Курсът не е намерен с ID: " + courseId));
         
-        // 2. Разкачаме преподавателя (правим го null)
         course.setProfessor(null);
-        
-        // 3. Запазваме промяната
         return courseRepository.save(course);
     }
 
-    public Course createCourse(Course course){
-        if (courseRepository.existsByName(course.getName())){
+    // СЪЗДАВАНЕ НА КУРС (с проверка за преподавател)
+    public Course createCourse(Course course) {
+        if (courseRepository.existsByName(course.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Специалност с това име вече съществува!");
+        }
 
-     }
-       return courseRepository.save(course);
+        // НОВО: Ако при създаването е избран преподавател, го връзваме правилно
+        if (course.getProfessor() != null && course.getProfessor().getId() != null) {
+            Professor professor = professorRepository.findById(course.getProfessor().getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Преподавателят не е намерен!"));
+            course.setProfessor(professor);
+        } else {
+            course.setProfessor(null);
+        }
+
+        return courseRepository.save(course);
     }
 
+    // ОБНОВЯВАНЕ НА КУРС (вече не губи преподавателя!)
     public Course updateCourse(Long id, Course updatedData) {
         Course existingCourse = courseRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Курсът не е намерен!"));
 
-        // Проверяваме дали не се опитваме да сложим име, което вече е заето от друг курс
         if (!existingCourse.getName().equals(updatedData.getName()) && courseRepository.existsByName(updatedData.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Специалност с това име вече съществува!");
         }
 
+        // Презаписваме основните данни
         existingCourse.setName(updatedData.getName());
         existingCourse.setCredits(updatedData.getCredits());
 
+        // НОВО: Презаписваме и преподавателя!
+        if (updatedData.getProfessor() != null && updatedData.getProfessor().getId() != null) {
+            Professor professor = professorRepository.findById(updatedData.getProfessor().getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Преподавателят не е намерен!"));
+            existingCourse.setProfessor(professor);
+        } else {
+            // Ако в падащото меню е избрано "-- Изберете --", махаме преподавателя
+            existingCourse.setProfessor(null);
+        }
+
         return courseRepository.save(existingCourse);
     }
-    
 }
