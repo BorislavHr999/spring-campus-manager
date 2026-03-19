@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CampusOS</title>
+    <title>CampusOS - Главно табло</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
@@ -16,8 +16,10 @@
         .bg-gradient-students { background: linear-gradient(135deg, #0d6efd 0%, #0043a8 100%); }
         .bg-gradient-courses { background: linear-gradient(135deg, #0dcaf0 0%, #057a92 100%); }
         .bg-gradient-profs { background: linear-gradient(135deg, #ffc107 0%, #b38600 100%); }
-        .stat-icon { font-size: 3rem; opacity: 0.5; position: absolute; right: 20px; bottom: 10px; }
-        .chart-container { background-color: #1e1e1e; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .stat-icon { font-size: 3rem; opacity: 0.3; position: absolute; right: 20px; bottom: 10px; }
+        .chart-container { background-color: #1e1e1e; border-radius: 10px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid #2d2d2d; }
+        .profile-header { background: linear-gradient(45deg, #1a1a1a, #2d2d2d); border-radius: 15px; padding: 30px; border: 1px solid #3d3d3d; }
+        .d-none { display: none !important; }
     </style>
 </head>
 <body>
@@ -27,57 +29,32 @@
             <nav class="col-md-2 d-none d-md-block sidebar py-4 d-flex flex-column justify-content-between" style="min-height: 100vh;">
                 <div>
                     <a href="index.html" class="text-decoration-none">
-    <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
-</a>
+                        <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
+                    </a>
                     <div class="list-group list-group-flush gap-2 px-2">
-                        <a href="index.html" class="list-group-item list-group-item-action bg-primary text-white rounded border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
-                        <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
-                        <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
-                        <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
+                        <a href="index.html" class="list-group-item list-group-item-action bg-primary text-white rounded border-0"><i class="bi bi-speedometer2 me-3"></i> <span>Главно табло</span></a>
+                        <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span>Студенти</span></a>
+                        <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span>Специалности</span></a>
+                        <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span>Преподаватели</span></a>
                     </div>
                 </div>
 
-                <div class="px-3 mt-auto pb-3">
+                <div class="px-3 mt-auto pb-3 text-center">
                     <hr class="border-secondary">
-                    
-                    <div class="dropup mb-2">
-                        <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-moon-stars me-1"></i> <span data-i18n="theme">Тема</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-dark w-100 shadow mb-1">
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="bi bi-sun me-2 text-warning"></i> <span data-i18n="theme_light">Светла тема</span></a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="bi bi-moon-stars me-2 text-info"></i> <span data-i18n="theme_dark">Тъмна тема</span></a></li>
-                        </ul>
-                    </div>
-
-                    <div class="dropup mb-3">
-                        <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-globe me-1"></i> <span data-i18n="lang_title">Език</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-dark w-100 shadow mb-1">
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('bg')">🇧🇬 Български</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('en')">🇬🇧 English</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('fr')">🇫🇷 Français</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('de')">🇩🇪 Deutsch</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('it')">🇮🇹 Italiano</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('ru')">🇷🇺 Русский</a></li>
-                        </ul>
-                    </div>
-
                     <a href="/logout" class="btn btn-outline-danger w-100 btn-sm"><i class="bi bi-box-arrow-left me-2"></i>Изход</a>
                 </div>
             </nav>
 
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
-                    <h1 class="h2 fw-light"><i class="bi bi-speedometer2 me-2"></i> <span data-i18n="nav_dashboard">Главно табло</span></h1>
+                <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom border-secondary">
+                    <h1 class="h2 fw-light"><i class="bi bi-house-door me-2"></i> Добре дошли, <span id="welcome-user" class="text-info">потребител</span>!</h1>
                 </div>
 
                 <div class="row mb-4">
                     <div class="col-md-4 mb-3">
                         <div class="card stat-card bg-gradient-students text-white h-100 shadow">
                             <div class="card-body position-relative p-4">
-                                <h5 class="card-title fw-light mb-1" data-i18n="nav_students">Студенти</h5>
+                                <h5 class="card-title fw-light mb-1">Общо Студенти</h5>
                                 <h1 class="display-4 fw-bold mb-0" id="total-students">-</h1>
                                 <i class="bi bi-people-fill stat-icon"></i>
                             </div>
@@ -86,7 +63,7 @@
                     <div class="col-md-4 mb-3">
                         <div class="card stat-card bg-gradient-courses text-white h-100 shadow">
                             <div class="card-body position-relative p-4">
-                                <h5 class="card-title fw-light mb-1" data-i18n="nav_courses">Специалности</h5>
+                                <h5 class="card-title fw-light mb-1">Специалности</h5>
                                 <h1 class="display-4 fw-bold mb-0" id="total-courses">-</h1>
                                 <i class="bi bi-journal-code stat-icon"></i>
                             </div>
@@ -95,7 +72,7 @@
                     <div class="col-md-4 mb-3">
                         <div class="card stat-card bg-gradient-profs text-white h-100 shadow">
                             <div class="card-body position-relative p-4">
-                                <h5 class="card-title fw-light text-dark mb-1" data-i18n="nav_prof">Преподаватели</h5>
+                                <h5 class="card-title fw-light text-dark mb-1">Преподаватели</h5>
                                 <h1 class="display-4 fw-bold text-dark mb-0" id="total-professors">-</h1>
                                 <i class="bi bi-person-workspace stat-icon text-dark"></i>
                             </div>
@@ -103,107 +80,199 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-7 mb-4">
-                        <div class="chart-container h-100">
-                            <h5 class="fw-light mb-4"><i class="bi bi-bar-chart-fill me-2 text-info"></i> <span data-i18n="chart_title">Разпределение на студентите</span></h5>
-                            <canvas id="studentsChart"></canvas>
+                <div id="admin-dashboard-section" class="d-none">
+                    <div class="row">
+                        <div class="col-md-7 mb-4">
+                            <div class="chart-container h-100">
+                                <h5 class="fw-light mb-4 text-info"><i class="bi bi-bar-chart-fill me-2"></i> Разпределение по курсове</h5>
+                                <canvas id="studentsChart"></canvas>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="col-md-5 mb-4">
-                        <div class="chart-container h-100">
-                            <h5 class="fw-light mb-3"><i class="bi bi-clock-history me-2"></i> <span data-i18n="recent_regs">Последни регистрации</span></h5>
-                            <div class="table-custom p-1 shadow-sm">
-                                <table class="table table-dark table-hover table-borderless align-middle mb-0">
-                                    <tbody id="recent-students-tbody">
-                                        <tr><td colspan="2" class="text-center text-muted py-4" data-i18n="loading">Зареждане...</td></tr>
-                                    </tbody>
-                                </table>
+                        <div class="col-md-5 mb-4">
+                            <div class="chart-container h-100">
+                                <h5 class="fw-light mb-3"><i class="bi bi-clock-history me-2"></i> Последни регистрации</h5>
+                                <div class="table-custom p-0">
+                                    <table class="table table-dark table-hover mb-0">
+                                        <tbody id="recent-students-tbody">
+                                            <tr><td class="text-center py-4 text-muted">Зареждане...</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <div id="student-profile-section" class="d-none">
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="profile-header text-center h-100 shadow">
+                                <i class="bi bi-person-badge display-1 text-primary mb-3"></i>
+                                <h2 id="profile-full-name" class="fw-bold">-</h2>
+                                <p class="text-muted mb-3" id="profile-email">-</p>
+                                <div class="badge bg-dark border border-info text-info px-4 py-2 rounded-pill mb-3">
+                                    Фак. Номер: <span id="profile-fac-number">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8 mb-4">
+                            <div class="chart-container h-100 shadow">
+                                <h5 class="fw-light mb-4 text-gradient"><i class="bi bi-mortarboard me-2"></i> Моите записвания и оценки</h5>
+                                <div class="table-custom p-0">
+                                    <table class="table table-dark table-hover mb-0">
+                                        <thead class="text-muted small border-bottom border-secondary">
+                                            <tr>
+                                                <th class="py-3">Дисциплина</th>
+                                                <th>Преподавател</th>
+                                                <th class="text-center">Кредити</th>
+                                                <th class="text-end">Оценка</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="student-enrollments-tbody">
+                                            <tr><td colspan="4" class="text-center py-5">Зареждане на академичен картон...</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="app.js"></script> 
-    
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Взимаме size=100 за да имаме достатъчно данни за графиката
-            Promise.all([
-                fetch('/api/students?size=100').then(res => res.json()),
-                fetch('/api/courses').then(res => res.json()),
-                fetch('/api/professors').then(res => res.json())
-            ])
-            .then(([studentsData, courses, professors]) => {
-                
-                // ТУК Е МАГИЯТА ЗА ПАГИНАЦИЯТА: Разопаковаме Page обекта
-                let students = studentsData.content ? studentsData.content : studentsData;
-                let totalStudentsCount = studentsData.totalElements !== undefined ? studentsData.totalElements : students.length;
+            let isAdmin = false;
 
-                document.getElementById('total-students').textContent = totalStudentsCount;
-                document.getElementById('total-courses').textContent = courses.length;
-                document.getElementById('total-professors').textContent = professors.length;
-
-                // Пълнене на таблицата
-                let recentStudents = students.slice(0, 4); // Взимаме първите 4
-                let tableBody = document.getElementById('recent-students-tbody');
-                tableBody.innerHTML = ''; 
-
-                if (recentStudents.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="2" class="text-center text-muted py-4">${t('no_students')}</td></tr>`;
-                } else {
-                    recentStudents.forEach(student => {
-                        let row = `<tr>
-                            <td class="fw-bold"><i class="bi bi-person-circle me-2 text-primary"></i> ${student.firstName} ${student.lastName}</td>
-                            <td class="text-end"><span class="badge bg-secondary">${student.facultyNumber}</span></td>
-                        </tr>`;
-                        tableBody.innerHTML += row;
-                    });
-                }
-
-                // --- ЗАМЕСТИ ОТ ТУК ---
-                const token = localStorage.getItem('token');
-                fetch('/api/dashboard/stats', {
-                    headers: { 'Authorization': token ? `Bearer ${token}` : '' }
-                })
+            // 1. Първоначална проверка на потребителя
+            fetch('/api/auth/me')
                 .then(res => res.json())
-                .then(statsData => {
-                    const labels = statsData.studentsPerCourse.map(item => item[0]);
-                    const counts = statsData.studentsPerCourse.map(item => item[1]);
+                .then(user => {
+                    isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
+                    document.getElementById('welcome-user').textContent = user.username;
 
-                    const ctx = document.getElementById('studentsChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Брой студенти',
-                                data: counts,
-                                backgroundColor: 'rgba(13, 202, 240, 0.6)',
-                                borderColor: 'rgba(13, 202, 240, 1)',
-                                borderWidth: 1,
-                                borderRadius: 6
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                y: { beginAtZero: true, ticks: { stepSize: 1, color: '#adb5bd' } },
-                                x: { ticks: { color: '#adb5bd' }, grid: { display: false } }
+                    // Общи статистики (зареждат се винаги)
+                    loadGeneralStats();
+
+                    if (isAdmin) {
+                        loadAdminDashboard();
+                    } else {
+                        loadStudentProfile();
+                    }
+                })
+                .catch(err => console.error("Грешка при аутентикация:", err));
+
+            // Функция за общи цифри (Студенти, Курсове, Преподаватели)
+            function loadGeneralStats() {
+                fetch('/api/students?size=1').then(res => res.json()).then(data => {
+                    document.getElementById('total-students').textContent = data.totalElements || 0;
+                });
+                fetch('/api/courses').then(res => res.json()).then(data => {
+                    document.getElementById('total-courses').textContent = data.length || data.content?.length || 0;
+                });
+                fetch('/api/professors').then(res => res.json()).then(data => {
+                    document.getElementById('total-professors').textContent = data.length || data.content?.length || 0;
+                });
+            }
+
+            // --- ЛОГИКА ЗА АДМИНСТРАТОР ---
+            function loadAdminDashboard() {
+                document.getElementById('admin-dashboard-section').classList.remove('d-none');
+
+                // 1. Последни 5 студенти
+                fetch('/api/students?size=5&sort=id,desc')
+                    .then(res => res.json())
+                    .then(data => {
+                        const tbody = document.getElementById('recent-students-tbody');
+                        tbody.innerHTML = '';
+                        const students = data.content || [];
+                        students.forEach(s => {
+                            tbody.innerHTML += `
+                                <tr class="align-middle">
+                                    <td class="py-3 fw-bold"><i class="bi bi-person-circle me-2 text-primary"></i> ${s.firstName} ${s.lastName}</td>
+                                    <td class="text-end"><span class="badge bg-secondary">${s.facultyNumber}</span></td>
+                                </tr>`;
+                        });
+                    });
+
+                // 2. Графика (Статистика студенти по курсове)
+                fetch('/api/dashboard/stats') // Вече имаш този ендпойнт от EnrollmentRepository
+                    .then(res => res.json())
+                    .then(statsData => {
+                        const labels = statsData.studentsPerCourse.map(item => item[0]);
+                        const counts = statsData.studentsPerCourse.map(item => item[1]);
+
+                        const ctx = document.getElementById('studentsChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Брой студенти',
+                                    data: counts,
+                                    backgroundColor: 'rgba(13, 202, 240, 0.5)',
+                                    borderColor: '#0dcaf0',
+                                    borderWidth: 2,
+                                    borderRadius: 8
+                                }]
                             },
-                            plugins: { legend: { labels: { color: '#ffffff' } } }
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                    y: { beginAtZero: true, grid: { color: '#333' }, ticks: { color: '#888' } },
+                                    x: { grid: { display: false }, ticks: { color: '#888' } }
+                                }
+                            }
+                        });
+                    });
+            }
+
+            // --- ЛОГИКА ЗА СТУДЕНТ ---
+            function loadStudentProfile() {
+                document.getElementById('student-profile-section').classList.remove('d-none');
+
+                // 1. Данни за профила
+                fetch('/api/students/me')
+                    .then(res => res.json())
+                    .then(student => {
+                        document.getElementById('profile-full-name').textContent = `${student.firstName} ${student.lastName}`;
+                        document.getElementById('profile-email').textContent = student.email;
+                        document.getElementById('profile-fac-number').textContent = student.facultyNumber;
+                    });
+
+                // 2. Списък с курсове и оценки
+                fetch('/api/students/my/enrollments')
+                    .then(res => res.json())
+                    .then(enrollments => {
+                        const tbody = document.getElementById('student-enrollments-tbody');
+                        tbody.innerHTML = '';
+
+                        if (enrollments.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted">Все още не сте записани в нито една специалност.</td></tr>';
+                            return;
                         }
-                    })
-            .catch(err => console.error("Грешка при статистика:", err));
-        })
-        .catch(err => console.error("Грешка:", err));
-    }); });
+
+                        enrollments.forEach(en => {
+                            const gradeValue = en.grade ? en.grade.toFixed(2) : '---';
+                            const gradeColor = en.grade >= 3 ? 'text-success' : (en.grade ? 'text-danger' : 'text-muted');
+                            
+                            tbody.innerHTML += `
+                                <tr class="align-middle">
+                                    <td class="py-3 fw-bold text-info">${en.course.name}</td>
+                                    <td>${en.course.professor ? en.course.professor.lastName : '<small class="text-muted">Няма назначен</small>'}</td>
+                                    <td class="text-center"><span class="badge bg-dark border border-secondary">${en.course.credits}</span></td>
+                                    <td class="text-end fw-bold ${gradeColor}" style="font-size: 1.1rem;">${gradeValue}</td>
+                                </tr>`;
+                        });
+                    });
+            }
+        });
     </script>
 </body>
 </html>
