@@ -1,6 +1,7 @@
 package com.campus.campus_management_system.service;
 
 import com.campus.campus_management_system.model.entity.Course;
+import com.campus.campus_management_system.model.entity.Enrollment;
 import com.campus.campus_management_system.model.entity.Student;
 import com.campus.campus_management_system.repository.CourseRepository;
 import com.campus.campus_management_system.repository.StudentRepository;
@@ -8,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,3 +67,4 @@ public class StudentService {
         studentRepository.deleteById(id);
     }
 }
+ 
