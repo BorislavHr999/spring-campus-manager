@@ -84,4 +84,13 @@ public class Student {
         }
         return this.enrollments.size();
     }
+
+    public java.util.List<String> getEnrolledCourseNames() {
+        if (this.enrollments == null) {
+            return java.util.Collections.emptyList();
+        }
+        return this.enrollments.stream()
+                  .map(e -> e.getCourse().getName())
+                  .collect(java.util.stream.Collectors.toList());
+    }
 }
