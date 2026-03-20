@@ -1,7 +1,5 @@
 package com.campus.campus_management_system.service;
 
-import com.campus.campus_management_system.model.entity.Course;
-import com.campus.campus_management_system.model.entity.Enrollment;
 import com.campus.campus_management_system.model.entity.Student;
 import com.campus.campus_management_system.repository.AddressRepository;
 import com.campus.campus_management_system.repository.CourseRepository;
@@ -12,9 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class StudentService {
@@ -44,7 +39,7 @@ public class StudentService {
         return studentRepository.findAll(pageable);
     }
 
-    // Създаване на студент (със задължителни Катедра и Адрес)
+    // Създаване на студент
     public Student createStudent(Student student) {
         if (studentRepository.existsByEmail(student.getEmail())) {
             throw new RuntimeException("Този имейл вече е регистриран!");
@@ -53,12 +48,15 @@ public class StudentService {
             throw new RuntimeException("Този факултетен номер вече съществува!");
         }
 
-        // --- НОВИ ЗАДЪЛЖИТЕЛНИ ПРОВЕРКИ ---
         if (student.getDepartment() == null || student.getDepartment().getId() == null) {
             throw new RuntimeException("Изборът на катедра е задължителен!");
         }
-        if (student.getAddress() == null || student.getAddress().getId() == null) {
-            throw new RuntimeException("Изборът на адрес е задължителен!");
+
+        // ЗАПАЗВАМЕ АДРЕСА ПЪРВО, ЗА ДА ПОЛУЧИ ID
+        if (student.getAddress() != null && student.getAddress().getCity() != null) {
+            addressRepository.save(student.getAddress());
+        } else {
+             throw new RuntimeException("Въвеждането на град и улица е задължително!");
         }
 
         return studentRepository.save(student);
@@ -74,12 +72,23 @@ public class StudentService {
         existingStudent.setEmail(studentDetails.getEmail());
         existingStudent.setFacultyNumber(studentDetails.getFacultyNumber());
 
-        // --- ОБНОВЯВАНЕ НА КАТЕДРА И АДРЕС ---
         if (studentDetails.getDepartment() != null && studentDetails.getDepartment().getId() != null) {
             existingStudent.setDepartment(studentDetails.getDepartment());
         }
-        if (studentDetails.getAddress() != null && studentDetails.getAddress().getId() != null) {
-            existingStudent.setAddress(studentDetails.getAddress());
+
+        // ОБНОВЯВАМЕ АДРЕСА (вече е текст, записваме го в базата)
+        if (studentDetails.getAddress() != null) {
+            if (existingStudent.getAddress() != null) {
+                // Ако студентът вече е имал адрес, просто му презаписваме текста
+                existingStudent.getAddress().setCity(studentDetails.getAddress().getCity());
+                existingStudent.getAddress().setStreet(studentDetails.getAddress().getStreet());
+                existingStudent.getAddress().setCountry(studentDetails.getAddress().getCountry());
+                addressRepository.save(existingStudent.getAddress());
+            } else {
+                // Ако е нямал адрес досега, създаваме новия
+                addressRepository.save(studentDetails.getAddress());
+                existingStudent.setAddress(studentDetails.getAddress());
+            }
         }
 
         return studentRepository.save(existingStudent);
