@@ -1,7 +1,9 @@
 package com.campus.campus_management_system.controller;
 
+import com.campus.campus_management_system.model.entity.Address;
 import com.campus.campus_management_system.model.entity.Student;
 import com.campus.campus_management_system.model.entity.User;
+import com.campus.campus_management_system.repository.AddressRepository;
 import com.campus.campus_management_system.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +23,18 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AddressRepository addressRepository; // ДОБАВЕНО ЗА АДРЕСА
 
     @Autowired
-    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthController(UserRepository userRepository, 
+                          PasswordEncoder passwordEncoder,
+                          AddressRepository addressRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.addressRepository = addressRepository;
     }
 
-    // Взимане на текущия потребител (Това вече го имахме)
+    // Взимане на текущия потребител
     @GetMapping("/me")
     public Map<String, Object> getCurrentUser(Authentication authentication) {
         Map<String, Object> userInfo = new HashMap<>();
@@ -42,29 +48,49 @@ public class AuthController {
         return userInfo;
     }
 
-    // НОВ МЕТОД: Регистрация на нов потребител
+    // Регистрация на нов потребител
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody Map<String, String> payload) {
-        String username = payload.get("username");
-        String password = payload.get("password");
+    public ResponseEntity<?> registerUser(@RequestBody Map<String, Object> payload) { // Променено на Object заради вложения Адрес
+        String username = (String) payload.get("username");
+        String password = (String) payload.get("password");
 
         // 1. Проверяваме дали името вече е заето
         if (userRepository.findByUsername(username).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Това потребителско име вече е заето!"));
         }
 
-        // 2. Създаваме новия потребител
+        // 2. Създаваме новия потребител (Акаунт за логин)
         User newUser = User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password)) // КРИПТИРАМЕ паролата!
-                .role("ROLE_USER") // По подразбиране всички нови са обикновени потребители
+                .role("ROLE_USER") 
                 .build();
 
+        // 3. Създаваме студентския профил към него
         Student newStudent = new Student();
-        newStudent.setFirstName("Нов");
-        newStudent.setLastName("Студент");
-        newStudent.setEmail(username + "@campus.com");
+        // Тук може да взимаме имената от формата, ако ги изпращаш, иначе слагаме временни
+        newStudent.setFirstName(payload.containsKey("firstName") ? (String) payload.get("firstName") : "Нов");
+        newStudent.setLastName(payload.containsKey("lastName") ? (String) payload.get("lastName") : "Студент");
+        newStudent.setEmail(payload.containsKey("email") ? (String) payload.get("email") : username + "@campus.com");
 
+        // --- 4. ОБРАБОТКА И ЗАПАЗВАНЕ НА АДРЕСА ---
+        if (payload.containsKey("address")) {
+            // Взимаме вложения обект "address" от JSON-а
+            Map<String, String> addressMap = (Map<String, String>) payload.get("address");
+            
+            Address newAddress = new Address();
+            newAddress.setCity(addressMap.get("city"));
+            newAddress.setStreet(addressMap.get("street"));
+            newAddress.setCountry(addressMap.getOrDefault("country", "България"));
+            
+            // Задължително го запазваме първо в базата!
+            addressRepository.save(newAddress);
+            
+            // Прикачваме го към студента
+            newStudent.setAddress(newAddress);
+        }
+
+        // 5. Навързваме нещата и запазваме всичко
         newStudent.setUser(newUser);
         newUser.setStudent(newStudent);
         

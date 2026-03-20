@@ -19,9 +19,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login.html", "/register.html", "/api/auth/register", "/css/**", "/js/**").permitAll()
-                .anyRequest().authenticated() 
-            )
+            .requestMatchers("/login.html", "/register.html", "/api/auth/register", "/css/**", "/js/**", "/api/departments").permitAll()
+            .anyRequest().authenticated()
+        )
             .formLogin(form -> form
                 .loginPage("/login.html") // КАЗВАМЕ: Използвай този HTML файл за логин
                 .loginProcessingUrl("/login") // КАЗВАМЕ: Обработвай данните на този адрес (както е във формата)
