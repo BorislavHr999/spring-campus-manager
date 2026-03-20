@@ -11,8 +11,8 @@
         .login-card { background-color: #1e1e1e; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #3d3d3d; padding: 2.5rem; width: 100%; max-width: 400px; animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         .text-gradient { background: linear-gradient(45deg, #198754, #20c997); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
-        .form-control { background-color: #2d2d2d; color: #fff; border: 1px solid #4d4d4d; }
-        .form-control:focus { background-color: #3d3d3d; color: #fff; border-color: #198754; box-shadow: none; }
+        .form-control, .form-select { background-color: #2d2d2d; color: #fff; border: 1px solid #4d4d4d; }
+        .form-control:focus, .form-select:focus { background-color: #3d3d3d; color: #fff; border-color: #198754; box-shadow: none; }
         .input-group-text { background-color: #222; border-color: #4d4d4d; color: #aaa; }
     </style>
 </head>
@@ -43,24 +43,24 @@
             </div>
 
             <div class="mb-3">
-    <label class="form-label text-info small"><i class="bi bi-building"></i> Катедра (Факултет) *</label>
-    <select class="form-select bg-dark text-light border-info" id="regDepartmentId" required>
-        <option value="">-- Избери Катедра --</option>
-    </select>
-</div>
+                <label class="form-label text-info small"><i class="bi bi-building"></i> Катедра (Факултет) *</label>
+                <select class="form-select border-info" id="regDepartmentId" required>
+                    <option value="">-- Избери Катедра --</option>
+                </select>
+            </div>
 
-<label class="form-label text-warning small"><i class="bi bi-geo-alt"></i> Адрес *</label>
-<div class="row mb-3">
-    <div class="col-md-4 mb-2">
-        <input type="text" class="form-control bg-dark text-light border-warning" id="regCity" placeholder="Град" required>
-    </div>
-    <div class="col-md-4 mb-2">
-        <input type="text" class="form-control bg-dark text-light border-warning" id="regStreet" placeholder="Улица" required>
-    </div>
-    <div class="col-md-4 mb-2">
-        <input type="text" class="form-control bg-dark text-light border-warning" id="regCountry" placeholder="Държава (пр. България)" value="България" required>
-    </div>
-</div>
+            <label class="form-label text-warning small"><i class="bi bi-geo-alt"></i> Адрес *</label>
+            <div class="row mb-3">
+                <div class="col-4 px-1">
+                    <input type="text" class="form-control border-warning text-center px-1" id="regCity" placeholder="Град" required>
+                </div>
+                <div class="col-4 px-1">
+                    <input type="text" class="form-control border-warning text-center px-1" id="regStreet" placeholder="Улица" required>
+                </div>
+                <div class="col-4 px-1">
+                    <input type="text" class="form-control border-warning text-center px-1" id="regCountry" value="България" required>
+                </div>
+            </div>
 
             <button type="submit" class="btn btn-success w-100 fw-bold rounded-pill shadow-sm mb-3 py-2">
                 Регистрирай ме
@@ -73,18 +73,51 @@
     </div>
 
     <script>
-        document.getElementById('registerForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); // Спираме презареждането на страницата
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Зареждаме катедрите от базата веднага щом страницата се отвори
+            fetch('/api/departments')
+                .then(res => res.json())
+                .then(depts => {
+                    let select = document.getElementById('regDepartmentId');
+                    let data = depts.content || depts;
+                    data.forEach(d => {
+                        select.innerHTML += `<option value="${d.id}">${d.name}</option>`;
+                    });
+                })
+                .catch(err => console.error("Грешка при зареждане на катедрите:", err));
+        });
 
+        // 2. Логика за запазване на новия потребител
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+
+            // Взимаме всички стойности
             const username = document.getElementById('reg-username').value;
             const password = document.getElementById('reg-password').value;
+            const deptId = document.getElementById('regDepartmentId').value;
+            const city = document.getElementById('regCity').value;
+            const street = document.getElementById('regStreet').value;
+            const country = document.getElementById('regCountry').value || 'България';
+
             const alertBox = document.getElementById('alert-box');
+
+            // Сглобяваме пълния JSON с адреса и катедрата
+            const payload = {
+                username: username,
+                password: password,
+                department: { id: parseInt(deptId) },
+                address: {
+                    city: city,
+                    street: street,
+                    country: country
+                }
+            };
 
             try {
                 const response = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify(payload) // Пращаме пълния пакет към Java!
                 });
 
                 const result = await response.json();
@@ -94,13 +127,16 @@
                 if (response.ok) {
                     alertBox.classList.add('alert-success');
                     alertBox.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i> ${result.message} Пренасочване...`;
-                    setTimeout(() => window.location.href = 'login.html', 1500); // Пращаме го към логина след 1.5 сек.
+                    setTimeout(() => window.location.href = 'login.html', 1500); 
                 } else {
                     alertBox.classList.add('alert-danger');
-                    alertBox.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> ${result.message}`;
+                    alertBox.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> ${result.message || 'Възникна грешка!'}`;
                 }
             } catch (error) {
                 console.error("Грешка:", error);
+                alertBox.classList.remove('d-none', 'alert-success');
+                alertBox.classList.add('alert-danger');
+                alertBox.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> Сървърна грешка. Опитайте пак.`;
             }
         });
     </script>
