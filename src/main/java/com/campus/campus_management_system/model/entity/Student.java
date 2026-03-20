@@ -7,13 +7,7 @@ import lombok.ToString;
 import lombok.EqualsAndHashCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.Set;
-import java.util.HashSet;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -39,7 +33,7 @@ public class Student {
 
     @ManyToOne
     @JoinColumn(name = "department_id")
-    @JsonIgnore
+    // МАХНАХМЕ @JsonIgnore ОТ ТУК, ЗА ДА СЕ ВИЖДА В БРАУЗЪРА!
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Department department;
@@ -61,23 +55,13 @@ public class Student {
     @EqualsAndHashCode.Exclude
     private Set<Club> clubs;
 
-    //@ManyToMany
-    //@JoinTable(
-    //    name = "student_course",
-    //    joinColumns = @JoinColumn(name = "student_id"),
-    //    inverseJoinColumns = @JoinColumn(name = "course_id")
-    //)
-
-    @JsonIgnoreProperties("students")
+    @JsonIgnore
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-
-    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "used_id", referencedColumnName = "id")
     private User user;
 
-    // 2. Този метод създава магическото поле "courseCount" в JSON-а
     public int getCourseCount() {
         if (this.enrollments == null) {
             return 0;
