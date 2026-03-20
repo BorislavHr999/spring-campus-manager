@@ -1,6 +1,7 @@
 package com.campus.campus_management_system.controller;
 
 import com.campus.campus_management_system.model.entity.Address;
+import com.campus.campus_management_system.model.entity.Department; // Добавен импорт за катедрата!
 import com.campus.campus_management_system.model.entity.Student;
 import com.campus.campus_management_system.model.entity.User;
 import com.campus.campus_management_system.repository.AddressRepository;
@@ -23,7 +24,7 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AddressRepository addressRepository; // ДОБАВЕНО ЗА АДРЕСА
+    private final AddressRepository addressRepository; 
 
     @Autowired
     public AuthController(UserRepository userRepository, 
@@ -50,7 +51,7 @@ public class AuthController {
 
     // Регистрация на нов потребител
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody Map<String, Object> payload) { // Променено на Object заради вложения Адрес
+    public ResponseEntity<?> registerUser(@RequestBody Map<String, Object> payload) { 
         String username = (String) payload.get("username");
         String password = (String) payload.get("password");
 
@@ -62,20 +63,31 @@ public class AuthController {
         // 2. Създаваме новия потребител (Акаунт за логин)
         User newUser = User.builder()
                 .username(username)
-                .password(passwordEncoder.encode(password)) // КРИПТИРАМЕ паролата!
+                .password(passwordEncoder.encode(password)) 
                 .role("ROLE_USER") 
                 .build();
 
         // 3. Създаваме студентския профил към него
         Student newStudent = new Student();
-        // Тук може да взимаме имената от формата, ако ги изпращаш, иначе слагаме временни
         newStudent.setFirstName(payload.containsKey("firstName") ? (String) payload.get("firstName") : "Нов");
         newStudent.setLastName(payload.containsKey("lastName") ? (String) payload.get("lastName") : "Студент");
         newStudent.setEmail(payload.containsKey("email") ? (String) payload.get("email") : username + "@campus.com");
 
+        // ---> НОВО: ОБРАБОТКА И ЗАПАЗВАНЕ НА КАТЕДРАТА <---
+        if (payload.containsKey("department")) {
+            Map<String, Object> deptMap = (Map<String, Object>) payload.get("department");
+            if (deptMap != null && deptMap.containsKey("id")) {
+                Long deptId = Long.valueOf(deptMap.get("id").toString());
+                
+                // Създаваме обект с ID-то, за да може Hibernate да го навърже
+                Department department = new Department();
+                department.setId(deptId);
+                newStudent.setDepartment(department);
+            }
+        }
+
         // --- 4. ОБРАБОТКА И ЗАПАЗВАНЕ НА АДРЕСА ---
         if (payload.containsKey("address")) {
-            // Взимаме вложения обект "address" от JSON-а
             Map<String, String> addressMap = (Map<String, String>) payload.get("address");
             
             Address newAddress = new Address();
