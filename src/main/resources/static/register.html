@@ -41,6 +41,27 @@
                     <input type="password" class="form-control" id="reg-password" required>
                 </div>
             </div>
+
+            <div class="mb-3">
+    <label class="form-label text-info small"><i class="bi bi-building"></i> Катедра (Факултет) *</label>
+    <select class="form-select bg-dark text-light border-info" id="regDepartmentId" required>
+        <option value="">-- Избери Катедра --</option>
+    </select>
+</div>
+
+<label class="form-label text-warning small"><i class="bi bi-geo-alt"></i> Адрес *</label>
+<div class="row mb-3">
+    <div class="col-md-4 mb-2">
+        <input type="text" class="form-control bg-dark text-light border-warning" id="regCity" placeholder="Град" required>
+    </div>
+    <div class="col-md-4 mb-2">
+        <input type="text" class="form-control bg-dark text-light border-warning" id="regStreet" placeholder="Улица" required>
+    </div>
+    <div class="col-md-4 mb-2">
+        <input type="text" class="form-control bg-dark text-light border-warning" id="regCountry" placeholder="Държава (пр. България)" value="България" required>
+    </div>
+</div>
+
             <button type="submit" class="btn btn-success w-100 fw-bold rounded-pill shadow-sm mb-3 py-2">
                 Регистрирай ме
             </button>
