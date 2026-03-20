@@ -59,7 +59,7 @@
                             </tr>
                         </thead>
                         <tbody id="all-courses-tbody">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </main>
@@ -261,26 +261,26 @@
             };
         });
 
-        // 7. Записване в курс
-        window.enrollInCourse = function(courseId) {
-            const token = localStorage.getItem('token');
-            const headers = { 'Content-Type': 'application/json' };
-            if (token) headers['Authorization'] = `Bearer ${token}`;
-
-            fetch(`/api/students/enroll/${courseId}`, {
-                method: 'POST',
-                headers: headers
-            })
-            .then(async res => {
-                if (res.ok) {
-                    alert("✅ Успешно се записахте!");
-                    window.location.href = 'index.html';
+        // 7. Записване в курс (ПОПРАВЕНАТА ФУНКЦИЯ)
+        window.enrollInCourse = async function(courseId) {
+            try {
+                // Извикваме правилния адрес към EnrollmentController
+                let response = await fetch(`/api/enrollments/enroll/${courseId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                let result = await response.json();
+                
+                if (response.ok) {
+                    alert("✅ " + result.message);
                 } else {
-                    const err = await res.text();
-                    alert("⚠️ Проблем: " + err);
+                    alert("⚠️ " + (result.message || "Грешка при записване"));
                 }
-            })
-            .catch(err => alert("❌ Грешка при връзката."));
+            } catch (error) {
+                console.error("Грешка:", error);
+                alert("❌ Възникна грешка при записването. Проверете конзолата.");
+            }
         };
     </script>
 </body>
