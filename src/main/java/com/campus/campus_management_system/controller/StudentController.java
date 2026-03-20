@@ -78,4 +78,10 @@ public class StudentController {
         Page<Student> studentPage = studentRepository.findAll(pageable);
         return ResponseEntity.ok(studentPage);
     }
+    
+    @GetMapping("/{id}/courses")
+    public ResponseEntity<?> getStudentCourses(@PathVariable Long id) {
+        List<Enrollment> enrollments = enrollmentRepository.findByStudentId(id);
+        return ResponseEntity.ok(enrollments);
+    }
 }
