@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/students")
@@ -83,5 +84,75 @@ public class StudentController {
     public ResponseEntity<?> getStudentCourses(@PathVariable Long id) {
         List<Enrollment> enrollments = enrollmentRepository.findByStudentId(id);
         return ResponseEntity.ok(enrollments);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteStudent(@PathVariable Long id, Authentication authentication) {
+        
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                
+        if (!isAdmin) {
+            return ResponseEntity.status(403).body(Map.of("message", "Отказ! Само администратори могат да трият студенти."));
+        }
+
+        try {
+            Optional<Student> studentOpt = studentRepository.findById(id);
+            if (studentOpt.isPresent()) {
+                Student student = studentOpt.get();
+                User linkedUser = student.getUser();
+                
+                studentRepository.delete(student);
+                
+                if (linkedUser != null) {
+                    userRepository.delete(linkedUser);
+                }
+                
+                return ResponseEntity.ok(Map.of("message", "Студентът е изтрит успешно!"));
+            } else {
+                return ResponseEntity.badRequest().body(Map.of("message", "Студентът не е намерен!"));
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            
+            String exactError = e.getMessage();
+            if (e.getCause() != null) {
+                exactError = e.getCause().getMessage();
+                if (e.getCause().getCause() != null) {
+                    exactError = e.getCause().getCause().getMessage();
+                }
+            }
+            
+            return ResponseEntity.status(500).body(Map.of("message", "JAVA ГРЕШКА: " + exactError));
+        }
+    }
+    
+    @PutMapping("/{studentId}/courses/{courseId}/grade")
+    public ResponseEntity<?> updateStudentGrade(
+            @PathVariable Long studentId,
+            @PathVariable Long courseId,
+            @RequestParam Double grade,
+            Authentication authentication) {
+            
+        
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                
+        if (!isAdmin) {
+            return ResponseEntity.status(403).body(Map.of("message", "Само администратори могат да пишат оценки!"));
+        }
+
+        Optional<Enrollment> enrollmentOpt = enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId);
+        
+        if (enrollmentOpt.isPresent()) {
+            Enrollment enrollment = enrollmentOpt.get();
+            enrollment.setGrade(grade);
+            enrollmentRepository.save(enrollment);
+            
+            return ResponseEntity.ok(Map.of("message", "Оценката е записана успешно!"));
+        } else {
+            return ResponseEntity.status(404).body(Map.of("message", "Не е намерено записване за този студент и курс."));
+        }
     }
 }
