@@ -20,6 +20,10 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     List<Enrollment> findByStudentId(long studentId);
 
     java.util.Optional<Enrollment> findByStudentIdAndCourseId(Long studentId, Long courseId);
+
+    @org.springframework.transaction.annotation.Transactional
+    @org.springframework.data.jpa.repository.Modifying
+    void deleteByStudentId(Long studentId);
 }
 
 
