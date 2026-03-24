@@ -265,56 +265,68 @@
             };
 
             // ПОПРАВЕНА ЛОГИКА ЗА ЗАПАЗВАНЕ (Вече чете ръчните полета за адрес)
-            document.getElementById('save-student-btn').addEventListener('click', async function() {
-                let id = document.getElementById('studentId').value;
-                let deptId = document.getElementById('departmentId').value;
-                let city = document.getElementById('addrCity').value;
-                let street = document.getElementById('addrStreet').value;
-                let country = document.getElementById('addrCountry').value || 'България';
+            
+            // ПОПРАВЕНА ЛОГИКА ЗА ЗАПАЗВАНЕ
+document.getElementById('save-student-btn').addEventListener('click', async function() {
+    let id = document.getElementById('studentId').value;
+    let deptId = document.getElementById('departmentId').value; // Провери дали в HTML е departmentId или studentDepartment
+    
+    // Взимаме стойностите внимателно
+    let city = document.getElementById('city') ? document.getElementById('city').value : "";
+    let street = document.getElementById('street') ? document.getElementById('street').value : "";
+    let country = document.getElementById('country') ? document.getElementById('country').value : "България";
 
-                if(!deptId || !city || !street) {
-                    let err = document.getElementById('errorAlert');
-                    err.innerHTML = "<i class='bi bi-exclamation-triangle-fill me-2'></i> Моля, изберете Катедра и попълнете Адреса (Град и Улица)!";
-                    err.classList.remove('d-none');
-                    return;
-                }
+    // Проверка за задължителни полета
+    if(!deptId || !city || !street) {
+        let err = document.getElementById('errorAlert');
+        if(err) {
+            err.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> Моля, попълнете Катедра и Адрес!`;
+            err.classList.remove('d-none');
+        } else {
+            alert("Моля, попълнете Катедра и Адрес!");
+        }
+        return;
+    }
 
-                let studentData = {
-                    firstName: document.getElementById('firstName').value,
-                    lastName: document.getElementById('lastName').value,
-                    facultyNumber: document.getElementById('facultyNumber').value,
-                    email: document.getElementById('email').value,
-                    department: { id: parseInt(deptId) },
-                    address: {
-                        city: city,
-                        street: street,
-                        country: country
-                    }
-                };
+    let studentData = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        facultyNumber: document.getElementById('facultyNumber').value,
+        email: document.getElementById('email').value,
+        department: { id: parseInt(deptId) },
+        address: {
+            city: city,
+            street: street,
+            country: country
+        }
+    };
 
-                let url = id ? `/api/students/${id}` : '/api/students';
-                let method = id ? 'PUT' : 'POST';
+    let url = id ? `/api/students/${id}` : '/api/students';
+    let method = id ? 'PUT' : 'POST';
 
-                try {
-                    let response = await fetch(url, {
-                        method: method,
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(studentData)
-                    });
+    console.log("Изпращам данни:", studentData); // За дебъг в конзолата
 
-                    if (!response.ok) {
-                        let errorMsg = await response.text();
-                        throw new Error(errorMsg || "Сървърна грешка.");
-                    }
+    try {
+        let response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(studentData)
+        });
 
-                    bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
-                    loadAllStudents(currentPage);
-                } catch (error) {
-                    let errorDiv = document.getElementById('errorAlert');
-                    errorDiv.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> ${error.message}`;
-                    errorDiv.classList.remove('d-none');
-                }
-            });
+        if (response.ok) {
+            bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
+            loadAllStudents(0);
+        } else {
+            const errorText = await response.text();
+            alert("Грешка при запис: " + errorText);
+        }
+    } catch (err) {
+        console.error("Грешка при fetch:", err);
+        alert("Грешка при връзката със сървъра (Failed to fetch). Проверете дали сървърът работи!");
+    }
+});
+        
+    });
 
             document.getElementById('searchInput').addEventListener('input', (e) => {
                 currentKeyword = e.target.value;
