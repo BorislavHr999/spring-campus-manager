@@ -87,36 +87,36 @@ public class StudentController {
     }
 
     @DeleteMapping("/{id}")
-public ResponseEntity<?> deleteStudent(@PathVariable Long id, Authentication authentication) {
-    
-    boolean isAdmin = authentication.getAuthorities().stream()
-            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-    if (!isAdmin) {
-        return ResponseEntity.status(403).body(Map.of("message", "Отказ! Само администратори могат да трият студенти."));
-    }
-
-    try {
-        Optional<Student> studentOpt = studentRepository.findById(id);
-        if (studentOpt.isPresent()) {
-            Student student = studentOpt.get();
-            User linkedUser = student.getUser();
-
-            enrollmentRepository.deleteByStudentId(id);
-
-            studentRepository.delete(student);
-
-            if (linkedUser != null) {
-                userRepository.delete(linkedUser);
-            }
-
-            return ResponseEntity.ok(Map.of("message", "Студентът и всички негови данни са изтрити успешно!"));
-        } else {
-            return ResponseEntity.status(404).body(Map.of("message", "Студентът не е намерен!"));
+    public ResponseEntity<?> deleteStudent(@PathVariable Long id, Authentication authentication) {
+        
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (!isAdmin) {
+            return ResponseEntity.status(403).body(Map.of("message", "Отказ! Само администратори могат да трият студенти."));
         }
-    } catch (Exception e) {
-        return ResponseEntity.status(500).body(Map.of("message", "Грешка при изтриване: " + e.getMessage()));
+
+        try {
+            Optional<Student> studentOpt = studentRepository.findById(id);
+            if (studentOpt.isPresent()) {
+                Student student = studentOpt.get();
+                User linkedUser = student.getUser();
+
+                enrollmentRepository.deleteByStudentId(id);
+
+                studentRepository.delete(student);
+
+                if (linkedUser != null) {
+                    userRepository.delete(linkedUser);
+                }
+
+                return ResponseEntity.ok(Map.of("message", "Студентът и всички негови данни са изтрити успешно!"));
+            } else {
+                return ResponseEntity.status(404).body(Map.of("message", "Студентът не е намерен!"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "Грешка при изтриване: " + e.getMessage()));
+        }
     }
-}
     
     @PutMapping("/{studentId}/courses/{courseId}/grade")
     public ResponseEntity<?> updateStudentGrade(
@@ -144,5 +144,20 @@ public ResponseEntity<?> deleteStudent(@PathVariable Long id, Authentication aut
         } else {
             return ResponseEntity.status(404).body(Map.of("message", "Не е намерено записване за този студент и курс."));
         }
+    }
+
+    // --- ПОПРАВЕНИТЕ МЕТОДИ ЗА ЗАПАЗВАНЕ И РЕДАКЦИЯ ---
+
+    @PostMapping 
+    public ResponseEntity<Student> createStudent(@RequestBody Student student) {
+        // Използваме вече дефинирания studentRepository
+        return ResponseEntity.ok(studentRepository.save(student));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Student> updateStudent(@PathVariable Long id, @RequestBody Student student) {
+        // Задаваме правилното ID на обекта, за да презапише съществуващия, а не да създаде нов
+        student.setId(id);
+        return ResponseEntity.ok(studentRepository.save(student));
     }
 }
