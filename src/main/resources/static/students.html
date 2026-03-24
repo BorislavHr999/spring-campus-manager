@@ -269,12 +269,12 @@
             // ПОПРАВЕНА ЛОГИКА ЗА ЗАПАЗВАНЕ
 document.getElementById('save-student-btn').addEventListener('click', async function() {
     let id = document.getElementById('studentId').value;
-    let deptId = document.getElementById('departmentId').value; // Провери дали в HTML е departmentId или studentDepartment
+    let deptId = document.getElementById('studentDepartment').value; // Провери дали в HTML е departmentId или studentDepartment
     
     // Взимаме стойностите внимателно
-    let city = document.getElementById('city') ? document.getElementById('city').value : "";
-    let street = document.getElementById('street') ? document.getElementById('street').value : "";
-    let country = document.getElementById('country') ? document.getElementById('country').value : "България";
+    let city = document.getElementById('addrCity') ? document.getElementById('city').value : "";
+    let street = document.getElementById('addrStreet') ? document.getElementById('street').value : "";
+    let country = document.getElementById('addrCountry') ? document.getElementById('country').value : "България";
 
     // Проверка за задължителни полета
     if(!deptId || !city || !street) {
