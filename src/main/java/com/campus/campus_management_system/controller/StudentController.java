@@ -127,4 +127,32 @@ public class StudentController {
             return ResponseEntity.status(500).body(Map.of("message", "JAVA ГРЕШКА: " + exactError));
         }
     }
+    
+    @PutMapping("/{studentId}/courses/{courseId}/grade")
+    public ResponseEntity<?> updateStudentGrade(
+            @PathVariable Long studentId,
+            @PathVariable Long courseId,
+            @RequestParam Double grade,
+            Authentication authentication) {
+            
+        
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                
+        if (!isAdmin) {
+            return ResponseEntity.status(403).body(Map.of("message", "Само администратори могат да пишат оценки!"));
+        }
+
+        Optional<Enrollment> enrollmentOpt = enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId);
+        
+        if (enrollmentOpt.isPresent()) {
+            Enrollment enrollment = enrollmentOpt.get();
+            enrollment.setGrade(grade);
+            enrollmentRepository.save(enrollment);
+            
+            return ResponseEntity.ok(Map.of("message", "Оценката е записана успешно!"));
+        } else {
+            return ResponseEntity.status(404).body(Map.of("message", "Не е намерено записване за този студент и курс."));
+        }
+    }
 }
