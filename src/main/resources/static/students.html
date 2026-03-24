@@ -269,14 +269,18 @@
             // ПОПРАВЕНА ЛОГИКА ЗА ЗАПАЗВАНЕ
 document.getElementById('save-student-btn').addEventListener('click', async function() {
     let id = document.getElementById('studentId').value;
-    let deptId = document.getElementById('departmentId').value; // Провери дали в HTML е departmentId или studentDepartment
     
-    // Взимаме стойностите внимателно
-    let city = document.getElementById('city') ? document.getElementById('city').value : "";
-    let street = document.getElementById('street') ? document.getElementById('street').value : "";
-    let country = document.getElementById('country') ? document.getElementById('country').value : "България";
+    let deptId = document.getElementById('studentDepartment') ? document.getElementById('studentDepartment').value : "";
+    
+    // Взимаме адреса стъпка по стъпка
+    let cityEl = document.getElementById('addrCity');
+    let streetEl = document.getElementById('addrStreet');
+    let countryEl = document.getElementById('addrCountry');
 
-    // Проверка за задължителни полета
+    let city = cityEl ? cityEl.value : "";
+    let street = streetEl ? streetEl.value : "";
+    let country = countryEl ? countryEl.value : "България";
+
     if(!deptId || !city || !street) {
         let err = document.getElementById('errorAlert');
         if(err) {
@@ -326,7 +330,6 @@ document.getElementById('save-student-btn').addEventListener('click', async func
     }
 });
         
-    });
 
             document.getElementById('searchInput').addEventListener('input', (e) => {
                 currentKeyword = e.target.value;
