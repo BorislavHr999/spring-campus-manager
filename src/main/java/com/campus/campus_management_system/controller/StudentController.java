@@ -112,9 +112,19 @@ public class StudentController {
             } else {
                 return ResponseEntity.badRequest().body(Map.of("message", "Студентът не е намерен!"));
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("message", "Грешка при изтриване на студента. Проверете конзолата."));
+            
+            String exactError = e.getMessage();
+            if (e.getCause() != null) {
+                exactError = e.getCause().getMessage();
+                if (e.getCause().getCause() != null) {
+                    exactError = e.getCause().getCause().getMessage();
+                }
+            }
+            
+            return ResponseEntity.status(500).body(Map.of("message", "JAVA ГРЕШКА: " + exactError));
         }
     }
 }
