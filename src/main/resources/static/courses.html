@@ -101,7 +101,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="app.js"></script>
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -113,6 +112,8 @@
                 .then(data => {
                     let professors = data.content ? data.content : data;
                     let select = document.getElementById('courseProfessor');
+                    // Изчистваме старите опции, за да няма дублиране
+                    select.innerHTML = '<option value="">-- Изберете преподавател --</option>';
                     professors.forEach(prof => {
                         select.innerHTML += `<option value="${prof.id}">${prof.firstName} ${prof.lastName}</option>`;
                     });
@@ -202,7 +203,7 @@
             window.openCreateModal = function() {
                 document.getElementById('courseForm').reset();
                 document.getElementById('courseId').value = '';
-                document.getElementById('courseProfessor').value = ''; // Изчистваме селекта
+                document.getElementById('courseProfessor').value = ''; 
                 new bootstrap.Modal(document.getElementById('courseModal')).show();
             };
 
@@ -222,22 +223,31 @@
                 new bootstrap.Modal(document.getElementById('courseModal')).show();
             };
 
-            // 5. Запазване в базата
+            // 5. Запазване в базата - ТУК Е МАГИЯТА
             document.getElementById('save-course-btn').addEventListener('click', function() {
                 let id = document.getElementById('courseId').value;
-                let profId = document.getElementById('courseProfessor').value;
+                
+                // Взимаме стойностите директно
+                let courseName = document.getElementById('courseName').value;
+                let courseCredits = document.getElementById('courseCredits').value;
+                let profSelect = document.getElementById('courseProfessor');
+                
+                // Хващаме реално избраната стойност в момента
+                let profId = profSelect.options[profSelect.selectedIndex].value;
+
+                console.log("Опитвам се да запазя курс с професор ID:", profId);
 
                 // Създаваме обекта
                 let data = {
-                    name: document.getElementById('courseName').value,
-                    credits: document.getElementById('courseCredits').value
+                    name: courseName,
+                    credits: courseCredits
                 };
 
-                // Ако сме избрали преподавател, го добавяме в обекта
-                if (profId) {
+                // Ако сме избрали преподавател (и не е празното поле), го добавяме
+                if (profId && profId !== "") {
                     data.professor = { id: parseInt(profId) };
                 } else {
-                    data.professor = null;
+                    data.professor = null; // Изрично казваме на Java да премахне професора, ако сме избрали "--Изберете--"
                 }
 
                 let url = id ? '/api/courses/' + id : '/api/courses';
@@ -247,9 +257,27 @@
                     method: method,
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(data)
-                }).then(() => {
-                    bootstrap.Modal.getInstance(document.getElementById('courseModal')).hide();
-                    loadCourses();
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message || "Грешка от сървъра") });
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    // Скриваме модала сигурно
+                    let modalEl = document.getElementById('courseModal');
+                    let modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) {
+                        modal.hide();
+                    }
+                    
+                    // Презареждаме таблицата
+                    window.loadCourses();
+                })
+                .catch(err => {
+                    console.error("Грешка при запазване:", err);
+                    alert("Възникна грешка: " + err.message);
                 });
             });
 
@@ -261,10 +289,9 @@
             };
         });
 
-        // 7. Записване в курс (ПОПРАВЕНАТА ФУНКЦИЯ)
+        // 7. Записване в курс
         window.enrollInCourse = async function(courseId) {
             try {
-                // Извикваме правилния адрес към EnrollmentController
                 let response = await fetch(`/api/enrollments/enroll/${courseId}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
