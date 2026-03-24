@@ -87,46 +87,36 @@ public class StudentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteStudent(@PathVariable Long id, Authentication authentication) {
-        
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-                
-        if (!isAdmin) {
-            return ResponseEntity.status(403).body(Map.of("message", "Отказ! Само администратори могат да трият студенти."));
-        }
-
-        try {
-            Optional<Student> studentOpt = studentRepository.findById(id);
-            if (studentOpt.isPresent()) {
-                Student student = studentOpt.get();
-                User linkedUser = student.getUser();
-                
-                studentRepository.delete(student);
-                
-                if (linkedUser != null) {
-                    userRepository.delete(linkedUser);
-                }
-                
-                return ResponseEntity.ok(Map.of("message", "Студентът е изтрит успешно!"));
-            } else {
-                return ResponseEntity.badRequest().body(Map.of("message", "Студентът не е намерен!"));
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            
-            String exactError = e.getMessage();
-            if (e.getCause() != null) {
-                exactError = e.getCause().getMessage();
-                if (e.getCause().getCause() != null) {
-                    exactError = e.getCause().getCause().getMessage();
-                }
-            }
-            
-            return ResponseEntity.status(500).body(Map.of("message", "JAVA ГРЕШКА: " + exactError));
-        }
+public ResponseEntity<?> deleteStudent(@PathVariable Long id, Authentication authentication) {
+    
+    boolean isAdmin = authentication.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    if (!isAdmin) {
+        return ResponseEntity.status(403).body(Map.of("message", "Отказ! Само администратори могат да трият студенти."));
     }
+
+    try {
+        Optional<Student> studentOpt = studentRepository.findById(id);
+        if (studentOpt.isPresent()) {
+            Student student = studentOpt.get();
+            User linkedUser = student.getUser();
+
+            enrollmentRepository.deleteByStudentId(id);
+
+            studentRepository.delete(student);
+
+            if (linkedUser != null) {
+                userRepository.delete(linkedUser);
+            }
+
+            return ResponseEntity.ok(Map.of("message", "Студентът и всички негови данни са изтрити успешно!"));
+        } else {
+            return ResponseEntity.status(404).body(Map.of("message", "Студентът не е намерен!"));
+        }
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body(Map.of("message", "Грешка при изтриване: " + e.getMessage()));
+    }
+}
     
     @PutMapping("/{studentId}/courses/{courseId}/grade")
     public ResponseEntity<?> updateStudentGrade(
