@@ -154,6 +154,9 @@
                         
                         document.getElementById('admin-dashboard').classList.remove('d-none');
                         loadAdminCharts();
+
+                        let navUsers = document.getElementById('nav-users');
+                        if (navUsers) navUsers.classList.remove('d-none');
                     } else {
                         // Покажи нещата за Студент
                         document.getElementById('student-dashboard').classList.remove('d-none');
