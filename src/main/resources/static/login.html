@@ -38,37 +38,39 @@
     <div class="login-card">
         <div class="text-center mb-4">
             <h2 class="text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h2>
-            <p class="text-muted small">Моля, въведете вашите данни за вход</p>
+            <p class="text-muted small" data-i18n="login_subtitle">Моля, въведете вашите данни за вход</p>
         </div>
 
         <div id="error-alert" class="alert alert-danger d-none py-2 small" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i> Грешно име или парола!
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <span data-i18n="login_error">Грешно име или парола!</span>
         </div>
 
         <form action="/login" method="POST">
             <div class="mb-3">
-                <label class="form-label text-muted small mb-1">Потребителско име</label>
+                <label class="form-label text-muted small mb-1" data-i18n="reg_username">Потребителско име</label>
                 <div class="input-group shadow-sm">
                     <span class="input-group-text"><i class="bi bi-person"></i></span>
                     <input type="text" class="form-control" name="username" required autofocus>
                 </div>
             </div>
             <div class="mb-4">
-                <label class="form-label text-muted small mb-1">Парола</label>
+                <label class="form-label text-muted small mb-1" data-i18n="reg_password">Парола</label>
                 <div class="input-group shadow-sm">
                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
                     <input type="password" class="form-control" name="password" required>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100 fw-bold rounded-pill shadow-sm mb-3 py-2">
+            <button type="submit" class="btn btn-primary w-100 fw-bold rounded-pill shadow-sm mb-3 py-2" data-i18n="login_btn">
                 Вход в системата
             </button>
             <div class="text-center mt-3">
-                <span class="text-muted small">Нямате акаунт?</span> 
-                <a href="register.html" class="text-primary text-decoration-none small fw-bold">Регистрирайте се</a>
+                <span class="text-muted small" data-i18n="login_no_account">Нямате акаунт?</span> 
+                <a href="register.html" class="text-primary text-decoration-none small fw-bold" data-i18n="login_register_link">Регистрирайте се</a>
             </div>
         </form>
     </div>
+
+    <script src="app.js"></script> 
 
     <script>
         // Проверяваме дали в URL-а има ?error (Spring добавя това автоматично при грешна парола)

@@ -20,8 +20,8 @@
 
     <div class="login-card">
         <div class="text-center mb-4">
-            <h2 class="text-gradient"><i class="bi bi-person-plus-fill"></i> Регистрация</h2>
-            <p class="text-muted small">Създайте своя нов акаунт</p>
+            <h2 class="text-gradient"><i class="bi bi-person-plus-fill"></i> <span data-i18n="reg_title">Регистрация</span></h2>
+            <p class="text-muted small" data-i18n="reg_subtitle">Създайте своя нов акаунт</p>
         </div>
 
         <div id="alert-box" class="alert d-none py-2 small" role="alert"></div>
@@ -30,17 +30,17 @@
             
             <div class="row mb-3">
                 <div class="col-6 pe-1">
-                    <label class="form-label text-muted small mb-1">Име *</label>
+                    <label class="form-label text-muted small mb-1"><span data-i18n="reg_firstname">Име</span> *</label>
                     <input type="text" class="form-control" id="regFirstName" required autofocus>
                 </div>
                 <div class="col-6 ps-1">
-                    <label class="form-label text-muted small mb-1">Фамилия *</label>
+                    <label class="form-label text-muted small mb-1"><span data-i18n="reg_lastname">Фамилия</span> *</label>
                     <input type="text" class="form-control" id="regLastName" required>
                 </div>
             </div>
 
             <div class="mb-3">
-                <label class="form-label text-muted small mb-1">Имейл *</label>
+                <label class="form-label text-muted small mb-1"><span data-i18n="reg_email">Имейл</span> *</label>
                 <div class="input-group shadow-sm">
                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                     <input type="email" class="form-control" id="regEmail" required>
@@ -48,14 +48,14 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label text-muted small mb-1">Потребителско име</label>
+                <label class="form-label text-muted small mb-1" data-i18n="reg_username">Потребителско име</label>
                 <div class="input-group shadow-sm">
                     <span class="input-group-text"><i class="bi bi-person"></i></span>
                     <input type="text" class="form-control" id="reg-username" required>
                 </div>
             </div>
             <div class="mb-4">
-                <label class="form-label text-muted small mb-1">Парола</label>
+                <label class="form-label text-muted small mb-1" data-i18n="reg_password">Парола</label>
                 <div class="input-group shadow-sm">
                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
                     <input type="password" class="form-control" id="reg-password" required>
@@ -63,34 +63,36 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label text-info small"><i class="bi bi-building"></i> Катедра (Факултет) *</label>
+                <label class="form-label text-info small"><i class="bi bi-building"></i> <span data-i18n="reg_department">Катедра (Факултет)</span> *</label>
                 <select class="form-select border-info" id="regDepartmentId" required>
-                    <option value="">-- Избери Катедра --</option>
+                    <option value="" data-i18n="reg_dept_placeholder">-- Избери Катедра --</option>
                 </select>
             </div>
 
-            <label class="form-label text-warning small"><i class="bi bi-geo-alt"></i> Адрес *</label>
+            <label class="form-label text-warning small"><i class="bi bi-geo-alt"></i> <span data-i18n="reg_address">Адрес</span> *</label>
             <div class="row mb-3">
                 <div class="col-4 px-1">
-                    <input type="text" class="form-control border-warning text-center px-1" id="regCity" placeholder="Град" required>
+                    <input type="text" class="form-control border-warning text-center px-1" id="regCity" placeholder="Град" data-i18n="reg_city" required>
                 </div>
                 <div class="col-4 px-1">
-                    <input type="text" class="form-control border-warning text-center px-1" id="regStreet" placeholder="Улица" required>
+                    <input type="text" class="form-control border-warning text-center px-1" id="regStreet" placeholder="Улица" data-i18n="reg_street" required>
                 </div>
                 <div class="col-4 px-1">
                     <input type="text" class="form-control border-warning text-center px-1" id="regCountry" value="България" required>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-success w-100 fw-bold rounded-pill shadow-sm mb-3 py-2">
+            <button type="submit" class="btn btn-success w-100 fw-bold rounded-pill shadow-sm mb-3 py-2" data-i18n="reg_btn">
                 Регистрирай ме
             </button>
             <div class="text-center mt-3">
-                <span class="text-muted small">Вече имате акаунт?</span> 
-                <a href="login.html" class="text-success text-decoration-none small fw-bold">Влезте тук</a>
+                <span class="text-muted small" data-i18n="reg_have_account">Вече имате акаунт?</span> 
+                <a href="login.html" class="text-success text-decoration-none small fw-bold" data-i18n="reg_login_link">Влезте тук</a>
             </div>
         </form>
     </div>
+
+    <script src="app.js"></script> 
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {

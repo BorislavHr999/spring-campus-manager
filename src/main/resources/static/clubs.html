@@ -25,31 +25,36 @@
                     <a href="index.html" class="text-decoration-none">
                         <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
                     </a>
+                    
                     <div class="list-group list-group-flush gap-2 px-2">
-                        <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span>Главно табло</span></a>
-                        <a href="profile.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-badge me-3"></i> <span>Моят профил</span></a>
-                        <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span>Студенти</span></a>
-                        <a href="departments.html" id="nav-departments" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-building me-3"></i> <span>Факултети</span></a>
-                        <a href="users.html" id="nav-users" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none">
-    <i class="bi bi-shield-lock me-3"></i> <span>Акаунти</span>
-</a>
-                        <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span>Специалности</span></a>
-                        <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span>Преподаватели</span></a>
+                        <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
                         
-                        <a href="clubs.html" class="list-group-item list-group-item-action bg-success text-white rounded border-0 fw-bold"><i class="bi bi-controller me-3"></i> <span>Студентски Клубове</span></a>
+                        <a href="profile.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-badge me-3"></i> <span data-i18n="nav_profile">Моят профил</span></a>
+                        
+                        <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
+                        
+                        <a href="departments.html" id="nav-departments" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-building me-3"></i> <span data-i18n="nav_departments">Факултети</span></a>
+                        
+                        <a href="users.html" id="nav-users" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-shield-lock me-3"></i> <span data-i18n="nav_users">Акаунти</span></a>
+                        
+                        <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
+                        
+                        <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
+                        
+                        <a href="clubs.html" class="list-group-item list-group-item-action bg-success text-white rounded border-0 fw-bold"><i class="bi bi-controller me-3"></i> <span data-i18n="nav_clubs">Студентски Клубове</span></a>
                     </div>
                 </div>
                 <div class="mt-auto px-3">
                     <hr class="border-secondary">
-                    <a href="/logout" class="btn btn-outline-danger w-100 btn-sm"><i class="bi bi-box-arrow-left me-2"></i>Изход</a>
+                    <a href="/logout" class="btn btn-outline-danger w-100 btn-sm"><i class="bi bi-box-arrow-left me-2"></i><span data-i18n="nav_logout">Изход</span></a>
                 </div>
             </nav>
 
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
-                    <h1 class="h2 fw-light"><i class="bi bi-controller me-2 text-success"></i> <span>Студентски Клубове</span></h1>
+                    <h1 class="h2 fw-light"><i class="bi bi-controller me-2 text-success"></i> <span data-i18n="nav_clubs">Студентски Клубове</span></h1>
                     <button id="btn-new-club" class="btn btn-outline-success btn-sm rounded-pill px-3 shadow-sm d-none" onclick="openClubModal()">
-                        <i class="bi bi-plus-lg me-1"></i> Нов Клуб
+                        <i class="bi bi-plus-lg me-1"></i> <span data-i18n="btn_new_club">Нов Клуб</span>
                     </button>
                 </div>
 
@@ -57,9 +62,9 @@
                     <table class="table table-dark table-hover table-borderless align-middle mb-0">
                         <thead class="border-bottom border-secondary text-muted">
                             <tr>
-                                <th class="py-3 px-4">Име на Клуба</th>
-                                <th class="py-3">Описание</th>
-                                <th class="py-3 text-end px-4" id="th-action">Действие</th>
+                                <th class="py-3 px-4" data-i18n="th_club_name">Име на Клуба</th>
+                                <th class="py-3" data-i18n="th_club_desc">Описание</th>
+                                <th class="py-3 text-end px-4" id="th-action" data-i18n="th_action">Действие</th>
                             </tr>
                         </thead>
                         <tbody id="clubs-tbody"></tbody>
@@ -73,18 +78,18 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg">
                 <div class="modal-header border-secondary">
-                    <h5 class="modal-title"><i class="bi bi-controller me-2 text-success"></i> Данни за Клуб</h5>
+                    <h5 class="modal-title"><i class="bi bi-controller me-2 text-success"></i> <span data-i18n="club_modal_title">Данни за Клуб</span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="clubForm">
                         <input type="hidden" id="clubId">
                         <div class="mb-3">
-                            <label class="text-muted small mb-1">Име на клуба *</label>
+                            <label class="text-muted small mb-1" data-i18n="th_club_name">Име на клуба *</label>
                             <input type="text" class="form-control border-success" id="clubName" placeholder="напр. Клуб по Роботика" required>
                         </div>
                         <div class="mb-3">
-                            <label class="text-muted small mb-1">Описание *</label>
+                            <label class="text-muted small mb-1" data-i18n="th_club_desc">Описание *</label>
                             <textarea class="form-control" id="clubDescription" rows="3" placeholder="С какво се занимава клубът..." required></textarea>
                         </div>
                     </form>
@@ -98,7 +103,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script src="app.js"></script> <script>
         document.addEventListener("DOMContentLoaded", function() {
             let isAdmin = false;
 
@@ -111,8 +116,9 @@
                     if (isAdmin) {
                         document.getElementById('nav-departments')?.classList.remove('d-none');
                         document.getElementById('btn-new-club')?.classList.remove('d-none');
+                        
                         let navUsers = document.getElementById('nav-users');
-                    if (navUsers) navUsers.classList.remove('d-none');
+                        if (navUsers) navUsers.classList.remove('d-none');
                     }
                     
                     loadClubs();
@@ -131,7 +137,7 @@
                         tbody.innerHTML = '';
                         
                         if (!clubs || clubs.length === 0) {
-                            tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-muted">Все още няма създадени клубове.</td></tr>`;
+                            tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-muted" data-i18n="loading">Все още няма създадени клубове.</td></tr>`;
                             return;
                         }
 
@@ -147,7 +153,7 @@
                             } else {
                                 actionHtml = `
                                     <button class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-sm" onclick="joinClub(${c.id})">
-                                        <i class="bi bi-person-plus-fill me-1"></i> Включи се
+                                        <i class="bi bi-person-plus-fill me-1"></i> <span data-i18n="enroll_btn">Включи се</span>
                                     </button>
                                 `;
                             }
