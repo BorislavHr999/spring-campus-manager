@@ -29,6 +29,9 @@
                     <div class="list-group list-group-flush gap-2 px-2">
                         <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
                         <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
+                        
+                        <a href="departments.html" id="nav-departments" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-building me-3"></i> <span>Факултети</span></a>
+                        
                         <a href="courses.html" class="list-group-item list-group-item-action bg-info text-dark rounded border-0 fw-bold"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
                         <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
                     </div>
@@ -42,7 +45,7 @@
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
                     <h1 class="h2 fw-light"><i class="bi bi-journal-code me-2 text-info"></i> <span data-i18n="nav_courses">Специалности</span></h1>
-                    <button id="btn-new-course" class="btn btn-outline-info btn-sm rounded-pill px-3 shadow-sm" onclick="openCreateModal()">
+                    <button id="btn-new-course" class="btn btn-outline-info btn-sm rounded-pill px-3 shadow-sm d-none" onclick="openCreateModal()">
                         <i class="bi bi-plus-circle-fill me-1"></i> <span data-i18n="btn_new_course">Нова Специалност</span>
                     </button>
                 </div>
@@ -55,7 +58,7 @@
                                 <th class="py-3" data-i18n="th_name">Име на специалността</th>
                                 <th class="py-3" data-i18n="th_credits">Кредити</th>
                                 <th class="py-3">Преподавател</th>
-                                <th class="py-3 text-end px-4" id="th-action" data-i18n="th_action">Управление</th>
+                                <th class="py-3 text-end px-4 admin-actions d-none" id="th-action" data-i18n="th_action">Управление</th>
                             </tr>
                         </thead>
                         <tbody id="all-courses-tbody">
@@ -112,7 +115,6 @@
                 .then(data => {
                     let professors = data.content ? data.content : data;
                     let select = document.getElementById('courseProfessor');
-                    // Изчистваме старите опции, за да няма дублиране
                     select.innerHTML = '<option value="">-- Изберете преподавател --</option>';
                     professors.forEach(prof => {
                         select.innerHTML += `<option value="${prof.id}">${prof.firstName} ${prof.lastName}</option>`;
@@ -120,23 +122,28 @@
                 })
                 .catch(err => console.error("Грешка при зареждане на преподаватели:", err));
             
-            // 1. Проверка на правата
+            // 1. Проверка на правата (Админ)
             fetch('/api/auth/me')
                 .then(res => res.json())
                 .then(user => {
                     isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
                     
-                    if (!isAdmin) {
+                    if (isAdmin) {
+                        // Показваме бутона за нова специалност и менюто Факултети
                         let newBtn = document.getElementById('btn-new-course');
+                        if(newBtn) newBtn.classList.remove('d-none');
+                        
+                        let navDept = document.getElementById('nav-departments');
+                        if(navDept) navDept.classList.remove('d-none');
+                        
                         let actionTh = document.getElementById('th-action');
-                        if(newBtn) newBtn.style.display = 'none';
-                        if(actionTh) actionTh.style.display = 'none';
+                        if(actionTh) actionTh.classList.remove('d-none');
                     }
-
+                    
                     window.loadCourses();
                 })
                 .catch(err => {
-                    console.error("Грешка при проверка:", err);
+                    console.error("Грешка при проверка на права:", err);
                     window.loadCourses();
                 });
 
@@ -168,20 +175,24 @@
                     if (isAdmin) {
                         const courseJson = encodeURIComponent(JSON.stringify(c));
                         actionButtonsHtml = `
-                            <button class="btn btn-outline-warning btn-sm rounded-circle me-1" onclick="openEditModal('${courseJson}')" title="Редактирай">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteCourse(${c.id})" title="Изтрий">
-                                <i class="bi bi-trash"></i>
-                            </button>`;
+                            <td class="text-end px-4">
+                                <button class="btn btn-outline-warning btn-sm rounded-circle me-1" onclick="openEditModal('${courseJson}')" title="Редактирай">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteCourse(${c.id})" title="Изтрий">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>`;
                     } else {
+                        // За обикновен потребител/студент бутон "Запиши се"
                         actionButtonsHtml = `
-                            <button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="enrollInCourse(${c.id})">
-                                <i class="bi bi-check-circle me-1"></i> Запиши се
-                            </button>`;
+                            <td class="text-end px-4">
+                                <button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="enrollInCourse(${c.id})">
+                                    <i class="bi bi-check-circle me-1"></i> Запиши се
+                                </button>
+                            </td>`;
                     }
 
-                    // Проверка и визуализация на преподавателя
                     let profName = c.professor 
                         ? `<i class="bi bi-person-workspace text-light me-1"></i> ${c.professor.firstName} ${c.professor.lastName}`
                         : `<span class="text-muted small fst-italic">Няма назначен</span>`;
@@ -193,7 +204,7 @@
                         <td class="fw-bold text-info">${c.name}</td>
                         <td><span class="badge bg-secondary">${c.credits}</span></td>
                         <td>${profName}</td>
-                        <td class="text-end px-4">${actionButtonsHtml}</td>
+                        ${actionButtonsHtml}
                     `;
                     tbody.appendChild(tr);
                 });
@@ -213,7 +224,6 @@
                 document.getElementById('courseName').value = c.name;
                 document.getElementById('courseCredits').value = c.credits;
                 
-                // Зареждане на текущия преподавател в падащото меню
                 if (c.professor && c.professor.id) {
                     document.getElementById('courseProfessor').value = c.professor.id;
                 } else {
@@ -223,31 +233,23 @@
                 new bootstrap.Modal(document.getElementById('courseModal')).show();
             };
 
-            // 5. Запазване в базата - ТУК Е МАГИЯТА
+            // 5. Запазване в базата
             document.getElementById('save-course-btn').addEventListener('click', function() {
                 let id = document.getElementById('courseId').value;
-                
-                // Взимаме стойностите директно
                 let courseName = document.getElementById('courseName').value;
                 let courseCredits = document.getElementById('courseCredits').value;
                 let profSelect = document.getElementById('courseProfessor');
-                
-                // Хващаме реално избраната стойност в момента
                 let profId = profSelect.options[profSelect.selectedIndex].value;
 
-                console.log("Опитвам се да запазя курс с професор ID:", profId);
-
-                // Създаваме обекта
                 let data = {
                     name: courseName,
                     credits: courseCredits
                 };
 
-                // Ако сме избрали преподавател (и не е празното поле), го добавяме
                 if (profId && profId !== "") {
                     data.professor = { id: parseInt(profId) };
                 } else {
-                    data.professor = null; // Изрично казваме на Java да премахне професора, ако сме избрали "--Изберете--"
+                    data.professor = null; 
                 }
 
                 let url = id ? '/api/courses/' + id : '/api/courses';
@@ -265,14 +267,10 @@
                     return response.json();
                 })
                 .then(() => {
-                    // Скриваме модала сигурно
                     let modalEl = document.getElementById('courseModal');
                     let modal = bootstrap.Modal.getInstance(modalEl);
-                    if (modal) {
-                        modal.hide();
-                    }
+                    if (modal) modal.hide();
                     
-                    // Презареждаме таблицата
                     window.loadCourses();
                 })
                 .catch(err => {

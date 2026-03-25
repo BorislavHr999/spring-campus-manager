@@ -27,11 +27,14 @@
             <nav class="col-md-2 d-none d-md-block sidebar py-4 d-flex flex-column justify-content-between" style="min-height: 100vh;">
                 <div>
                     <a href="index.html" class="text-decoration-none">
-    <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
-</a>
+                        <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
+                    </a>
                     <div class="list-group list-group-flush gap-2 px-2">
                         <a href="index.html" class="list-group-item list-group-item-action bg-primary text-white rounded border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
                         <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
+                        
+                        <a href="departments.html" id="nav-departments" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-building me-3"></i> <span>Факултети</span></a>
+                        
                         <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
                         <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
                     </div>
@@ -134,7 +137,20 @@
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Взимаме size=100 за да имаме достатъчно данни за графиката
+            
+            // 1. Проверка за Админ (за да покажем Факултети в менюто)
+            fetch('/api/auth/me')
+                .then(res => res.json())
+                .then(user => {
+                    let isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
+                    if (isAdmin) {
+                        let navDept = document.getElementById('nav-departments');
+                        if (navDept) navDept.classList.remove('d-none');
+                    }
+                })
+                .catch(err => console.warn("Не сте логнати или има грешка с аутентикацията:", err));
+
+            // 2. Взимане на данни за статистиките
             Promise.all([
                 fetch('/api/students?size=100').then(res => res.json()),
                 fetch('/api/courses').then(res => res.json()),
@@ -142,7 +158,6 @@
             ])
             .then(([studentsData, courses, professors]) => {
                 
-                // ТУК Е МАГИЯТА ЗА ПАГИНАЦИЯТА: Разопаковаме Page обекта
                 let students = studentsData.content ? studentsData.content : studentsData;
                 let totalStudentsCount = studentsData.totalElements !== undefined ? studentsData.totalElements : students.length;
 
@@ -151,12 +166,12 @@
                 document.getElementById('total-professors').textContent = professors.length;
 
                 // Пълнене на таблицата
-                let recentStudents = students.slice(0, 4); // Взимаме първите 4
+                let recentStudents = students.slice(0, 4);
                 let tableBody = document.getElementById('recent-students-tbody');
                 tableBody.innerHTML = ''; 
 
                 if (recentStudents.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="2" class="text-center text-muted py-4">${t('no_students')}</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="2" class="text-center text-muted py-4">Няма студенти</td></tr>`;
                 } else {
                     recentStudents.forEach(student => {
                         let row = `<tr>
@@ -167,43 +182,43 @@
                     });
                 }
 
-                // --- ЗАМЕСТИ ОТ ТУК ---
+                // Взимане на статистика за графиката
                 const token = localStorage.getItem('token');
-                fetch('/api/dashboard/stats', {
+                return fetch('/api/dashboard/stats', {
                     headers: { 'Authorization': token ? `Bearer ${token}` : '' }
-                })
-                .then(res => res.json())
-                .then(statsData => {
-                    const labels = statsData.studentsPerCourse.map(item => item[0]);
-                    const counts = statsData.studentsPerCourse.map(item => item[1]);
+                });
+            })
+            .then(res => res.json())
+            .then(statsData => {
+                const labels = statsData.studentsPerCourse.map(item => item[0]);
+                const counts = statsData.studentsPerCourse.map(item => item[1]);
 
-                    const ctx = document.getElementById('studentsChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Брой студенти',
-                                data: counts,
-                                backgroundColor: 'rgba(13, 202, 240, 0.6)',
-                                borderColor: 'rgba(13, 202, 240, 1)',
-                                borderWidth: 1,
-                                borderRadius: 6
-                            }]
+                const ctx = document.getElementById('studentsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Брой студенти',
+                            data: counts,
+                            backgroundColor: 'rgba(13, 202, 240, 0.6)',
+                            borderColor: 'rgba(13, 202, 240, 1)',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 1, color: '#adb5bd' } },
+                            x: { ticks: { color: '#adb5bd' }, grid: { display: false } }
                         },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                y: { beginAtZero: true, ticks: { stepSize: 1, color: '#adb5bd' } },
-                                x: { ticks: { color: '#adb5bd' }, grid: { display: false } }
-                            },
-                            plugins: { legend: { labels: { color: '#ffffff' } } }
-                        }
-                    })
-            .catch(err => console.error("Грешка при статистика:", err));
-        })
-        .catch(err => console.error("Грешка:", err));
-    }); });
+                        plugins: { legend: { labels: { color: '#ffffff' } } }
+                    }
+                });
+            })
+            .catch(err => console.error("Грешка при зареждане на таблото:", err));
+        });
     </script>
 </body>
 </html>
