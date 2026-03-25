@@ -30,6 +30,9 @@
                         <a href="profile.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-badge me-3"></i> <span>Моят профил</span></a>
                         <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span>Студенти</span></a>
                         <a href="departments.html" id="nav-departments" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-building me-3"></i> <span>Факултети</span></a>
+                        <a href="users.html" id="nav-users" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none">
+    <i class="bi bi-shield-lock me-3"></i> <span>Акаунти</span>
+</a>
                         <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span>Специалности</span></a>
                         <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span>Преподаватели</span></a>
                         
@@ -108,6 +111,8 @@
                     if (isAdmin) {
                         document.getElementById('nav-departments')?.classList.remove('d-none');
                         document.getElementById('btn-new-club')?.classList.remove('d-none');
+                        let navUsers = document.getElementById('nav-users');
+if (navUsers) navUsers.classList.remove('d-none');
                     }
                     
                     loadClubs();
