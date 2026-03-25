@@ -26,23 +26,28 @@
                     <a href="index.html" class="text-decoration-none">
                         <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
                     </a>
+                    
                     <div class="list-group list-group-flush gap-2 px-2">
                         <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
-                        <a href="profile.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-badge me-3"></i> <span>Моят профил</span></a>
+                        
+                        <a href="profile.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-badge me-3"></i> <span data-i18n="nav_profile">Моят профил</span></a>
+                        
                         <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
                         
-                        <a href="departments.html" id="nav-departments" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-building me-3"></i> <span>Факултети</span></a>
-                        <a href="users.html" id="nav-users" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none">
-    <i class="bi bi-shield-lock me-3"></i> <span>Акаунти</span>
-</a>
+                        <a href="departments.html" id="nav-departments" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-building me-3"></i> <span data-i18n="nav_departments">Факултети</span></a>
+                        
+                        <a href="users.html" id="nav-users" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-shield-lock me-3"></i> <span data-i18n="nav_users">Акаунти</span></a>
+                        
                         <a href="courses.html" class="list-group-item list-group-item-action bg-info text-dark rounded border-0 fw-bold"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
+                        
                         <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
-                        <a href="clubs.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-controller me-3"></i> <span>Студентски Клубове</span></a>
+                        
+                        <a href="clubs.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-controller me-3"></i> <span data-i18n="nav_clubs">Студентски Клубове</span></a>
                     </div>
                 </div>
                 <div class="mt-auto px-3">
                     <hr class="border-secondary">
-                    <a href="/logout" class="btn btn-outline-danger w-100 btn-sm"><i class="bi bi-box-arrow-left me-2"></i>Изход</a>
+                    <a href="/logout" class="btn btn-outline-danger w-100 btn-sm"><i class="bi bi-box-arrow-left me-2"></i><span data-i18n="nav_logout">Изход</span></a>
                 </div>
             </nav>
 
@@ -59,9 +64,9 @@
                         <thead class="border-bottom border-secondary text-muted">
                             <tr>
                                 <th class="py-3 px-4" data-i18n="th_id">ID</th>
-                                <th class="py-3" data-i18n="th_name">Име на специалността</th>
+                                <th class="py-3" data-i18n="th_course_name">Име на специалността</th>
                                 <th class="py-3" data-i18n="th_credits">Кредити</th>
-                                <th class="py-3">Преподавател</th>
+                                <th class="py-3" data-i18n="th_professor">Преподавател</th>
                                 <th class="py-3 text-end px-4 admin-actions d-none" id="th-action" data-i18n="th_action">Управление</th>
                             </tr>
                         </thead>
@@ -77,22 +82,22 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg">
                 <div class="modal-header border-secondary">
-                    <h5 class="modal-title" id="modalTitle"><i class="bi bi-journal-plus me-2 text-info"></i> Специалност</h5>
+                    <h5 class="modal-title" id="modalTitle"><i class="bi bi-journal-plus me-2 text-info"></i> <span data-i18n="nav_courses">Специалност</span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="courseForm">
                         <input type="hidden" id="courseId">
                         <div class="mb-3">
-                            <label class="text-muted small mb-1">Име на специалността</label>
+                            <label class="text-muted small mb-1" data-i18n="th_course_name">Име на специалността</label>
                             <input type="text" class="form-control" id="courseName" required>
                         </div>
                         <div class="mb-3">
-                            <label class="text-muted small mb-1">Кредити</label>
+                            <label class="text-muted small mb-1" data-i18n="th_credits">Кредити</label>
                             <input type="number" class="form-control" id="courseCredits" required>
                         </div>
                         <div class="mb-3">
-                            <label class="text-muted small mb-1">Преподавател</label>
+                            <label class="text-muted small mb-1" data-i18n="th_professor">Преподавател</label>
                             <select class="form-select" id="courseProfessor">
                                 <option value="">-- Изберете преподавател --</option>
                             </select>
@@ -108,8 +113,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
+    <script src="app.js"></script> <script>
         document.addEventListener("DOMContentLoaded", function() {
             let isAdmin = false;
 
@@ -133,7 +137,6 @@
                     isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
                     
                     if (isAdmin) {
-                        // Показваме бутона за нова специалност и менюто Факултети
                         let newBtn = document.getElementById('btn-new-course');
                         if(newBtn) newBtn.classList.remove('d-none');
                         
@@ -172,7 +175,7 @@
                 
                 if(courses.length === 0) {
                     let colspan = isAdmin ? 5 : 4;
-                    tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4">Няма данни</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4" data-i18n="loading">Няма данни</td></tr>`;
                     return;
                 }
 
@@ -191,11 +194,11 @@
                                 </button>
                             </td>`;
                     } else {
-                        // За обикновен потребител/студент бутон "Запиши се"
+                        // Бутон "Запиши се" за студенти
                         actionButtonsHtml = `
                             <td class="text-end px-4">
                                 <button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="enrollInCourse(${c.id})">
-                                    <i class="bi bi-check-circle me-1"></i> Запиши се
+                                    <i class="bi bi-check-circle me-1"></i> <span data-i18n="enroll_btn">Запиши се</span>
                                 </button>
                             </td>`;
                     }

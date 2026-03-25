@@ -15,6 +15,19 @@ const translations = {
         // Общи за таблиците
         th_id: "ID", th_action: "Управление",
         
+        // Вход и Регистрация
+        login_subtitle: "Моля, въведете вашите данни за вход", login_error: "Грешно име или парола!", 
+        login_btn: "Вход в системата", login_no_account: "Нямате акаунт?", login_register_link: "Регистрирайте се",
+        reg_title: "Регистрация", reg_subtitle: "Създайте своя нов акаунт", reg_firstname: "Име", reg_lastname: "Фамилия", 
+        reg_email: "Имейл", reg_username: "Потребителско име", reg_password: "Парола", reg_department: "Катедра (Факултет)", 
+        reg_dept_placeholder: "-- Избери Катедра --", reg_address: "Адрес", reg_city: "Град", reg_street: "Улица", 
+        reg_btn: "Регистрирай ме", reg_have_account: "Вече имате акаунт?", reg_login_link: "Влезте тук",
+        
+        // Профил
+        prof_settings: "Настройки на профила", prof_personal_data: "Лични данни", prof_firstname_readonly: "Име (Само за четене)", 
+        prof_lastname_readonly: "Фамилия (Само за четене)", prof_address_title: "Адрес за кореспонденция", 
+        prof_country: "Държава", prof_save_btn: "Запази промените", prof_saving: "Записване...",
+        
         // Студенти
         th_name: "Име", th_fac: "Фак. Номер", th_email: "Имейл", th_courses: "Записани курсове",
         btn_new_student: "Нов Студент", search_student: "Търси по име, фак. номер...",
@@ -24,9 +37,16 @@ const translations = {
         btn_new_prof: "Нов Преподавател", search_prof: "Търси преподавател...",
         
         // Курсове / Специалности
-        th_course_name: "Име на курса", th_course: "Специалности", th_credits: "Кредити", th_professor: "Преподавател", th_prof: "Преподавател", th_grade: "Оценка",
-        btn_new_course: "Нов Курс", search_course: "Търси курс по име...",
-        btn_assign_prof: "Преподавател"
+        th_course_name: "Име на специалността", th_course: "Специалности", th_credits: "Кредити", th_professor: "Преподавател", th_prof: "Преподавател", th_grade: "Оценка",
+        btn_new_course: "Нова Специалност", search_course: "Търси курс по име...",
+        btn_assign_prof: "Преподавател", enroll_btn: "Запиши се",
+        
+        // Факултети
+        dept_manage_title: "Управление на Факултети", btn_new_dept: "Нов Факултет", th_dept_name: "Име на Факултет", 
+        th_dept_office: "Офис (Кабинет)", dept_modal_title: "Данни за Факултет", dept_office_hint: "Това ще се показва в падащите менюта.",
+        
+        // Клубове
+        btn_new_club: "Нов Клуб", th_club_name: "Име на Клуба", th_club_desc: "Описание", club_modal_title: "Данни за Клуб"
     },
     en: {
         nav_dashboard: "Dashboard", nav_profile: "My Profile", nav_students: "Students", 
@@ -40,6 +60,17 @@ const translations = {
         
         th_id: "ID", th_action: "Actions",
         
+        login_subtitle: "Please enter your login details", login_error: "Invalid username or password!", 
+        login_btn: "Login", login_no_account: "Don't have an account?", login_register_link: "Register here",
+        reg_title: "Registration", reg_subtitle: "Create your new account", reg_firstname: "First Name", reg_lastname: "Last Name", 
+        reg_email: "Email", reg_username: "Username", reg_password: "Password", reg_department: "Department", 
+        reg_dept_placeholder: "-- Select Department --", reg_address: "Address", reg_city: "City", reg_street: "Street", 
+        reg_btn: "Register", reg_have_account: "Already have an account?", reg_login_link: "Login here",
+        
+        prof_settings: "Profile Settings", prof_personal_data: "Personal Data", prof_firstname_readonly: "First Name (Read-only)", 
+        prof_lastname_readonly: "Last Name (Read-only)", prof_address_title: "Correspondence Address", 
+        prof_country: "Country", prof_save_btn: "Save Changes", prof_saving: "Saving...",
+        
         th_name: "Name", th_fac: "Faculty No.", th_email: "Email", th_courses: "Enrolled Courses",
         btn_new_student: "New Student", search_student: "Search by name, ID...",
         
@@ -48,7 +79,12 @@ const translations = {
         
         th_course_name: "Course Name", th_course: "Course", th_credits: "Credits", th_professor: "Professor", th_prof: "Professor", th_grade: "Grade",
         btn_new_course: "New Course", search_course: "Search course by name...",
-        btn_assign_prof: "Professor"
+        btn_assign_prof: "Professor", enroll_btn: "Enroll",
+        
+        dept_manage_title: "Manage Departments", btn_new_dept: "New Department", th_dept_name: "Department Name", 
+        th_dept_office: "Office (Room)", dept_modal_title: "Department Data", dept_office_hint: "This will be shown in dropdown menus.",
+        
+        btn_new_club: "New Club", th_club_name: "Club Name", th_club_desc: "Description", club_modal_title: "Club Data"
     },
     fr: {
         nav_dashboard: "Tableau de bord", nav_profile: "Mon Profil", nav_students: "Étudiants", 
@@ -62,6 +98,17 @@ const translations = {
         
         th_id: "ID", th_action: "Actions",
         
+        login_subtitle: "Veuillez entrer vos identifiants", login_error: "Nom d'utilisateur ou mot de passe invalide!", 
+        login_btn: "Se connecter", login_no_account: "Pas de compte?", login_register_link: "S'inscrire",
+        reg_title: "Inscription", reg_subtitle: "Créez votre nouveau compte", reg_firstname: "Prénom", reg_lastname: "Nom", 
+        reg_email: "E-mail", reg_username: "Nom d'utilisateur", reg_password: "Mot de passe", reg_department: "Département", 
+        reg_dept_placeholder: "-- Sélectionner un département --", reg_address: "Adresse", reg_city: "Ville", reg_street: "Rue", 
+        reg_btn: "S'inscrire", reg_have_account: "Déjà un compte?", reg_login_link: "Se connecter",
+        
+        prof_settings: "Paramètres du Profil", prof_personal_data: "Données Personnelles", prof_firstname_readonly: "Prénom (Lecture seule)", 
+        prof_lastname_readonly: "Nom (Lecture seule)", prof_address_title: "Adresse de Correspondance", 
+        prof_country: "Pays", prof_save_btn: "Enregistrer", prof_saving: "Enregistrement...",
+        
         th_name: "Nom", th_fac: "Numéro d'étud.", th_email: "E-mail", th_courses: "Cours inscrits",
         btn_new_student: "Nouvel Étudiant", search_student: "Rechercher un étudiant...",
         
@@ -70,7 +117,12 @@ const translations = {
         
         th_course_name: "Nom du cours", th_course: "Cours", th_credits: "Crédits", th_professor: "Professeur", th_prof: "Professeur", th_grade: "Note",
         btn_new_course: "Nouveau Cours", search_course: "Rechercher un cours...",
-        btn_assign_prof: "Professeur"
+        btn_assign_prof: "Professeur", enroll_btn: "S'inscrire",
+        
+        dept_manage_title: "Gérer les Départements", btn_new_dept: "Nouveau Département", th_dept_name: "Nom du Département", 
+        th_dept_office: "Bureau (Salle)", dept_modal_title: "Données du Département", dept_office_hint: "Sera affiché dans les menus déroulants.",
+        
+        btn_new_club: "Nouveau Club", th_club_name: "Nom du Club", th_club_desc: "Description", club_modal_title: "Données du Club"
     },
     es: {
         nav_dashboard: "Tablero", nav_profile: "Mi Perfil", nav_students: "Estudiantes", 
@@ -84,6 +136,17 @@ const translations = {
         
         th_id: "ID", th_action: "Acciones",
         
+        login_subtitle: "Por favor ingrese sus datos", login_error: "¡Usuario o contraseña inválidos!", 
+        login_btn: "Iniciar sesión", login_no_account: "¿No tienes una cuenta?", login_register_link: "Regístrate aquí",
+        reg_title: "Registro", reg_subtitle: "Crea tu nueva cuenta", reg_firstname: "Nombre", reg_lastname: "Apellido", 
+        reg_email: "Correo", reg_username: "Usuario", reg_password: "Contraseña", reg_department: "Departamento", 
+        reg_dept_placeholder: "-- Seleccionar Departamento --", reg_address: "Dirección", reg_city: "Ciudad", reg_street: "Calle", 
+        reg_btn: "Registrarme", reg_have_account: "¿Ya tienes cuenta?", reg_login_link: "Entra aquí",
+        
+        prof_settings: "Ajustes del Perfil", prof_personal_data: "Datos Personales", prof_firstname_readonly: "Nombre (Solo lectura)", 
+        prof_lastname_readonly: "Apellido (Solo lectura)", prof_address_title: "Dirección de Correspondencia", 
+        prof_country: "País", prof_save_btn: "Guardar Cambios", prof_saving: "Guardando...",
+        
         th_name: "Nombre", th_fac: "Nº Matrícula", th_email: "Correo", th_courses: "Cursos Inscritos",
         btn_new_student: "Nuevo Estudiante", search_student: "Buscar por nombre, ID...",
         
@@ -92,7 +155,12 @@ const translations = {
         
         th_course_name: "Nombre del Curso", th_course: "Curso", th_credits: "Créditos", th_professor: "Profesor", th_prof: "Profesor", th_grade: "Nota",
         btn_new_course: "Nuevo Curso", search_course: "Buscar curso...",
-        btn_assign_prof: "Profesor"
+        btn_assign_prof: "Profesor", enroll_btn: "Inscribirse",
+        
+        dept_manage_title: "Gestionar Departamentos", btn_new_dept: "Nuevo Departamento", th_dept_name: "Nombre del Departamento", 
+        th_dept_office: "Oficina (Sala)", dept_modal_title: "Datos del Departamento", dept_office_hint: "Se mostrará en los menús desplegables.",
+        
+        btn_new_club: "Nuevo Club", th_club_name: "Nombre del Club", th_club_desc: "Descripción", club_modal_title: "Datos del Club"
     },
     de: {
         nav_dashboard: "Dashboard", nav_profile: "Mein Profil", nav_students: "Studenten", 
@@ -106,6 +174,17 @@ const translations = {
         
         th_id: "ID", th_action: "Aktionen",
         
+        login_subtitle: "Bitte geben Sie Ihre Anmeldedaten ein", login_error: "Ungültiger Benutzername oder Passwort!", 
+        login_btn: "Anmelden", login_no_account: "Kein Konto?", login_register_link: "Hier registrieren",
+        reg_title: "Registrierung", reg_subtitle: "Erstellen Sie Ihr neues Konto", reg_firstname: "Vorname", reg_lastname: "Nachname", 
+        reg_email: "E-Mail", reg_username: "Benutzername", reg_password: "Passwort", reg_department: "Abteilung", 
+        reg_dept_placeholder: "-- Abteilung wählen --", reg_address: "Adresse", reg_city: "Stadt", reg_street: "Straße", 
+        reg_btn: "Registrieren", reg_have_account: "Haben Sie bereits ein Konto?", reg_login_link: "Hier anmelden",
+        
+        prof_settings: "Profileinstellungen", prof_personal_data: "Persönliche Daten", prof_firstname_readonly: "Vorname (Schreibgeschützt)", 
+        prof_lastname_readonly: "Nachname (Schreibgeschützt)", prof_address_title: "Korrespondenzadresse", 
+        prof_country: "Land", prof_save_btn: "Änderungen speichern", prof_saving: "Speichern...",
+        
         th_name: "Name", th_fac: "Matrikelnummer", th_email: "E-Mail", th_courses: "Eingeschriebene Kurse",
         btn_new_student: "Neuer Student", search_student: "Suchen nach Name, ID...",
         
@@ -114,7 +193,12 @@ const translations = {
         
         th_course_name: "Kursname", th_course: "Kurs", th_credits: "Credits", th_professor: "Professor", th_prof: "Professor", th_grade: "Note",
         btn_new_course: "Neuer Kurs", search_course: "Kurs suchen...",
-        btn_assign_prof: "Professor"
+        btn_assign_prof: "Professor", enroll_btn: "Einschreiben",
+        
+        dept_manage_title: "Abteilungen verwalten", btn_new_dept: "Neue Abteilung", th_dept_name: "Abteilungsname", 
+        th_dept_office: "Büro (Raum)", dept_modal_title: "Abteilungsdaten", dept_office_hint: "Wird in Dropdown-Menüs angezeigt.",
+        
+        btn_new_club: "Neuer Club", th_club_name: "Clubname", th_club_desc: "Beschreibung", club_modal_title: "Clubdaten"
     },
     it: {
         nav_dashboard: "Bacheca", nav_profile: "Il mio profilo", nav_students: "Studenti", 
@@ -128,6 +212,17 @@ const translations = {
         
         th_id: "ID", th_action: "Azioni",
         
+        login_subtitle: "Inserisci i tuoi dati di accesso", login_error: "Nome utente o password non validi!", 
+        login_btn: "Accedi", login_no_account: "Non hai un account?", login_register_link: "Registrati qui",
+        reg_title: "Registrazione", reg_subtitle: "Crea il tuo nuovo account", reg_firstname: "Nome", reg_lastname: "Cognome", 
+        reg_email: "Email", reg_username: "Nome utente", reg_password: "Password", reg_department: "Dipartimento", 
+        reg_dept_placeholder: "-- Seleziona Dipartimento --", reg_address: "Indirizzo", reg_city: "Città", reg_street: "Via", 
+        reg_btn: "Registrati", reg_have_account: "Hai già un account?", reg_login_link: "Accedi qui",
+        
+        prof_settings: "Impostazioni Profilo", prof_personal_data: "Dati Personali", prof_firstname_readonly: "Nome (Sola lettura)", 
+        prof_lastname_readonly: "Cognome (Sola lettura)", prof_address_title: "Indirizzo di Corrispondenza", 
+        prof_country: "Nazione", prof_save_btn: "Salva Modifiche", prof_saving: "Salvataggio...",
+        
         th_name: "Nome", th_fac: "Matricola", th_email: "Email", th_courses: "Corsi iscritti",
         btn_new_student: "Nuovo Studente", search_student: "Cerca studente...",
         
@@ -136,7 +231,12 @@ const translations = {
         
         th_course_name: "Nome del corso", th_course: "Corso", th_credits: "Crediti", th_professor: "Professore", th_prof: "Professore", th_grade: "Voto",
         btn_new_course: "Nuovo Corso", search_course: "Cerca corso...",
-        btn_assign_prof: "Professore"
+        btn_assign_prof: "Professore", enroll_btn: "Iscriviti",
+        
+        dept_manage_title: "Gestisci Dipartimenti", btn_new_dept: "Nuovo Dipartimento", th_dept_name: "Nome Dipartimento", 
+        th_dept_office: "Ufficio (Stanza)", dept_modal_title: "Dati Dipartimento", dept_office_hint: "Verrà mostrato nei menu a discesa.",
+        
+        btn_new_club: "Nuovo Club", th_club_name: "Nome del Club", th_club_desc: "Descrizione", club_modal_title: "Dati del Club"
     },
     ru: {
         nav_dashboard: "Главная панель", nav_profile: "Мой профиль", nav_students: "Студенты", 
@@ -150,6 +250,17 @@ const translations = {
         
         th_id: "ID", th_action: "Управление",
         
+        login_subtitle: "Пожалуйста, введите ваши данные", login_error: "Неверное имя или пароль!", 
+        login_btn: "Войти", login_no_account: "Нет аккаунта?", login_register_link: "Зарегистрируйтесь здесь",
+        reg_title: "Регистрация", reg_subtitle: "Создайте свой новый аккаунт", reg_firstname: "Имя", reg_lastname: "Фамилия", 
+        reg_email: "Email", reg_username: "Имя пользователя", reg_password: "Пароль", reg_department: "Кафедра", 
+        reg_dept_placeholder: "-- Выберите кафедру --", reg_address: "Адрес", reg_city: "Город", reg_street: "Улица", 
+        reg_btn: "Зарегистрироваться", reg_have_account: "Уже есть аккаунт?", reg_login_link: "Войти здесь",
+        
+        prof_settings: "Настройки профиля", prof_personal_data: "Личные данные", prof_firstname_readonly: "Имя (Только чтение)", 
+        prof_lastname_readonly: "Фамилия (Только чтение)", prof_address_title: "Адрес для корреспонденции", 
+        prof_country: "Страна", prof_save_btn: "Сохранить изменения", prof_saving: "Сохранение...",
+        
         th_name: "Имя", th_fac: "Номер зачетки", th_email: "Email", th_courses: "Записанные курсы",
         btn_new_student: "Новый Студент", search_student: "Поиск студента...",
         
@@ -158,7 +269,12 @@ const translations = {
         
         th_course_name: "Название курса", th_course: "Специальность", th_credits: "Кредиты", th_professor: "Преподаватель", th_prof: "Преподаватель", th_grade: "Оценка",
         btn_new_course: "Новый Курс", search_course: "Поиск курса...",
-        btn_assign_prof: "Преподаватель"
+        btn_assign_prof: "Преподаватель", enroll_btn: "Записаться",
+        
+        dept_manage_title: "Управление кафедрами", btn_new_dept: "Новая кафедра", th_dept_name: "Название кафедры", 
+        th_dept_office: "Офис (Кабинет)", dept_modal_title: "Данные кафедры", dept_office_hint: "Это будет отображаться в выпадающих списках.",
+        
+        btn_new_club: "Новый клуб", th_club_name: "Название клуба", th_club_desc: "Описание", club_modal_title: "Данные клуба"
     }
 };
 
@@ -170,6 +286,7 @@ const lightThemeCss = `
     [data-bs-theme="light"] .table-dark { --bs-table-bg: transparent; --bs-table-color: #212529; }
     [data-bs-theme="light"] .form-control, [data-bs-theme="light"] .form-select { background-color: #fff !important; color: #212529 !important; border-color: #ced4da !important; }
     [data-bs-theme="light"] .border-secondary { border-color: #dee2e6 !important; }
+    [data-bs-theme="light"] .login-card { background-color: #ffffff !important; border: 1px solid #dee2e6 !important; }
 `;
 const styleSheet = document.createElement("style");
 styleSheet.innerText = lightThemeCss;
@@ -197,14 +314,14 @@ window.setLanguage = function(lang) {
         }
     });
 
-    // Рестартираме само Главното табло, за да се преначертае Chart.js графиката на новия език
     if(window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
         location.reload(); 
     } else {
-        // Ако сме на друга страница (Студенти/Курсове), презареждаме таблицата, за да се преведат бутоните вътре
         if(typeof window.loadAllStudents === 'function') window.loadAllStudents();
-        if(typeof window.loadAllProfessors === 'function') window.loadAllProfessors();
-        if(typeof window.loadAllCourses === 'function') window.loadAllCourses();
+        if(typeof window.loadProfessors === 'function') window.loadProfessors();
+        if(typeof window.loadCourses === 'function') window.loadCourses();
+        if(typeof window.loadDepartments === 'function') window.loadDepartments();
+        if(typeof window.loadClubs === 'function') window.loadClubs();
     }
 }
 
