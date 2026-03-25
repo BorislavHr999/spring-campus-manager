@@ -33,10 +33,44 @@ public class ProfessorController {
         return professorService.getAllProfessors();
     }
 
-    // Добавяне на нов преподавател
+    // Добавяне на нов преподавател (Защитено за Админ)
     @PostMapping
-    public Professor createProfessor(@RequestBody Professor professor) {
-        return professorService.createProfessor(professor);
+    public ResponseEntity<?> createProfessor(@RequestBody Professor professor, Authentication authentication) {
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        
+        if (!isAdmin) {
+            return ResponseEntity.status(403).body(Map.of("message", "Само администратори могат да добавят преподаватели!"));
+        }
+
+        return ResponseEntity.ok(professorService.createProfessor(professor));
+    }
+
+    // --- НОВ МЕТОД: Редактиране на преподавател (Защитено за Админ) ---
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProfessor(@PathVariable Long id, @RequestBody Professor updatedProfessor, Authentication authentication) {
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        
+        if (!isAdmin) {
+            return ResponseEntity.status(403).body(Map.of("message", "Само администратори могат да редактират преподаватели!"));
+        }
+
+        Optional<Professor> profOpt = professorRepository.findById(id);
+        if (profOpt.isPresent()) {
+            Professor existingProf = profOpt.get();
+            existingProf.setFirstName(updatedProfessor.getFirstName());
+            existingProf.setLastName(updatedProfessor.getLastName());
+            existingProf.setTitle(updatedProfessor.getTitle());
+            
+            // ТУК ЗАПАЗВАМЕ ИМЕЙЛА!
+            existingProf.setEmail(updatedProfessor.getEmail()); 
+            
+            professorRepository.save(existingProf);
+            return ResponseEntity.ok(existingProf);
+        } else {
+            return ResponseEntity.status(404).body(Map.of("message", "Преподавателят не е намерен!"));
+        }
     }
 
     // Изтриване на преподавател (с чистене на връзките в базата)
@@ -44,7 +78,7 @@ public class ProfessorController {
     public ResponseEntity<?> deleteProfessor(@PathVariable Long id, Authentication authentication) {
         
         // 1. Проверка дали потребителят е АДМИН
-        boolean isAdmin = authentication.getAuthorities().stream()
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         
         if (!isAdmin) {
