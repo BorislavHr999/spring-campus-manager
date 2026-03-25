@@ -42,31 +42,6 @@
 
                 <div class="px-3 mt-auto pb-3">
                     <hr class="border-secondary">
-                    
-                    <div class="dropup mb-2">
-                        <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-moon-stars me-1"></i> <span data-i18n="theme">Тема</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-dark w-100 shadow mb-1">
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="bi bi-sun me-2 text-warning"></i> <span data-i18n="theme_light">Светла тема</span></a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="bi bi-moon-stars me-2 text-info"></i> <span data-i18n="theme_dark">Тъмна тема</span></a></li>
-                        </ul>
-                    </div>
-
-                    <div class="dropup mb-3">
-                        <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-globe me-1"></i> <span data-i18n="lang_title">Език</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-dark w-100 shadow mb-1">
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('bg')">🇧🇬 Български</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('en')">🇬🇧 English</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('fr')">🇫🇷 Français</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('de')">🇩🇪 Deutsch</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('it')">🇮🇹 Italiano</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('ru')">🇷🇺 Русский</a></li>
-                        </ul>
-                    </div>
-
                     <a href="/logout" class="btn btn-outline-danger w-100 btn-sm"><i class="bi bi-box-arrow-left me-2"></i>Изход</a>
                 </div>
             </nav>
@@ -106,27 +81,51 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row d-none" id="admin-dashboard">
                     <div class="col-md-7 mb-4">
                         <div class="chart-container h-100">
-                            <h5 class="fw-light mb-4"><i class="bi bi-bar-chart-fill me-2 text-info"></i> <span data-i18n="chart_title">Разпределение на студентите</span></h5>
+                            <h5 class="fw-light mb-4"><i class="bi bi-bar-chart-fill me-2 text-info"></i> Разпределение на студентите</h5>
                             <canvas id="studentsChart"></canvas>
                         </div>
                     </div>
                     
                     <div class="col-md-5 mb-4">
                         <div class="chart-container h-100">
-                            <h5 class="fw-light mb-3"><i class="bi bi-clock-history me-2"></i> <span data-i18n="recent_regs">Последни регистрации</span></h5>
+                            <h5 class="fw-light mb-3"><i class="bi bi-clock-history me-2"></i> Последни регистрации</h5>
                             <div class="table-custom p-1 shadow-sm">
                                 <table class="table table-dark table-hover table-borderless align-middle mb-0">
                                     <tbody id="recent-students-tbody">
-                                        <tr><td colspan="2" class="text-center text-muted py-4" data-i18n="loading">Зареждане...</td></tr>
+                                        <tr><td colspan="2" class="text-center text-muted py-4">Зареждане...</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="row d-none" id="student-dashboard">
+                    <div class="col-12 mb-4">
+                        <div class="chart-container h-100 border border-secondary border-opacity-50">
+                            <h5 class="fw-light mb-4"><i class="bi bi-journal-bookmark-fill me-2 text-info"></i> Моите курсове и оценки</h5>
+                            <div class="table-custom p-1 shadow-sm">
+                                <table class="table table-dark table-hover table-borderless align-middle mb-0">
+                                    <thead class="border-bottom border-secondary text-muted">
+                                        <tr>
+                                            <th class="py-3 px-4">Специалност</th>
+                                            <th class="py-3">Преподавател</th>
+                                            <th class="py-3 text-center">Кредити</th>
+                                            <th class="py-3 text-center">Оценка</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="my-grades-tbody">
+                                        <tr><td colspan="4" class="text-center text-muted py-4">Зареждане...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
     </div>
@@ -138,86 +137,158 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // 1. Проверка за Админ (за да покажем Факултети в менюто)
+            // 1. Проверяваме кой е логнат и показваме правилното табло
             fetch('/api/auth/me')
                 .then(res => res.json())
                 .then(user => {
                     let isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
+                    
                     if (isAdmin) {
+                        // Покажи нещата за Админ
                         let navDept = document.getElementById('nav-departments');
                         if (navDept) navDept.classList.remove('d-none');
+                        
+                        document.getElementById('admin-dashboard').classList.remove('d-none');
+                        loadAdminCharts();
+                    } else {
+                        // Покажи нещата за Студент
+                        document.getElementById('student-dashboard').classList.remove('d-none');
+                        loadStudentGrades();
                     }
                 })
-                .catch(err => console.warn("Не сте логнати или има грешка с аутентикацията:", err));
+                .catch(err => console.warn("Аутентикация грешка:", err));
 
-            // 2. Взимане на данни за статистиките
+            // 2. Винаги зареждаме бройките най-горе
             Promise.all([
-                fetch('/api/students?size=100').then(res => res.json()),
+                fetch('/api/students?size=1').then(res => res.json()), // Искаме само totalElements
                 fetch('/api/courses').then(res => res.json()),
                 fetch('/api/professors').then(res => res.json())
             ])
             .then(([studentsData, courses, professors]) => {
+                let totalStudentsCount = studentsData.totalElements !== undefined ? studentsData.totalElements : (studentsData.content ? studentsData.content.length : studentsData.length);
                 
-                let students = studentsData.content ? studentsData.content : studentsData;
-                let totalStudentsCount = studentsData.totalElements !== undefined ? studentsData.totalElements : students.length;
-
                 document.getElementById('total-students').textContent = totalStudentsCount;
-                document.getElementById('total-courses').textContent = courses.length;
-                document.getElementById('total-professors').textContent = professors.length;
+                document.getElementById('total-courses').textContent = courses.content ? courses.content.length : courses.length;
+                document.getElementById('total-professors').textContent = professors.content ? professors.content.length : professors.length;
+            })
+            .catch(err => console.error("Грешка при горните статистики:", err));
 
-                // Пълнене на таблицата
-                let recentStudents = students.slice(0, 4);
-                let tableBody = document.getElementById('recent-students-tbody');
-                tableBody.innerHTML = ''; 
 
-                if (recentStudents.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="2" class="text-center text-muted py-4">Няма студенти</td></tr>`;
-                } else {
-                    recentStudents.forEach(student => {
-                        let row = `<tr>
-                            <td class="fw-bold"><i class="bi bi-person-circle me-2 text-primary"></i> ${student.firstName} ${student.lastName}</td>
-                            <td class="text-end"><span class="badge bg-secondary">${student.facultyNumber}</span></td>
-                        </tr>`;
-                        tableBody.innerHTML += row;
-                    });
-                }
+            // --- ФУНКЦИИ ЗА АДМИН ТАБЛО ---
+            function loadAdminCharts() {
+                // Пълнене на таблицата с последни регистрации
+                fetch('/api/students?size=10') 
+                .then(res => res.json())
+                .then(studentsData => {
+                    let students = studentsData.content ? studentsData.content : studentsData;
+                    let recentStudents = students.slice(0, 4); // Взимаме само последните 4
+                    let tableBody = document.getElementById('recent-students-tbody');
+                    tableBody.innerHTML = ''; 
+
+                    if (recentStudents.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="2" class="text-center text-muted py-4">Няма студенти</td></tr>`;
+                    } else {
+                        recentStudents.forEach(student => {
+                            let row = `<tr>
+                                <td class="fw-bold"><i class="bi bi-person-circle me-2 text-primary"></i> ${student.firstName} ${student.lastName}</td>
+                                <td class="text-end"><span class="badge bg-secondary">${student.facultyNumber || '-'}</span></td>
+                            </tr>`;
+                            tableBody.innerHTML += row;
+                        });
+                    }
+                });
 
                 // Взимане на статистика за графиката
                 const token = localStorage.getItem('token');
-                return fetch('/api/dashboard/stats', {
+                fetch('/api/dashboard/stats', {
                     headers: { 'Authorization': token ? `Bearer ${token}` : '' }
-                });
-            })
-            .then(res => res.json())
-            .then(statsData => {
-                const labels = statsData.studentsPerCourse.map(item => item[0]);
-                const counts = statsData.studentsPerCourse.map(item => item[1]);
+                })
+                .then(res => res.json())
+                .then(statsData => {
+                    if(!statsData.studentsPerCourse) return;
+                    
+                    const labels = statsData.studentsPerCourse.map(item => item[0]);
+                    const counts = statsData.studentsPerCourse.map(item => item[1]);
 
-                const ctx = document.getElementById('studentsChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Брой студенти',
-                            data: counts,
-                            backgroundColor: 'rgba(13, 202, 240, 0.6)',
-                            borderColor: 'rgba(13, 202, 240, 1)',
-                            borderWidth: 1,
-                            borderRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: { beginAtZero: true, ticks: { stepSize: 1, color: '#adb5bd' } },
-                            x: { ticks: { color: '#adb5bd' }, grid: { display: false } }
+                    const ctx = document.getElementById('studentsChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Брой студенти',
+                                data: counts,
+                                backgroundColor: 'rgba(13, 202, 240, 0.6)',
+                                borderColor: 'rgba(13, 202, 240, 1)',
+                                borderWidth: 1,
+                                borderRadius: 6
+                            }]
                         },
-                        plugins: { legend: { labels: { color: '#ffffff' } } }
-                    }
-                });
-            })
-            .catch(err => console.error("Грешка при зареждане на таблото:", err));
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: { beginAtZero: true, ticks: { stepSize: 1, color: '#adb5bd' } },
+                                x: { ticks: { color: '#adb5bd' }, grid: { display: false } }
+                            },
+                            plugins: { legend: { labels: { color: '#ffffff' } } }
+                        }
+                    });
+                })
+                .catch(err => console.error("Грешка при графиката:", err));
+            }
+
+
+            // --- ФУНКЦИИ ЗА СТУДЕНТСКО ТАБЛО ---
+            function loadStudentGrades() {
+                // 1. Взимаме ID-то на логнатия студент
+                fetch('/api/students/me')
+                    .then(res => {
+                        if(!res.ok) throw new Error("Акаунтът Ви все още не е свързан със студентски профил.");
+                        return res.json();
+                    })
+                    // 2. Взимаме курсовете и оценките му
+                    .then(student => fetch(`/api/students/${student.id}/courses`))
+                    .then(res => res.json())
+                    .then(enrollments => {
+                        let tbody = document.getElementById('my-grades-tbody');
+                        tbody.innerHTML = '';
+                        
+                        if(enrollments.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Нямате записани курсове. Можете да се запишете от меню "Специалности".</td></tr>';
+                            return;
+                        }
+                        
+                        // Рисуваме всеки курс в таблицата
+                        enrollments.forEach(en => {
+                            let profName = en.course.professor ? `${en.course.professor.firstName} ${en.course.professor.lastName}` : '<span class="text-muted small">Няма назначен</span>';
+                            
+                            // Логика за цвета на баджа на оценката
+                            let gradeBadge = '';
+                            if (en.grade) {
+                                if (en.grade >= 3.00) {
+                                    gradeBadge = `<span class="badge bg-success fs-6 text-dark px-3 py-2 border border-success">${en.grade.toFixed(2)}</span>`;
+                                } else {
+                                    gradeBadge = `<span class="badge bg-danger fs-6 px-3 py-2 border border-danger">${en.grade.toFixed(2)}</span>`;
+                                }
+                            } else {
+                                gradeBadge = `<span class="badge bg-secondary text-light fst-italic">Очаква оценка</span>`;
+                            }
+
+                            tbody.innerHTML += `
+                                <tr class="border-bottom border-dark">
+                                    <td class="px-4 py-3 fw-bold text-info"><i class="bi bi-bookmark-check me-2"></i> ${en.course.name}</td>
+                                    <td><i class="bi bi-person-workspace me-2 text-warning"></i> ${profName}</td>
+                                    <td class="text-center"><span class="badge bg-dark border border-secondary">${en.course.credits}</span></td>
+                                    <td class="text-center">${gradeBadge}</td>
+                                </tr>
+                            `;
+                        });
+                    })
+                    .catch(err => {
+                        document.getElementById('my-grades-tbody').innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">${err.message}</td></tr>`;
+                    });
+            }
+
         });
     </script>
 </body>
