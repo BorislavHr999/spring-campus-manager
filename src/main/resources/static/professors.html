@@ -57,6 +57,7 @@
                                 <th class="py-3 px-4">ID</th>
                                 <th class="py-3">Преподавател</th>
                                 <th class="py-3">Академична Титла</th>
+                                <th class="py-3">Имейл</th>
                                 <th class="py-3 text-end px-4 admin-actions d-none" id="th-action">Управление</th>
                             </tr>
                         </thead>
@@ -148,7 +149,7 @@
                 tbody.innerHTML = '';
                 
                 if(profs.length === 0) {
-                    let colspan = isAdmin ? 4 : 3;
+                    let colspan = isAdmin ? 5 : 4; // Увеличено заради новата колона
                     tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4">Няма данни</td></tr>`;
                     return;
                 }
@@ -164,17 +165,17 @@
                         </td>`;
                     }
 
-                    let displayEmail = p.email ? p.email : '<span class="text-muted fst-italic">Няма имейл</span>';
+                    // Форматиране на имейла (кликаем линк или сив текст, ако няма)
+                    let displayEmail = p.email ? `<a href="mailto:${p.email}" class="text-warning text-decoration-none">${p.email}</a>` : '<span class="text-muted fst-italic">Няма имейл</span>';
 
                     tbody.innerHTML += `
                     <tr class="new-row">
                         <td class="px-4 py-3 text-secondary">#${p.id}</td>
                         <td class="fw-bold">
-                            <i class="bi bi-person-workspace me-2 text-warning"></i> ${p.firstName} ${p.lastName}<br>
-                            <small class="text-muted fw-normal">${displayEmail}</small>
+                            <i class="bi bi-person-workspace me-2 text-warning"></i> ${p.firstName} ${p.lastName}
                         </td>
                         <td><span class="badge bg-warning text-dark">${p.title || '-'}</span></td>
-                        ${actionColumnHtml}
+                        <td>${displayEmail}</td> ${actionColumnHtml}
                     </tr>`;
                 });
             }
@@ -182,7 +183,7 @@
             window.openCreateModal = function() {
                 document.getElementById('profForm').reset();
                 document.getElementById('profId').value = '';
-                document.getElementById('profEmail').value = ''; // Изчистваме имейла
+                document.getElementById('profEmail').value = ''; 
                 new bootstrap.Modal(document.getElementById('profModal')).show();
             };
 
@@ -192,7 +193,7 @@
                 document.getElementById('profFirstName').value = p.firstName;
                 document.getElementById('profLastName').value = p.lastName;
                 document.getElementById('profTitle').value = p.title;
-                document.getElementById('profEmail').value = p.email || ''; // Зареждаме имейла
+                document.getElementById('profEmail').value = p.email || ''; 
                 new bootstrap.Modal(document.getElementById('profModal')).show();
             };
 
@@ -202,7 +203,7 @@
                     firstName: document.getElementById('profFirstName').value,
                     lastName: document.getElementById('profLastName').value,
                     title: document.getElementById('profTitle').value,
-                    email: document.getElementById('profEmail').value // Взимаме имейла
+                    email: document.getElementById('profEmail').value 
                 };
                 let url = id ? '/api/professors/' + id : '/api/professors';
                 let method = id ? 'PUT' : 'POST';
