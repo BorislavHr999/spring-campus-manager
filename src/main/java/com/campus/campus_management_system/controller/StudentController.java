@@ -160,4 +160,26 @@ public class StudentController {
         student.setId(id);
         return ResponseEntity.ok(studentRepository.save(student));
     }
+
+    @PutMapping("/me")
+    public ResponseEntity<?> updateMyProfile(@RequestBody Student updatedData, Authentication authentication) {
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Потребителят не е намерен"));
+        
+        Student student = user.getStudent();
+        if (student == null) {
+            return ResponseEntity.status(403).body(Map.of("message", "Вие сте администратор и нямате студентски профил."));
+        }
+
+        // 🔒 ЗАЩИТА: Студентът може да променя само имейла и адреса си!
+        student.setEmail(updatedData.getEmail());
+        
+        if (updatedData.getAddress() != null) {
+            student.setAddress(updatedData.getAddress());
+        }
+
+        studentRepository.save(student);
+        return ResponseEntity.ok(Map.of("message", "Профилът е обновен успешно!"));
+    }
 }
