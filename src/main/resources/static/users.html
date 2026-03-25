@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="bg" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление на Акаунти - CampusOS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #121212; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { background-color: #1e1e1e; min-height: 100vh; box-shadow: 2px 0 5px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .text-gradient { background: linear-gradient(45deg, #dc3545, #fd7e14); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
+        .table-custom { background-color: #1e1e1e; border-radius: 10px; overflow: hidden; }
+        .modal-content { background-color: #1e1e1e; border: 1px solid #3d3d3d; }
+        .form-control, .form-select { background-color: #2d2d2d; color: #fff; border: 1px solid #4d4d4d; }
+        .form-control:focus, .form-select:focus { background-color: #3d3d3d; color: #fff; border-color: #dc3545; box-shadow: none; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 d-none d-md-block sidebar py-4">
+                <div>
+                    <a href="index.html" class="text-decoration-none">
+                        <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
+                    </a>
+                    <div class="list-group list-group-flush gap-2 px-2">
+                        <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span>Главно табло</span></a>
+                        
+                        <a href="users.html" class="list-group-item list-group-item-action bg-danger text-white rounded border-0 fw-bold"><i class="bi bi-shield-lock me-3"></i> <span>Акаунти (Админ)</span></a>
+                        
+                        <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span>Студенти</span></a>
+                        <a href="departments.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-building me-3"></i> <span>Факултети</span></a>
+                        <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span>Специалности</span></a>
+                        <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span>Преподаватели</span></a>
+                        <a href="clubs.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-controller me-3"></i> <span>Студентски Клубове</span></a>
+                    </div>
+                </div>
+                <div class="mt-auto px-3">
+                    <hr class="border-secondary">
+                    <a href="/logout" class="btn btn-outline-danger w-100 btn-sm"><i class="bi bi-box-arrow-left me-2"></i>Изход</a>
+                </div>
+            </nav>
+
+            <main class="col-md-10 ms-sm-auto px-md-5 py-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
+                    <h1 class="h2 fw-light"><i class="bi bi-shield-lock me-2 text-danger"></i> <span>Управление на Акаунти</span></h1>
+                </div>
+
+                <div class="table-custom p-1 shadow mb-3">
+                    <table class="table table-dark table-hover table-borderless align-middle mb-0">
+                        <thead class="border-bottom border-secondary text-muted">
+                            <tr>
+                                <th class="py-3 px-4">ID</th>
+                                <th class="py-3">Потребителско име</th>
+                                <th class="py-3">Роля</th>
+                                <th class="py-3 text-center">Свързан Студент</th>
+                                <th class="py-3 text-end px-4">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-tbody">
+                            <tr><td colspan="5" class="text-center text-muted py-4">Зареждане...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal fade" id="roleModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title"><i class="bi bi-person-gear me-2 text-warning"></i> Смяна на роля</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="roleUserId">
+                    <label class="text-muted small mb-2">Изберете нова роля:</label>
+                    <select class="form-select border-warning" id="newRoleSelect">
+                        <option value="ROLE_USER">Потребител (ROLE_USER)</option>
+                        <option value="ROLE_ADMIN">Администратор (ROLE_ADMIN)</option>
+                    </select>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Отказ</button>
+                    <button type="button" class="btn btn-warning btn-sm fw-bold" onclick="saveRole()">Запази</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="passwordModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content shadow-lg">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title"><i class="bi bi-key me-2 text-danger"></i> Нова парола</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="passUserId">
+                    <label class="text-muted small mb-2">Въведете нова парола:</label>
+                    <input type="password" class="form-control border-danger" id="newPasswordInput" placeholder="Нова парола...">
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Отказ</button>
+                    <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="savePassword()">Смени</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // Проверка за достъп
+            fetch('/api/auth/me')
+                .then(res => res.json())
+                .then(user => {
+                    if (!user.roles || !user.roles.includes('ROLE_ADMIN')) {
+                        document.body.innerHTML = '<h1 class="text-center text-danger mt-5">Достъпът е отказан. Само за администратори.</h1>';
+                    } else {
+                        loadUsers();
+                    }
+                });
+
+            window.loadUsers = function() {
+                fetch('/api/users')
+                    .then(res => res.json())
+                    .then(users => {
+                        let tbody = document.getElementById('users-tbody');
+                        tbody.innerHTML = '';
+                        
+                        users.forEach(u => {
+                            let roleBadge = u.role === 'ROLE_ADMIN' 
+                                ? '<span class="badge bg-danger">АДМИН</span>' 
+                                : '<span class="badge bg-secondary">ПОТРЕБИТЕЛ</span>';
+                            
+                            let linkedStudent = u.student ? `<span class="text-info">${u.student.firstName} ${u.student.lastName}</span>` : '<span class="text-muted fst-italic">Няма свързан студент</span>';
+
+                            let row = `
+                            <tr>
+                                <td class="px-4 py-3 text-secondary">#${u.id}</td>
+                                <td class="fw-bold text-white"><i class="bi bi-person me-2"></i> ${u.username}</td>
+                                <td>${roleBadge}</td>
+                                <td class="text-center">${linkedStudent}</td>
+                                <td class="text-end px-4">
+                                    <button class="btn btn-outline-warning btn-sm me-1" onclick="openRoleModal(${u.id}, '${u.role}')" title="Смени роля"><i class="bi bi-person-gear"></i></button>
+                                    <button class="btn btn-outline-danger btn-sm me-1" onclick="openPasswordModal(${u.id})" title="Смени парола"><i class="bi bi-key"></i></button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="deleteUser(${u.id})" title="Изтрий акаунт"><i class="bi bi-trash"></i></button>
+                                </td>
+                            </tr>`;
+                            tbody.innerHTML += row;
+                        });
+                    });
+            };
+
+            // Функции за модалите и действията
+            window.openRoleModal = (id, currentRole) => {
+                document.getElementById('roleUserId').value = id;
+                document.getElementById('newRoleSelect').value = currentRole;
+                new bootstrap.Modal(document.getElementById('roleModal')).show();
+            };
+
+            window.saveRole = () => {
+                let id = document.getElementById('roleUserId').value;
+                let newRole = document.getElementById('newRoleSelect').value;
+                fetch(`/api/users/${id}/role?newRole=${newRole}`, { method: 'PUT' })
+                    .then(() => { bootstrap.Modal.getInstance(document.getElementById('roleModal')).hide(); loadUsers(); });
+            };
+
+            window.openPasswordModal = (id) => {
+                document.getElementById('passUserId').value = id;
+                document.getElementById('newPasswordInput').value = '';
+                new bootstrap.Modal(document.getElementById('passwordModal')).show();
+            };
+
+            window.savePassword = () => {
+                let id = document.getElementById('passUserId').value;
+                let newPassword = document.getElementById('newPasswordInput').value;
+                if(!newPassword) return alert('Въведете парола!');
+                
+                fetch(`/api/users/${id}/password`, { 
+                    method: 'PUT', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ newPassword }) 
+                }).then(res => {
+                    if(res.ok) {
+                        alert("Паролата е успешно сменена!");
+                        bootstrap.Modal.getInstance(document.getElementById('passwordModal')).hide();
+                    }
+                });
+            };
+
+            window.deleteUser = (id) => {
+                if(confirm('Изтриване на този акаунт? Ако е свързан със студент, изтрийте първо студента!')) {
+                    fetch(`/api/users/${id}`, { method: 'DELETE' }).then(res => {
+                        if(res.ok) loadUsers();
+                        else alert('Грешка при изтриване. Вероятно акаунтът е вързан към студентски профил.');
+                    });
+                }
+            };
+        });
+    </script>
+</body>
+</html>
