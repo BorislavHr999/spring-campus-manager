@@ -27,6 +27,9 @@
                     <div class="list-group list-group-flush gap-2 px-2">
                         <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span>Главно табло</span></a>
                         <a href="students.html" class="list-group-item list-group-item-action bg-primary text-white rounded border-0"><i class="bi bi-people me-3"></i> <span>Студенти</span></a>
+                        
+                        <a href="departments.html" id="nav-departments" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-building me-3"></i> <span>Факултети</span></a>
+                        
                         <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span>Специалности</span></a>
                         <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span>Преподаватели</span></a>
                     </div>
@@ -40,7 +43,7 @@
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
                     <h1 class="h2 fw-light"><i class="bi bi-people me-2"></i> <span>Всички студенти</span></h1>
-                    <button id="btn-new-student" class="btn btn-outline-success btn-sm rounded-pill px-3 shadow-sm" onclick="openCreateModal()">
+                    <button id="btn-new-student" class="btn btn-outline-success btn-sm rounded-pill px-3 shadow-sm d-none" onclick="openCreateModal()">
                         <i class="bi bi-person-plus-fill me-1"></i> Нов Студент
                     </button>
                 </div>
@@ -49,7 +52,7 @@
                     <div class="col-md-5">
                         <div class="input-group shadow-sm">
                             <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
-                            <input type="text" id="searchInput" class="form-control border-secondary" placeholder="Търси...">
+                            <input type="text" id="searchInput" class="form-control border-secondary" placeholder="Търси по име или фак. номер...">
                         </div>
                     </div>
                 </div>
@@ -63,7 +66,7 @@
                                 <th class="py-3">Катедра & Адрес</th>
                                 <th class="py-3">Фак. Номер</th>
                                 <th class="py-3 text-center">Записани курсове</th>
-                                <th class="py-3 text-end px-4" id="th-action">Управление</th>
+                                <th class="py-3 text-end px-4 admin-actions d-none" id="th-action">Управление</th>
                             </tr>
                         </thead>
                         <tbody id="all-students-tbody"></tbody>
@@ -85,14 +88,13 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content shadow-lg">
                 <div class="modal-header border-secondary">
-                    <h5 class="modal-title"><i class="bi bi-person-badge me-2"></i> <span>Студент</span></h5>
+                    <h5 class="modal-title"><i class="bi bi-person-badge me-2"></i> <span>Данни за студент</span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div id="errorAlert" class="alert alert-danger d-none small py-2 mb-3" role="alert"></div>
                     <form id="studentForm">
                         <input type="hidden" id="studentId">
-                        
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="text-muted small mb-1">Име</label>
@@ -103,18 +105,16 @@
                                 <input type="text" class="form-control" id="lastName" required>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="text-muted small mb-1">Факултетен номер</label>
-                                <input type="text" class="form-control" id="facultyNumber" placeholder="Ще се генерира, ако е празно">
+                                <input type="text" class="form-control" id="facultyNumber" placeholder="Ще се генерира автоматично">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="text-muted small mb-1">Имейл</label>
                                 <input type="email" class="form-control" id="email" required>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label class="text-info small mb-1"><i class="bi bi-building"></i> Катедра (Факултет) *</label>
@@ -123,7 +123,6 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-12 mb-1">
                                 <label class="text-warning small"><i class="bi bi-geo-alt"></i> Адрес *</label>
@@ -135,7 +134,7 @@
                                 <input type="text" class="form-control border-warning" id="addrStreet" placeholder="Улица" required>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <input type="text" class="form-control border-warning" id="addrCountry" placeholder="Държава (пр. България)" required>
+                                <input type="text" class="form-control border-warning" id="addrCountry" placeholder="Държава" required>
                             </div>
                         </div>
                     </form>
@@ -170,6 +169,28 @@
             const pageSize = 10;
             let currentKeyword = '';
 
+            // --- Проверка на права (АДМИН ЛОГИКА) ---
+            fetch('/api/auth/me')
+                .then(res => res.json())
+                .then(user => {
+                    isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
+                    
+                    if (isAdmin) {
+                        // Показваме нещата за админа
+                        document.getElementById('nav-departments')?.classList.remove('d-none');
+                        document.getElementById('btn-new-student')?.classList.remove('d-none');
+                        document.getElementById('th-action')?.classList.remove('d-none');
+                    }
+                    
+                    loadAllStudents(0);
+                })
+                .catch(err => {
+                    console.error("Грешка при проверка на права:", err);
+                    loadAllStudents(0); // Зареждаме таблицата дори при грешка, но без админ права
+                });
+
+
+            // --- ЗАРЕЖДАНЕ НА ДАННИ ---
             window.loadAllStudents = function(page = 0) {
                 let url = `/api/students?page=${page}&size=${pageSize}`;
                 if (currentKeyword) url += `&keyword=${encodeURIComponent(currentKeyword)}`;
@@ -178,13 +199,13 @@
                     .then(res => res.json())
                     .then(data => {
                         currentPage = data.number || 0;
-                        let studentsArray = data.content ? data.content : data;
+                        let studentsArray = data.content || data;
                         renderTable(studentsArray);
                         
                         let pageInfo = document.getElementById('page-info');
                         if(pageInfo) pageInfo.innerText = `Страница ${(data.number || 0) + 1} от ${data.totalPages || 1}`;
                     })
-                    .catch(err => console.error("Грешка при зареждане на студентите:", err));
+                    .catch(err => console.error("Грешка при зареждане:", err));
             };
 
             function renderTable(students) {
@@ -199,9 +220,8 @@
 
                 students.forEach(s => {
                     let studentJson = encodeURIComponent(JSON.stringify(s));
-                    
-                    let deptName = s.department && s.department.name ? s.department.name : '<span class="text-danger small">Няма</span>';
-                    let addrCity = s.address && s.address.city ? s.address.city : '<span class="text-danger small">Няма</span>';
+                    let deptName = s.department ? `${s.department.name} <small class="text-muted">(Офис: ${s.department.office || 'няма'})</small>` : '---';
+                    let addrCity = s.address ? s.address.city : '---';
                     
                     let row = `
                     <tr>
@@ -211,20 +231,20 @@
                             <div class="small"><i class="bi bi-building text-info me-1"></i> ${deptName}</div>
                             <div class="small"><i class="bi bi-geo-alt text-warning me-1"></i> ${addrCity}</div>
                         </td>
-                        <td><span class="text-info">${s.facultyNumber || 'Няма'}</span></td>
+                        <td><span class="text-info">${s.facultyNumber || 'Генерира се...'}</span></td>
                         <td class="text-center">
-                            <span class="badge bg-info text-dark rounded-pill px-3 view-courses-btn" style="cursor: pointer;" data-student-id="${s.id}" data-name="${s.firstName} ${s.lastName}">${s.courseCount || 0} курса</span>
+                            <span class="badge bg-info text-dark rounded-pill px-3 view-courses-btn" style="cursor: pointer;" data-student-id="${s.id}" data-name="${s.firstName} ${s.lastName}">Детайли</span>
                         </td>
-                        ${isAdmin ? `
-                        <td class="text-end px-4">
+                        <td class="text-end px-4 admin-actions-row" style="display: ${isAdmin ? 'table-cell' : 'none'}">
                             <button class="btn btn-outline-warning btn-sm rounded-circle me-1" onclick="openEditModal('${studentJson}')"><i class="bi bi-pencil"></i></button>
                             <button class="btn btn-outline-danger btn-sm rounded-circle" onclick="deleteStudent(${s.id})"><i class="bi bi-trash"></i></button>
-                        </td>` : ''}
+                        </td>
                     </tr>`;
                     tbody.innerHTML += row;
                 });
             }
 
+            // --- МОДАЛИ И УПРАВЛЕНИЕ ---
             window.openCreateModal = function() {
                 document.getElementById('studentForm').reset();
                 document.getElementById('studentId').value = '';
@@ -233,17 +253,17 @@
             };
 
             window.openEditModal = function(encodedStudent) {
-                let student = JSON.parse(decodeURIComponent(encodedStudent));
-                document.getElementById('studentId').value = student.id;
-                document.getElementById('firstName').value = student.firstName;
-                document.getElementById('lastName').value = student.lastName;
-                document.getElementById('facultyNumber').value = student.facultyNumber || '';
-                document.getElementById('email').value = student.email;
+                let s = JSON.parse(decodeURIComponent(encodedStudent));
+                document.getElementById('studentId').value = s.id;
+                document.getElementById('firstName').value = s.firstName;
+                document.getElementById('lastName').value = s.lastName;
+                document.getElementById('facultyNumber').value = s.facultyNumber || '';
+                document.getElementById('email').value = s.email;
                 
-                document.getElementById('departmentId').value = student.department ? student.department.id : '';
-                document.getElementById('addrCity').value = student.address ? student.address.city : '';
-                document.getElementById('addrStreet').value = student.address ? student.address.street : '';
-                document.getElementById('addrCountry').value = student.address ? student.address.country : '';
+                document.getElementById('departmentId').value = s.department ? s.department.id : '';
+                document.getElementById('addrCity').value = s.address ? s.address.city : '';
+                document.getElementById('addrStreet').value = s.address ? s.address.street : '';
+                document.getElementById('addrCountry').value = s.address ? s.address.country : '';
 
                 document.getElementById('errorAlert').classList.add('d-none');
                 new bootstrap.Modal(document.getElementById('studentModal')).show();
@@ -254,142 +274,111 @@
             };
 
             window.deleteStudent = function(id) {
-                if(confirm('Сигурни ли сте?')) {
-                    fetch('/api/students/' + id, { method: 'DELETE' }).then(() => loadAllStudents(currentPage));
+                if(confirm('Сигурни ли сте, че искате да изтриете този студент?')) {
+                    fetch('/api/students/' + id, { method: 'DELETE' })
+                        .then(() => loadAllStudents(currentPage));
                 }
             };
 
-            window.saveGrade = function(studentId, courseId) {
-                const grade = document.getElementById(`grade-${courseId}`).value;
-                fetch(`/api/students/${studentId}/courses/${courseId}/grade?grade=${grade}`, { method: 'PUT' })
-                    .then(res => res.ok ? alert("✅ Оценката е запазена!") : alert("❌ Грешка при запис."));
-            };
-
-            // ПОПРАВЕНА И БРОНИРАНА ЛОГИКА ЗА ЗАПАЗВАНЕ
+            // --- ЗАПАЗВАНЕ ---
             document.getElementById('save-student-btn').addEventListener('click', async function() {
                 const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value : "";
 
-                const id = getVal('studentId');
-                const deptId = getVal('departmentId'); 
-                const city = getVal('addrCity');
-                const street = getVal('addrStreet');
-                const country = getVal('addrCountry') || "България";
+                let id = getVal('studentId');
+                let deptId = getVal('departmentId');
+                let city = getVal('addrCity');
+                let street = getVal('addrStreet');
+                let country = getVal('addrCountry') || "България";
 
-                if (!deptId || !city || !street) {
-                    const err = document.getElementById('errorAlert');
-                    if (err) {
-                        err.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> Моля, попълнете Катедра и пълен Адрес!`;
-                        err.classList.remove('d-none');
-                    } else {
-                        alert("Моля, попълнете Катедра и пълен Адрес!");
-                    }
+                if(!deptId || !city || !street) {
+                    let err = document.getElementById('errorAlert');
+                    err.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> Моля, попълнете Катедра и Адрес!`;
+                    err.classList.remove('d-none');
                     return;
                 }
 
-                const studentData = {
+                let studentData = {
                     firstName: getVal('firstName'),
                     lastName: getVal('lastName'),
                     facultyNumber: getVal('facultyNumber') || null,
                     email: getVal('email'),
                     department: { id: parseInt(deptId) },
-                    address: {
-                        city: city,
-                        street: street,
-                        country: country
-                    }
+                    address: { city, street, country }
                 };
 
-                const url = id ? `/api/students/${id}` : '/api/students';
-                const method = id ? 'PUT' : 'POST';
+                let url = id ? `/api/students/${id}` : '/api/students';
+                let method = id ? 'PUT' : 'POST';
 
                 try {
-                    const response = await fetch(url, {
+                    let response = await fetch(url, {
                         method: method,
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(studentData)
                     });
 
                     if (response.ok) {
-                        const modalEl = document.getElementById('studentModal');
-                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                        if (modalInstance) modalInstance.hide();
+                        bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
                         loadAllStudents(0);
                     } else {
-                        const errorText = await response.text();
-                        alert("Грешка при запис: " + errorText);
+                        let txt = await response.text();
+                        alert("Грешка: " + txt);
                     }
                 } catch (err) {
-                    console.error("Грешка при fetch:", err);
-                    alert("Грешка при връзката със сървъра (Failed to fetch). Проверете конзолата (F12)!");
+                    alert("Проблем с връзката към сървъра!");
                 }
             });
 
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                currentKeyword = e.target.value;
-                loadAllStudents(0);
-            });
-
+            // --- КУРСОВЕ И ОЦЕНКИ ---
             document.getElementById('all-students-tbody').addEventListener('click', function(e) {
-                let badge = e.target.closest('.view-courses-btn');
-                if (badge) {
-                    const studentId = badge.getAttribute('data-student-id');
-                    const fullName = badge.getAttribute('data-name');
-                    document.getElementById('modalStudentName').textContent = fullName;
+                let btn = e.target.closest('.view-courses-btn');
+                if (btn) {
+                    const studentId = btn.getAttribute('data-student-id');
+                    document.getElementById('modalStudentName').textContent = btn.getAttribute('data-name');
                     const list = document.getElementById('modalCoursesList');
-                    list.innerHTML = '<li class="list-group-item text-center"><div class="spinner-border spinner-border-sm text-primary"></div></li>';
+                    list.innerHTML = '<li class="list-group-item text-center"><div class="spinner-border text-primary"></div></li>';
                     
                     fetch(`/api/students/${studentId}/courses`)
                         .then(res => res.json())
                         .then(enrollments => {
-                            list.innerHTML = '';
-                            if (!enrollments || enrollments.length === 0) {
-                                list.innerHTML = '<li class="list-group-item text-muted">Няма записани курсове.</li>';
-                            } else {
-                                enrollments.forEach(en => {
-                                    list.innerHTML += `
-                                    <li class="list-group-item d-flex justify-content-between align-items-center py-3">
-                                        <div><div class="fw-bold">${en.course.name}</div><small class="text-muted">Преподавател: ${en.course.professor ? en.course.professor.lastName : '---'}</small></div>
-                                        <div class="d-flex align-items-center">
-                                            <input type="number" step="0.1" min="2" max="6" id="grade-${en.course.id}" class="form-control form-control-sm me-2" style="width: 70px" value="${en.grade || ''}" ${!isAdmin ? 'disabled' : ''}>
-                                            ${isAdmin ? `<button class="btn btn-sm btn-primary" onclick="saveGrade(${studentId}, ${en.course.id})">Запиши</button>` : ''}
-                                        </div>
-                                    </li>`;
-                                });
-                            }
-                        }).catch(err => {
-                            list.innerHTML = '<li class="list-group-item text-danger">Грешка при зареждане на оценките.</li>';
+                            list.innerHTML = enrollments.length === 0 ? '<li class="list-group-item text-muted">Няма записи.</li>' : '';
+                            enrollments.forEach(en => {
+                                list.innerHTML += `
+                                <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                    <div><div class="fw-bold">${en.course.name}</div><small class="text-muted">Преподавател: ${en.course.professor ? en.course.professor.lastName : '---'}</small></div>
+                                    <div class="d-flex align-items-center">
+                                        <input type="number" step="0.1" id="grade-${en.course.id}" class="form-control form-control-sm me-2" style="width: 65px" value="${en.grade || ''}" ${!isAdmin ? 'disabled' : ''}>
+                                        ${isAdmin ? `<button class="btn btn-sm btn-primary" onclick="saveGrade(${studentId}, ${en.course.id})">OK</button>` : ''}
+                                    </div>
+                                </li>`;
+                            });
                         });
                     new bootstrap.Modal(document.getElementById('coursesModal')).show();
                 }
             });
 
-            window.loadAllStudents(0);
+            window.saveGrade = function(studentId, courseId) {
+                const grade = document.getElementById(`grade-${courseId}`).value;
+                fetch(`/api/students/${studentId}/courses/${courseId}/grade?grade=${grade}`, { method: 'PUT' })
+                    .then(res => res.ok ? alert("Записано!") : alert("Грешка!"));
+            };
 
-            fetch('/api/auth/me')
-                .then(res => res.json())
-                .then(user => {
-                    isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
-                    if (!isAdmin) {
-                        let newBtn = document.getElementById('btn-new-student');
-                        let thAction = document.getElementById('th-action');
-                        if(newBtn) newBtn.style.display = 'none';
-                        if(thAction) thAction.style.display = 'none';
-                    }
-                })
-                .catch(err => console.error("Грешка при проверка на права:", err));
+            // --- ИНИЦИАЛИЗАЦИЯ ---
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                currentKeyword = e.target.value;
+                loadAllStudents(0);
+            });
 
+            // Зареждане на катедри
             fetch('/api/departments')
                 .then(res => res.json())
-                .then(depts => {
-                    let deptSelect = document.getElementById('departmentId');
-                    let data = depts.content || depts;
-                    if(data && Array.isArray(data)) {
-                        data.forEach(d => {
-                            deptSelect.innerHTML += `<option value="${d.id}">${d.name} (Офис: ${d.office})</option>`;
-                        });
-                    }
-                })
-                .catch(err => console.warn("Не успях да заредя катедрите:", err));
+                .then(data => {
+                    let depts = data.content || data;
+                    let select = document.getElementById('departmentId');
+                    depts.forEach(d => {
+                        let officeText = d.office ? ` (Офис: ${d.office})` : '';
+                        select.innerHTML += `<option value="${d.id}">${d.name}${officeText}</option>`;
+                    });
+                });
         });
     </script>
 </body>

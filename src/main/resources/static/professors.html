@@ -24,11 +24,14 @@
             <nav class="col-md-2 d-none d-md-block sidebar py-4">
                 <div>
                     <a href="index.html" class="text-decoration-none">
-    <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
-</a>
+                        <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
+                    </a>
                     <div class="list-group list-group-flush gap-2 px-2">
                         <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
                         <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
+                        
+                        <a href="departments.html" id="nav-departments" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-building me-3"></i> <span>Факултети</span></a>
+                        
                         <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
                         <a href="professors.html" class="list-group-item list-group-item-action bg-warning text-dark rounded border-0 fw-bold"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
                     </div>
@@ -42,7 +45,7 @@
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
                     <h1 class="h2 fw-light"><i class="bi bi-person-badge me-2 text-warning"></i> <span data-i18n="nav_prof">Преподаватели</span></h1>
-                    <button id="btn-new-professor" class="btn btn-outline-warning btn-sm rounded-pill px-3 shadow-sm" onclick="openCreateModal()">
+                    <button id="btn-new-professor" class="btn btn-outline-warning btn-sm rounded-pill px-3 shadow-sm d-none" onclick="openCreateModal()">
                         <i class="bi bi-plus-circle-fill me-1"></i> Нов Преподавател
                     </button>
                 </div>
@@ -55,11 +58,11 @@
                                 <th class="py-3">Име</th>
                                 <th class="py-3">Фамилия</th>
                                 <th class="py-3">Титла</th>
-                                <th class="py-3 text-end px-4" id="th-action">Управление</th>
+                                <th class="py-3 text-end px-4 admin-actions d-none" id="th-action">Управление</th>
                             </tr>
                         </thead>
                         <tbody id="all-professors-tbody">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </main>
@@ -106,17 +109,22 @@
         document.addEventListener("DOMContentLoaded", function() {
             let isAdmin = false;
 
-            // 1. Проверка на правата
+            // 1. Проверка на правата (АДМИН ЛОГИКА)
             fetch('/api/auth/me')
                 .then(res => res.json())
                 .then(user => {
                     isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
                     
-                    if (!isAdmin) {
+                    if (isAdmin) {
+                        // Показваме нещата за админа
+                        let navDept = document.getElementById('nav-departments');
+                        if (navDept) navDept.classList.remove('d-none');
+                        
                         let newBtn = document.getElementById('btn-new-professor');
+                        if(newBtn) newBtn.classList.remove('d-none');
+                        
                         let actionTh = document.getElementById('th-action');
-                        if(newBtn) newBtn.style.display = 'none';
-                        if(actionTh) actionTh.style.display = 'none';
+                        if(actionTh) actionTh.classList.remove('d-none');
                     }
 
                     // 2. Зареждане на таблицата
@@ -137,6 +145,7 @@
             function renderTable(profs) {
                 let tbody = document.getElementById('all-professors-tbody');
                 tbody.innerHTML = '';
+                
                 if(profs.length === 0) {
                     let colspan = isAdmin ? 5 : 4;
                     tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4">Няма данни</td></tr>`;
@@ -195,8 +204,11 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(data)
                 }).then(() => {
-                    bootstrap.Modal.getInstance(document.getElementById('profModal')).show();
-                    bootstrap.Modal.getInstance(document.getElementById('profModal')).hide();
+                    // Сигурно скриване на модала
+                    let modalEl = document.getElementById('profModal');
+                    let modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if(modalInstance) modalInstance.hide();
+                    
                     loadProfessors();
                 });
             });
