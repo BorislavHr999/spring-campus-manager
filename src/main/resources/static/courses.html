@@ -66,6 +66,7 @@
                                 <th class="py-3 px-4" data-i18n="th_id">ID</th>
                                 <th class="py-3" data-i18n="th_course_name">Име на специалността</th>
                                 <th class="py-3" data-i18n="th_credits">Кредити</th>
+                                <th class="py-3" data-i18n="th_schedule">График</th>
                                 <th class="py-3" data-i18n="th_professor">Преподавател</th>
                                 <th class="py-3 text-end px-4 admin-actions d-none" id="th-action" data-i18n="th_action">Управление</th>
                             </tr>
@@ -96,6 +97,34 @@
                             <label class="text-muted small mb-1" data-i18n="th_credits">Кредити</label>
                             <input type="number" class="form-control" id="courseCredits" required>
                         </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12 mb-2">
+                                <label class="text-info small fw-bold mb-1"><i class="bi bi-calendar-event"></i> <span data-i18n="course_schedule_title">Учебен График</span></label>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label class="text-muted small mb-1" data-i18n="course_day">Ден</label>
+                                <select class="form-select border-info" id="courseDay">
+                                    <option value="" data-i18n="course_day_placeholder">Избери...</option>
+                                    <option value="Понеделник">Понеделник</option>
+                                    <option value="Вторник">Вторник</option>
+                                    <option value="Сряда">Сряда</option>
+                                    <option value="Четвъртък">Четвъртък</option>
+                                    <option value="Петък">Петък</option>
+                                    <option value="Събота">Събота</option>
+                                    <option value="Неделя">Неделя</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label class="text-muted small mb-1" data-i18n="course_start_time">Начало</label>
+                                <input type="time" class="form-control border-info" id="courseStartTime">
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label class="text-muted small mb-1" data-i18n="course_end_time">Край</label>
+                                <input type="time" class="form-control border-info" id="courseEndTime">
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label class="text-muted small mb-1" data-i18n="th_professor">Преподавател</label>
                             <select class="form-select" id="courseProfessor">
@@ -113,7 +142,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="app.js"></script> <script>
+    <script src="app.js"></script> 
+    <script>
         document.addEventListener("DOMContentLoaded", function() {
             let isAdmin = false;
 
@@ -174,7 +204,7 @@
                 tbody.innerHTML = '';
                 
                 if(courses.length === 0) {
-                    let colspan = isAdmin ? 5 : 4;
+                    let colspan = isAdmin ? 6 : 5;
                     tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4" data-i18n="loading">Няма данни</td></tr>`;
                     return;
                 }
@@ -207,12 +237,18 @@
                         ? `<i class="bi bi-person-workspace text-light me-1"></i> ${c.professor.firstName} ${c.professor.lastName}`
                         : `<span class="text-muted small fst-italic">Няма назначен</span>`;
 
+                    // Форматиране на графика
+                    let scheduleText = (c.dayOfWeek && c.startTime && c.endTime) 
+                        ? `<span class="text-info"><i class="bi bi-calendar-event me-1"></i>${c.dayOfWeek}</span> <br><small class="text-muted"><i class="bi bi-clock me-1"></i>${c.startTime} - ${c.endTime}</small>`
+                        : `<span class="text-muted small fst-italic">Не е зададен</span>`;
+
                     const tr = document.createElement('tr');
                     tr.className = 'new-row';
                     tr.innerHTML = `
                         <td class="px-4 py-3 text-secondary">#${c.id}</td>
                         <td class="fw-bold text-info">${c.name}</td>
                         <td><span class="badge bg-secondary">${c.credits}</span></td>
+                        <td>${scheduleText}</td>
                         <td>${profName}</td>
                         ${actionButtonsHtml}
                     `;
@@ -234,6 +270,11 @@
                 document.getElementById('courseName').value = c.name;
                 document.getElementById('courseCredits').value = c.credits;
                 
+                // Зареждане на графика
+                document.getElementById('courseDay').value = c.dayOfWeek || '';
+                document.getElementById('courseStartTime').value = c.startTime || '';
+                document.getElementById('courseEndTime').value = c.endTime || '';
+                
                 if (c.professor && c.professor.id) {
                     document.getElementById('courseProfessor').value = c.professor.id;
                 } else {
@@ -248,12 +289,21 @@
                 let id = document.getElementById('courseId').value;
                 let courseName = document.getElementById('courseName').value;
                 let courseCredits = document.getElementById('courseCredits').value;
+                
+                // Взимане на данните за графика
+                let dayOfWeek = document.getElementById('courseDay').value;
+                let startTime = document.getElementById('courseStartTime').value;
+                let endTime = document.getElementById('courseEndTime').value;
+
                 let profSelect = document.getElementById('courseProfessor');
                 let profId = profSelect.options[profSelect.selectedIndex].value;
 
                 let data = {
                     name: courseName,
-                    credits: courseCredits
+                    credits: courseCredits,
+                    dayOfWeek: dayOfWeek || null,
+                    startTime: startTime || null,
+                    endTime: endTime || null
                 };
 
                 if (profId && profId !== "") {
