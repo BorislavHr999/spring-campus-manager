@@ -19,7 +19,6 @@ const translations = {
         prof_lastname_readonly: "Фамилия (Само за четене)", prof_address_title: "Адрес за кореспонденция", 
         prof_country: "Държава", prof_save_btn: "Запази промените", prof_saving: "Записване...",
         
-        // СТУДЕНТИ И АКАУНТИ
         all_students_title: "Всички студенти", th_student: "Студент", th_dept_address: "Катедра & Адрес", th_fac: "Фак. Номер", 
         th_enrolled_courses: "Записани курсове", btn_new_student: "Нов Студент", search_student: "Търси по име или фак. номер...", 
         details_btn: "Детайли", generating: "Генерира се...",
@@ -29,6 +28,11 @@ const translations = {
         th_title: "Титла", th_prof_name: "Име и Фамилия", btn_new_prof: "Нов Преподавател", search_prof: "Търси преподавател...",
         th_course_name: "Име на специалността", th_course: "Специалности", th_credits: "Кредити", th_professor: "Преподавател", th_prof: "Преподавател", th_grade: "Оценка",
         btn_new_course: "Нова Специалност", search_course: "Търси курс по име...", btn_assign_prof: "Преподавател", enroll_btn: "Запиши се",
+        
+        // НОВИ ЗА УЧЕБНИЯ ГРАФИК
+        th_schedule: "График", course_schedule_title: "Учебен График", course_day: "Ден", course_day_placeholder: "Избери...", 
+        course_start_time: "Начало", course_end_time: "Край",
+        
         dept_manage_title: "Управление на Факултети", btn_new_dept: "Нов Факултет", th_dept_name: "Име на Факултет", 
         th_dept_office: "Офис (Кабинет)", dept_modal_title: "Данни за Факултет", dept_office_hint: "Това ще се показва в падащите менюта.",
         btn_new_club: "Нов Клуб", th_club_name: "Име на Клуба", th_club_desc: "Описание", club_modal_title: "Данни за Клуб"
@@ -61,6 +65,10 @@ const translations = {
         th_title: "Title", th_prof_name: "Full Name", btn_new_prof: "New Professor", search_prof: "Search professor...",
         th_course_name: "Course Name", th_course: "Course", th_credits: "Credits", th_professor: "Professor", th_prof: "Professor", th_grade: "Grade",
         btn_new_course: "New Course", search_course: "Search course by name...", btn_assign_prof: "Professor", enroll_btn: "Enroll",
+        
+        th_schedule: "Schedule", course_schedule_title: "Class Schedule", course_day: "Day", course_day_placeholder: "Select...", 
+        course_start_time: "Start", course_end_time: "End",
+        
         dept_manage_title: "Manage Departments", btn_new_dept: "New Department", th_dept_name: "Department Name", 
         th_dept_office: "Office (Room)", dept_modal_title: "Department Data", dept_office_hint: "This will be shown in dropdown menus.",
         btn_new_club: "New Club", th_club_name: "Club Name", th_club_desc: "Description", club_modal_title: "Club Data"
@@ -93,6 +101,10 @@ const translations = {
         th_title: "Titre", th_prof_name: "Nom et Prénom", btn_new_prof: "Nouveau Professeur", search_prof: "Rechercher un professeur...",
         th_course_name: "Nom du cours", th_course: "Cours", th_credits: "Crédits", th_professor: "Professeur", th_prof: "Professeur", th_grade: "Note",
         btn_new_course: "Nouveau Cours", search_course: "Rechercher un cours...", btn_assign_prof: "Professeur", enroll_btn: "S'inscrire",
+        
+        th_schedule: "Emploi du temps", course_schedule_title: "Emploi du temps", course_day: "Jour", course_day_placeholder: "Sélectionner...", 
+        course_start_time: "Début", course_end_time: "Fin",
+        
         dept_manage_title: "Gérer les Départements", btn_new_dept: "Nouveau Département", th_dept_name: "Nom du Département", 
         th_dept_office: "Bureau (Salle)", dept_modal_title: "Données du Département", dept_office_hint: "Sera affiché dans les menus déroulants.",
         btn_new_club: "Nouveau Club", th_club_name: "Nom du Club", th_club_desc: "Description", club_modal_title: "Données du Club"
@@ -125,6 +137,10 @@ const translations = {
         th_title: "Título", th_prof_name: "Nombre y Apellido", btn_new_prof: "Nuevo Profesor", search_prof: "Buscar profesor...",
         th_course_name: "Nombre del Curso", th_course: "Curso", th_credits: "Créditos", th_professor: "Profesor", th_prof: "Profesor", th_grade: "Nota",
         btn_new_course: "Nuevo Curso", search_course: "Buscar curso...", btn_assign_prof: "Profesor", enroll_btn: "Inscribirse",
+        
+        th_schedule: "Horario", course_schedule_title: "Horario de clases", course_day: "Día", course_day_placeholder: "Seleccionar...", 
+        course_start_time: "Inicio", course_end_time: "Fin",
+        
         dept_manage_title: "Gestionar Departamentos", btn_new_dept: "Nuevo Departamento", th_dept_name: "Nombre del Departamento", 
         th_dept_office: "Oficina (Sala)", dept_modal_title: "Datos del Departamento", dept_office_hint: "Se mostrará en los menús desplegables.",
         btn_new_club: "Nuevo Club", th_club_name: "Nombre del Club", th_club_desc: "Descripción", club_modal_title: "Datos del Club"
@@ -157,6 +173,10 @@ const translations = {
         th_title: "Titel", th_prof_name: "Vor- und Nachname", btn_new_prof: "Neuer Professor", search_prof: "Professor suchen...",
         th_course_name: "Kursname", th_course: "Kurs", th_credits: "Credits", th_professor: "Professor", th_prof: "Professor", th_grade: "Note",
         btn_new_course: "Neuer Kurs", search_course: "Kurs suchen...", btn_assign_prof: "Professor", enroll_btn: "Einschreiben",
+        
+        th_schedule: "Zeitplan", course_schedule_title: "Stundenplan", course_day: "Tag", course_day_placeholder: "Auswählen...", 
+        course_start_time: "Start", course_end_time: "Ende",
+        
         dept_manage_title: "Abteilungen verwalten", btn_new_dept: "Neue Abteilung", th_dept_name: "Abteilungsname", 
         th_dept_office: "Büro (Raum)", dept_modal_title: "Abteilungsdaten", dept_office_hint: "Wird in Dropdown-Menüs angezeigt.",
         btn_new_club: "Neuer Club", th_club_name: "Clubname", th_club_desc: "Beschreibung", club_modal_title: "Clubdaten"
@@ -189,6 +209,10 @@ const translations = {
         th_title: "Titolo", th_prof_name: "Nome e Cognome", btn_new_prof: "Nuovo Professore", search_prof: "Cerca professore...",
         th_course_name: "Nome del corso", th_course: "Corso", th_credits: "Crediti", th_professor: "Professore", th_prof: "Professore", th_grade: "Voto",
         btn_new_course: "Nuovo Corso", search_course: "Cerca corso...", btn_assign_prof: "Professore", enroll_btn: "Iscriviti",
+        
+        th_schedule: "Orario", course_schedule_title: "Orario delle lezioni", course_day: "Giorno", course_day_placeholder: "Seleziona...", 
+        course_start_time: "Inizio", course_end_time: "Fine",
+        
         dept_manage_title: "Gestisci Dipartimenti", btn_new_dept: "Nuovo Dipartimento", th_dept_name: "Nome Dipartimento", 
         th_dept_office: "Ufficio (Stanza)", dept_modal_title: "Dati Dipartimento", dept_office_hint: "Verrà mostrato nei menu a discesa.",
         btn_new_club: "Nuovo Club", th_club_name: "Nome del Club", th_club_desc: "Descrizione", club_modal_title: "Dati del Club"
@@ -221,6 +245,10 @@ const translations = {
         th_title: "Должность", th_prof_name: "Имя и Фамилия", btn_new_prof: "Новый Преподаватель", search_prof: "Поиск преподавателя...",
         th_course_name: "Название курса", th_course: "Специальность", th_credits: "Кредиты", th_professor: "Преподаватель", th_prof: "Преподаватель", th_grade: "Оценка",
         btn_new_course: "Новый Курс", search_course: "Поиск курса...", btn_assign_prof: "Преподаватель", enroll_btn: "Записаться",
+        
+        th_schedule: "Расписание", course_schedule_title: "Учебное расписание", course_day: "День", course_day_placeholder: "Выбрать...", 
+        course_start_time: "Начало", course_end_time: "Конец",
+        
         dept_manage_title: "Управление кафедрами", btn_new_dept: "Новая кафедра", th_dept_name: "Название кафедры", 
         th_dept_office: "Офис (Кабинет)", dept_modal_title: "Данные кафедры", dept_office_hint: "Это будет отображаться в выпадающих списках.",
         btn_new_club: "Новый клуб", th_club_name: "Название клуба", th_club_desc: "Описание", club_modal_title: "Данные клуба"
