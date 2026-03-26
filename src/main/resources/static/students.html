@@ -51,9 +51,9 @@
 
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
-                    <h1 class="h2 fw-light"><i class="bi bi-people me-2"></i> <span>Всички студенти</span></h1>
+                    <h1 class="h2 fw-light"><i class="bi bi-people me-2"></i> <span data-i18n="all_students_title">Всички студенти</span></h1>
                     <button id="btn-new-student" class="btn btn-outline-success btn-sm rounded-pill px-3 shadow-sm d-none" onclick="openCreateModal()">
-                        <i class="bi bi-person-plus-fill me-1"></i> Нов Студент
+                        <i class="bi bi-person-plus-fill me-1"></i> <span data-i18n="btn_new_student">Нов Студент</span>
                     </button>
                 </div>
 
@@ -61,7 +61,7 @@
                     <div class="col-md-5">
                         <div class="input-group shadow-sm">
                             <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
-                            <input type="text" id="searchInput" class="form-control border-secondary" placeholder="Търси по име или фак. номер...">
+                            <input type="text" id="searchInput" class="form-control border-secondary" placeholder="Търси по име или фак. номер..." data-i18n="search_student">
                         </div>
                     </div>
                 </div>
@@ -70,12 +70,12 @@
                     <table class="table table-dark table-hover table-borderless align-middle mb-0">
                         <thead class="border-bottom border-secondary text-muted">
                             <tr>
-                                <th class="py-3 px-4">ID</th>
-                                <th class="py-3">Студент</th>
-                                <th class="py-3">Катедра & Адрес</th>
-                                <th class="py-3">Фак. Номер</th>
-                                <th class="py-3 text-center">Записани курсове</th>
-                                <th class="py-3 text-end px-4 admin-actions d-none" id="th-action">Управление</th>
+                                <th class="py-3 px-4" data-i18n="th_id">ID</th>
+                                <th class="py-3" data-i18n="th_student">Студент</th>
+                                <th class="py-3" data-i18n="th_dept_address">Катедра & Адрес</th>
+                                <th class="py-3" data-i18n="th_fac">Фак. Номер</th>
+                                <th class="py-3 text-center" data-i18n="th_enrolled_courses">Записани курсове</th>
+                                <th class="py-3 text-end px-4 admin-actions d-none" id="th-action" data-i18n="th_action">Управление</th>
                             </tr>
                         </thead>
                         <tbody id="all-students-tbody"></tbody>
@@ -171,7 +171,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="app.js"></script> <script>
+    <script src="app.js"></script> 
+    
+    <script>
         document.addEventListener("DOMContentLoaded", function() {
             let isAdmin = false;
             let currentPage = 0;
@@ -225,9 +227,13 @@
                 
                 if (!students || students.length === 0) {
                     let colSpan = isAdmin ? 6 : 5;
-                    tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center py-4 text-muted">Няма намерени студенти</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center py-4 text-muted" data-i18n="no_data">Няма намерени студенти</td></tr>`;
                     return;
                 }
+                
+                // Вземаме преведените текстове за баджовете
+                let generatingText = window.t ? window.t('generating') : 'Генерира се...';
+                let detailsText = window.t ? window.t('details_btn') : 'Детайли';
 
                 students.forEach(s => {
                     let studentJson = encodeURIComponent(JSON.stringify(s));
@@ -242,9 +248,9 @@
                             <div class="small"><i class="bi bi-building text-info me-1"></i> ${deptName}</div>
                             <div class="small"><i class="bi bi-geo-alt text-warning me-1"></i> ${addrCity}</div>
                         </td>
-                        <td><span class="text-info">${s.facultyNumber || 'Генерира се...'}</span></td>
+                        <td><span class="text-info">${s.facultyNumber || generatingText}</span></td>
                         <td class="text-center">
-                            <span class="badge bg-info text-dark rounded-pill px-3 view-courses-btn" style="cursor: pointer;" data-student-id="${s.id}" data-name="${s.firstName} ${s.lastName}">Детайли</span>
+                            <span class="badge bg-info text-dark rounded-pill px-3 view-courses-btn" style="cursor: pointer;" data-student-id="${s.id}" data-name="${s.firstName} ${s.lastName}">${detailsText}</span>
                         </td>
                         <td class="text-end px-4 admin-actions-row" style="display: ${isAdmin ? 'table-cell' : 'none'}">
                             <button class="btn btn-outline-warning btn-sm rounded-circle me-1" onclick="openEditModal('${studentJson}')"><i class="bi bi-pencil"></i></button>
