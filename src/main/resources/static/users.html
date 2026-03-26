@@ -51,22 +51,22 @@
 
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
-                    <h1 class="h2 fw-light"><i class="bi bi-shield-lock me-2 text-danger"></i> <span>Управление на Акаунти</span></h1>
+                    <h1 class="h2 fw-light"><i class="bi bi-shield-lock me-2 text-danger"></i> <span data-i18n="users_manage_title">Управление на Акаунти</span></h1>
                 </div>
 
                 <div class="table-custom p-1 shadow mb-3">
                     <table class="table table-dark table-hover table-borderless align-middle mb-0">
                         <thead class="border-bottom border-secondary text-muted">
                             <tr>
-                                <th class="py-3 px-4">ID</th>
-                                <th class="py-3">Потребителско име</th>
-                                <th class="py-3">Роля</th>
-                                <th class="py-3 text-center">Свързан Студент</th>
-                                <th class="py-3 text-end px-4">Действия</th>
+                                <th class="py-3 px-4" data-i18n="th_id">ID</th>
+                                <th class="py-3" data-i18n="th_username">Потребителско име</th>
+                                <th class="py-3" data-i18n="th_role">Роля</th>
+                                <th class="py-3 text-center" data-i18n="th_linked_student">Свързан Студент</th>
+                                <th class="py-3 text-end px-4" data-i18n="th_action">Действия</th>
                             </tr>
                         </thead>
                         <tbody id="users-tbody">
-                            <tr><td colspan="5" class="text-center text-muted py-4">Зареждане...</td></tr>
+                            <tr><td colspan="5" class="text-center text-muted py-4" data-i18n="loading">Зареждане...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -118,7 +118,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="app.js"></script> <script>
+    <script src="app.js"></script> 
+    
+    <script>
         document.addEventListener("DOMContentLoaded", function() {
             
             // Проверка за достъп
@@ -147,12 +149,17 @@
                         let tbody = document.getElementById('users-tbody');
                         tbody.innerHTML = '';
                         
+                        // Взимане на преведените текстове за баджовете
+                        let adminTxt = window.t ? window.t('role_admin') : 'АДМИН';
+                        let userTxt = window.t ? window.t('role_user') : 'ПОТРЕБИТЕЛ';
+                        let noLinkedTxt = window.t ? window.t('no_linked_student') : 'Няма свързан студент';
+
                         users.forEach(u => {
                             let roleBadge = u.role === 'ROLE_ADMIN' 
-                                ? '<span class="badge bg-danger">АДМИН</span>' 
-                                : '<span class="badge bg-secondary">ПОТРЕБИТЕЛ</span>';
+                                ? `<span class="badge bg-danger">${adminTxt}</span>` 
+                                : `<span class="badge bg-secondary">${userTxt}</span>`;
                             
-                            let linkedStudent = u.student ? `<span class="text-info">${u.student.firstName} ${u.student.lastName}</span>` : '<span class="text-muted fst-italic">Няма свързан студент</span>';
+                            let linkedStudent = u.student ? `<span class="text-info">${u.student.firstName} ${u.student.lastName}</span>` : `<span class="text-muted fst-italic">${noLinkedTxt}</span>`;
 
                             let row = `
                             <tr>
@@ -171,7 +178,6 @@
                     });
             };
 
-            // Функции за модалите e... (без промяна надолу)
             window.openRoleModal = (id, currentRole) => {
                 document.getElementById('roleUserId').value = id;
                 document.getElementById('newRoleSelect').value = currentRole;
