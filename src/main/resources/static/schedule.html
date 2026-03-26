@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="bg" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моят График - CampusOS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #121212; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { background-color: #1e1e1e; min-height: 100vh; box-shadow: 2px 0 5px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .text-gradient { background: linear-gradient(45deg, #6f42c1, #d63384); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
+        
+        /* Специални стилове за Графика */
+        .schedule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .day-column { background-color: #1e1e1e; border-radius: 12px; padding: 15px; border: 1px solid #3d3d3d; display: flex; flex-direction: column; min-height: 400px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .day-header { text-align: center; font-weight: bold; border-bottom: 2px solid #6f42c1; padding-bottom: 10px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; color: #e0e0e0; }
+        
+        .course-card { background-color: #2d2d2d; border-left: 4px solid #6f42c1; border-radius: 6px; padding: 12px; margin-bottom: 12px; transition: transform 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .course-card:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+        .course-time { font-size: 0.8rem; color: #d63384; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; }
+        .course-title { font-weight: bold; font-size: 1rem; margin-bottom: 5px; line-height: 1.2; }
+        .course-prof { font-size: 0.75rem; color: #adb5bd; }
+        
+        [data-bs-theme="light"] .day-column { background-color: #ffffff; border-color: #dee2e6; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        [data-bs-theme="light"] .course-card { background-color: #f8f9fa; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        [data-bs-theme="light"] .day-header { color: #495057; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 d-none d-md-block sidebar py-4">
+                <div>
+                    <a href="index.html" class="text-decoration-none">
+                        <h3 class="text-center mb-5 text-gradient"><i class="bi bi-mortarboard-fill"></i> CampusOS</h3>
+                    </a>
+                    
+                    <div class="list-group list-group-flush gap-2 px-2">
+                        <a href="index.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-speedometer2 me-3"></i> <span data-i18n="nav_dashboard">Главно табло</span></a>
+                        
+                        <a href="profile.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-badge me-3"></i> <span data-i18n="nav_profile">Моят профил</span></a>
+                        
+                        <a href="schedule.html" id="nav-schedule" class="list-group-item list-group-item-action text-white rounded border-0 fw-bold d-none" style="background: linear-gradient(45deg, #6f42c1, #d63384);"><i class="bi bi-calendar3 me-3"></i> <span data-i18n="nav_schedule">Моят График</span></a>
+                        
+                        <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
+                        
+                        <a href="departments.html" id="nav-departments" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-building me-3"></i> <span data-i18n="nav_departments">Факултети</span></a>
+                        
+                        <a href="users.html" id="nav-users" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-shield-lock me-3"></i> <span data-i18n="nav_users">Акаунти</span></a>
+                        
+                        <a href="courses.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-journal-code me-3"></i> <span data-i18n="nav_courses">Специалности</span></a>
+                        
+                        <a href="professors.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-workspace me-3"></i> <span data-i18n="nav_prof">Преподаватели</span></a>
+                        
+                        <a href="clubs.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-controller me-3"></i> <span data-i18n="nav_clubs">Студентски Клубове</span></a>
+                    </div>
+                </div>
+                <div class="mt-auto px-3">
+                    <hr class="border-secondary">
+                    <a href="/logout" class="btn btn-outline-danger w-100 btn-sm"><i class="bi bi-box-arrow-left me-2"></i><span data-i18n="nav_logout">Изход</span></a>
+                </div>
+            </nav>
+
+            <main class="col-md-10 ms-sm-auto px-md-5 py-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
+                    <h1 class="h2 fw-light"><i class="bi bi-calendar3 me-2" style="color: #d63384;"></i> <span data-i18n="my_schedule_title">Седмичен График</span></h1>
+                </div>
+
+                <div id="schedule-alert" class="alert alert-warning d-none" role="alert"></div>
+
+                <div class="schedule-grid" id="schedule-container">
+                    </div>
+
+                <div id="unscheduled-container" class="mt-4 d-none">
+                    <h5 class="fw-light mb-3 text-muted"><i class="bi bi-info-circle me-2"></i> <span data-i18n="unscheduled_courses">Курсове без зададен час</span></h5>
+                    <div class="row" id="unscheduled-list"></div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script> 
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let isAdmin = false;
+            
+            // 1. Проверка на ролята
+            fetch('/api/auth/me')
+                .then(res => res.json())
+                .then(user => {
+                    isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
+                    
+                    if (isAdmin) {
+                        document.getElementById('nav-departments')?.classList.remove('d-none');
+                        document.getElementById('nav-users')?.classList.remove('d-none');
+                        // Админът няма личен график, показваме му съобщение
+                        document.getElementById('schedule-alert').classList.remove('d-none');
+                        document.getElementById('schedule-alert').innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i> Администраторите нямат личен учебен график.';
+                    } else {
+                        // Студентът вижда бутона
+                        document.getElementById('nav-schedule')?.classList.remove('d-none');
+                        loadStudentSchedule();
+                    }
+                })
+                .catch(err => console.error("Аутентикация грешка:", err));
+
+            // Дните от седмицата, които искаме да покажем
+            const daysOfWeek = ["Понеделник", "Вторник", "Сряда", "Четвъртък", "Петък"];
+            
+            function initGrid() {
+                const container = document.getElementById('schedule-container');
+                container.innerHTML = '';
+                
+                daysOfWeek.forEach(day => {
+                    // Опитваме да вземем превод за деня (ако сме добавили в app.js)
+                    let translatedDay = window.t ? window.t('day_' + day.toLowerCase()) : day;
+                    // Ако не намери превод, връща ключа. Тогава ползваме оригинала.
+                    if(translatedDay === 'day_' + day.toLowerCase()) translatedDay = day;
+
+                    container.innerHTML += `
+                        <div class="day-column" id="col-${day}">
+                            <div class="day-header">${translatedDay}</div>
+                            <div class="day-content" id="content-${day}">
+                                </div>
+                        </div>
+                    `;
+                });
+            }
+
+            function loadStudentSchedule() {
+                initGrid(); // Рисуваме празната решетка
+                
+                fetch('/api/students/me')
+                    .then(res => {
+                        if(!res.ok) throw new Error("Не е намерен студентски профил.");
+                        return res.json();
+                    })
+                    .then(student => fetch(`/api/students/${student.id}/courses`))
+                    .then(res => res.json())
+                    .then(enrollments => {
+                        let hasUnscheduled = false;
+                        
+                        enrollments.forEach(en => {
+                            let c = en.course;
+                            let profName = c.professor ? `${c.professor.firstName} ${c.professor.lastName}` : '<span class="fst-italic">Не е назначен</span>';
+                            
+                            // Създаваме HTML картата за курса
+                            let cardHtml = `
+                                <div class="course-card">
+                                    <div class="course-time"><i class="bi bi-clock me-1"></i> ${c.startTime || '?'} - ${c.endTime || '?'}</div>
+                                    <div class="course-title">${c.name}</div>
+                                    <div class="course-prof"><i class="bi bi-person-workspace me-1"></i> ${profName}</div>
+                                </div>
+                            `;
+
+                            // Ако курсът има ден от седмицата, го слагаме в правилната колона
+                            if (c.dayOfWeek && daysOfWeek.includes(c.dayOfWeek)) {
+                                document.getElementById(`content-${c.dayOfWeek}`).innerHTML += cardHtml;
+                            } else {
+                                // Ако няма ден или е през уикенда, отива в секцията "без час"
+                                hasUnscheduled = true;
+                                document.getElementById('unscheduled-list').innerHTML += `
+                                    <div class="col-md-3">
+                                        <div class="course-card border-secondary">
+                                            <div class="course-title text-info">${c.name}</div>
+                                            <div class="course-prof"><i class="bi bi-person-workspace me-1"></i> ${profName}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        });
+
+                        // Показваме зоната за курсове без график, ако има такива
+                        if (hasUnscheduled) {
+                            document.getElementById('unscheduled-container').classList.remove('d-none');
+                        }
+                        
+                        // Сортираме курсовете във всяка колона по начален час
+                        daysOfWeek.forEach(day => {
+                            let contentDiv = document.getElementById(`content-${day}`);
+                            let cards = Array.from(contentDiv.getElementsByClassName('course-card'));
+                            
+                            cards.sort((a, b) => {
+                                let timeA = a.querySelector('.course-time').innerText.split('-')[0].trim();
+                                let timeB = b.querySelector('.course-time').innerText.split('-')[0].trim();
+                                return timeA.localeCompare(timeB);
+                            });
+                            
+                            contentDiv.innerHTML = '';
+                            cards.forEach(card => contentDiv.appendChild(card));
+                            
+                            // Ако няма курсове за деня, показваме празен текст
+                            if(cards.length === 0) {
+                                let emptyTxt = window.t ? window.t('no_classes') : 'Свободен ден';
+                                contentDiv.innerHTML = `<div class="text-center text-muted small mt-3 fst-italic">${emptyTxt}</div>`;
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        document.getElementById('schedule-alert').classList.remove('d-none');
+                        document.getElementById('schedule-alert').innerHTML = `<i class="bi bi-info-circle me-2"></i> ${err.message}`;
+                    });
+            }
+        });
+    </script>
+</body>
+</html>
