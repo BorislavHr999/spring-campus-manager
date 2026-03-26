@@ -63,11 +63,11 @@
                     <table class="table table-dark table-hover table-borderless align-middle mb-0">
                         <thead class="border-bottom border-secondary text-muted">
                             <tr>
-                                <th class="py-3 px-4"><span data-i18n="th_id">ID</span></th>
-                                <th class="py-3"><span data-i18n="th_prof_name">Преподавател</span></th>
-                                <th class="py-3"><span data-i18n="th_title">Академична Титла</span></th>
-                                <th class="py-3"><span data-i18n="th_email">Имейл</span></th>
-                                <th class="py-3 text-end px-4 admin-actions d-none" id="th-action"><span data-i18n="th_action">Управление</span></th>
+                                <th class="py-3 px-4" data-i18n="th_id">ID</th>
+                                <th class="py-3" data-i18n="th_prof_name">Преподавател</th>
+                                <th class="py-3" data-i18n="th_title">Академична Титла</th>
+                                <th class="py-3" data-i18n="th_email">Имейл</th>
+                                <th class="py-3 text-end px-4 admin-actions d-none" id="th-action" data-i18n="th_action">Управление</th>
                             </tr>
                         </thead>
                         <tbody id="all-professors-tbody">
@@ -117,7 +117,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="app.js"></script> <script>
+    <script src="app.js"></script> 
+    
+    <script>
         document.addEventListener("DOMContentLoaded", function() {
             let isAdmin = false;
 
@@ -162,7 +164,7 @@
                 
                 if(profs.length === 0) {
                     let colspan = isAdmin ? 5 : 4; 
-                    tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4">Няма данни</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center text-muted py-4" data-i18n="no_data">Няма данни</td></tr>`;
                     return;
                 }
 
