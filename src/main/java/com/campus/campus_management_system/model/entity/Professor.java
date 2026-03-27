@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.JsonIgnore; // <-- ВАЖНО: Новият импорт!
 
 @Entity
 @Table(name = "professor")
@@ -38,5 +39,6 @@ public class Professor {
     @JoinColumn(name = "user_id")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore // <-- ВАЖНО: Това скрива User-а от JSON-а, за да няма безкраен цикъл!
     private User user;
 }
