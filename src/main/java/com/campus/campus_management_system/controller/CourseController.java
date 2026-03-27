@@ -2,8 +2,11 @@ package com.campus.campus_management_system.controller;
 
 import com.campus.campus_management_system.model.entity.Course;
 import com.campus.campus_management_system.model.entity.Professor;
+// ВАЖНО: Провери дали импортите за Enrollment съвпадат с твоите имена на класове!
+import com.campus.campus_management_system.model.entity.Enrollment; 
 import com.campus.campus_management_system.repository.CourseRepository;
 import com.campus.campus_management_system.repository.ProfessorRepository;
+import com.campus.campus_management_system.repository.EnrollmentRepository; 
 import com.campus.campus_management_system.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,10 @@ public class CourseController {
 
     @Autowired
     private ProfessorRepository professorRepository;
+
+    // --- НОВО: Repository за оценките и записванията ---
+    @Autowired
+    private EnrollmentRepository enrollmentRepository;
 
     // 1. Взимане на всички курсове
     @GetMapping
@@ -109,6 +116,20 @@ public class CourseController {
             return ResponseEntity.status(404).body(Map.of("message", "Курсът не е намерен!"));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("message", "Грешка при обновяване: " + e.getMessage()));
+        }
+    }
+
+    // ==========================================
+    // НОВО: МЕТОД ЗА ИЗВЛИЧАНЕ НА СТУДЕНТИТЕ ЗА ОЦЕНЯВАНЕ
+    // ==========================================
+    @GetMapping("/{id}/students")
+    public ResponseEntity<?> getStudentsInCourse(@PathVariable Long id) {
+        try {
+            // Взимаме списък с всички записани студенти за този курс
+            List<Enrollment> enrollments = enrollmentRepository.findByCourseId(id);
+            return ResponseEntity.ok(enrollments);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "Грешка при зареждане на студентите: " + e.getMessage()));
         }
     }
 }
