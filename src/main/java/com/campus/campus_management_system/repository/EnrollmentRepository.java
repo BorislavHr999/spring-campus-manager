@@ -24,6 +24,8 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     @org.springframework.transaction.annotation.Transactional
     @org.springframework.data.jpa.repository.Modifying
     void deleteByStudentId(Long studentId);
+
+    List<Enrollment> findByCourseId(Long courseId);
 }
 
 
