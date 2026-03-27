@@ -156,4 +156,45 @@ public class ProfessorController {
             return ResponseEntity.status(500).body(Map.of("message", "Грешка при изтриване: " + e.getMessage()));
         }
     }
+
+    // ==========================================
+    // МЕТОДИ ЗА ЛИЧНИЯ ПРОФИЛ НА ПРЕПОДАВАТЕЛЯ
+    // ==========================================
+
+    // 1. Взимане на данните на логнатия преподавател
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyProfile(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "Не сте влезли в системата."));
+        }
+
+        String username = authentication.getName();
+        Optional<User> userOpt = userRepository.findByUsername(username);
+
+        if (userOpt.isPresent() && userOpt.get().getProfessor() != null) {
+            return ResponseEntity.ok(userOpt.get().getProfessor());
+        }
+
+        return ResponseEntity.status(404).body(Map.of("message", "Профилът на преподавателя не е намерен!"));
+    }
+
+    // 2. Взимане на курсовете, които води логнатият преподавател
+    @GetMapping("/me/courses")
+    public ResponseEntity<?> getMyCourses(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "Не сте влезли в системата."));
+        }
+
+        String username = authentication.getName();
+        Optional<User> userOpt = userRepository.findByUsername(username);
+
+        if (userOpt.isPresent() && userOpt.get().getProfessor() != null) {
+            Professor me = userOpt.get().getProfessor();
+            // Взимаме само курсовете, на които този преподавател е назначен
+            List<Course> myCourses = courseRepository.findByProfessorId(me.getId());
+            return ResponseEntity.ok(myCourses);
+        }
+
+        return ResponseEntity.status(404).body(Map.of("message", "Профилът на преподавателя не е намерен!"));
+    }
 }
