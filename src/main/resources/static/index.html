@@ -223,38 +223,47 @@
 
             // Функция за зареждане на данните на Преподавателя
             function loadProfessorDashboard() {
-                fetch('/api/professors/me/courses')
-                    .then(res => {
-                        if(!res.ok) throw new Error("Възникна грешка при зареждане на курсовете Ви.");
-                        return res.json();
-                    })
-                    .then(courses => {
-                        let tbody = document.getElementById('prof-courses-tbody');
-                        tbody.innerHTML = '';
-                        
-                        if(courses.length === 0) {
-                            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-4">Все още нямате възложени специалности.</td></tr>';
-                            return;
-                        }
-                        
-                        courses.forEach(c => {
-                            let scheduleText = (c.dayOfWeek && c.startTime && c.endTime) 
-                                ? `<span class="text-info"><i class="bi bi-calendar-event me-1"></i>${c.dayOfWeek}</span> <br><small class="text-muted"><i class="bi bi-clock me-1"></i>${c.startTime} - ${c.endTime}</small>`
-                                : `<span class="text-muted small fst-italic">Не е зададен график</span>`;
+    // Използваме credentials: 'include', за да изпратим сесийната бисквитка на Spring Security
+    fetch('/api/professors/me/courses', { 
+        credentials: 'include' 
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Грешка при зареждане: " + res.status);
+        return res.json();
+    })
+    .then(courses => {
+        let tbody = document.getElementById('prof-courses-tbody');
+        tbody.innerHTML = '';
+        
+        if (courses.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Все още нямате възложени специалности.</td></tr>';
+            return;
+        }
+        
+        courses.forEach(c => {
+            let scheduleText = (c.dayOfWeek && c.startTime && c.endTime) 
+                ? `<span class="text-info"><i class="bi bi-calendar-event me-1"></i>${c.dayOfWeek}</span> <br><small class="text-muted"><i class="bi bi-clock me-1"></i>${c.startTime} - ${c.endTime}</small>`
+                : `<span class="text-muted small fst-italic">Не е зададен график</span>`;
 
-                            tbody.innerHTML += `
-                                <tr class="border-bottom border-dark">
-                                    <td class="px-4 py-3 fw-bold text-warning"><i class="bi bi-journal-code me-2"></i> ${c.name}</td>
-                                    <td class="text-center"><span class="badge bg-dark border border-secondary">${c.credits}</span></td>
-                                    <td>${scheduleText}</td>
-                                </tr>
-                            `;
-                        });
-                    })
-                    .catch(err => {
-                        document.getElementById('prof-courses-tbody').innerHTML = `<tr><td colspan="3" class="text-center text-danger py-4">${err.message}</td></tr>`;
-                    });
-            }
+            tbody.innerHTML += `
+                <tr class="border-bottom border-dark">
+                    <td class="px-4 py-3 fw-bold text-warning"><i class="bi bi-journal-code me-2"></i> ${c.name}</td>
+                    <td class="text-center"><span class="badge bg-dark border border-secondary">${c.credits}</span></td>
+                    <td>${scheduleText}</td>
+                    <td class="text-end px-4">
+                        <button class="btn btn-sm btn-outline-warning rounded-pill px-3 shadow-sm" onclick="viewEnrolledStudents(${c.id}, '${c.name}')">
+                            <i class="bi bi-people-fill me-1"></i> Оцени студенти
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    })
+    .catch(err => {
+        console.error(err);
+        document.getElementById('prof-courses-tbody').innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">Възникна грешка при връзката със сървъра.</td></tr>`;
+    });
+}
 
             // --- ДОЛУ ОСТАВАТ СТАРИТЕ ФУНКЦИИ ЗА АДМИН И СТУДЕНТ ---
             function loadAdminCharts() {
