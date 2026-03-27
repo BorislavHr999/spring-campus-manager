@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalTime;
 
@@ -20,9 +21,13 @@ public class Course {
     private String name;
     private Integer credits;
 
-    // --- НОВИ ПОЛЕТА ЗА УЧЕБЕН ГРАФИК ---
+    // --- ПОЛЕТА ЗА УЧЕБЕН ГРАФИК ---
     private String dayOfWeek;   // напр. "Понеделник", "Вторник"
+    
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime startTime; // напр. 10:00
+
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;   // напр. 12:00
 
     @ManyToOne

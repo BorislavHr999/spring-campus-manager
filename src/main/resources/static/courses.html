@@ -32,6 +32,8 @@
                         
                         <a href="profile.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-person-badge me-3"></i> <span data-i18n="nav_profile">Моят профил</span></a>
                         
+                        <a href="schedule.html" id="nav-schedule" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-calendar3 me-3"></i> <span data-i18n="nav_schedule">Моят График</span></a>
+                        
                         <a href="students.html" class="list-group-item list-group-item-action bg-transparent text-light border-0"><i class="bi bi-people me-3"></i> <span data-i18n="nav_students">Студенти</span></a>
                         
                         <a href="departments.html" id="nav-departments" class="list-group-item list-group-item-action bg-transparent text-light border-0 d-none"><i class="bi bi-building me-3"></i> <span data-i18n="nav_departments">Факултети</span></a>
@@ -160,7 +162,7 @@
                 })
                 .catch(err => console.error("Грешка при зареждане на преподаватели:", err));
             
-            // 1. Проверка на правата (Админ)
+            // 1. Проверка на правата
             fetch('/api/auth/me')
                 .then(res => res.json())
                 .then(user => {
@@ -178,6 +180,10 @@
 
                         let navUsers = document.getElementById('nav-users');
                         if (navUsers) navUsers.classList.remove('d-none');
+                    } else {
+                        // АКО Е СТУДЕНТ - ПОКАЗВАМЕ БУТОНА ЗА ГРАФИКА
+                        let navSchedule = document.getElementById('nav-schedule');
+                        if (navSchedule) navSchedule.classList.remove('d-none');
                     }
                     
                     window.loadCourses();
@@ -358,7 +364,7 @@
                 let result = await response.json();
                 
                 if (response.ok) {
-                    alert("✅ " + result.message);
+                    alert("✅ Успешно се записахте!");
                 } else {
                     alert("⚠️ " + (result.message || "Грешка при записване"));
                 }
