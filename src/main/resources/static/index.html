@@ -150,12 +150,39 @@
                                             <th class="py-3 px-4">Специалност</th>
                                             <th class="py-3 text-center">Кредити</th>
                                             <th class="py-3">График</th>
+                                            <th class="py-3 text-end px-4">Действие</th>
                                             </tr>
                                     </thead>
                                     <tbody id="prof-courses-tbody">
-                                        <tr><td colspan="3" class="text-center text-muted py-4" data-i18n="loading">Зареждане...</td></tr>
+                                        <tr><td colspan="4" class="text-center text-muted py-4" data-i18n="loading">Зареждане...</td></tr>
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="gradeModal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content shadow-lg border-warning">
+                            <div class="modal-header border-secondary bg-dark">
+                                <h5 class="modal-title text-warning"><i class="bi bi-people-fill me-2"></i> Оценяване: <span id="gradeModalCourseName" class="text-white"></span></h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body p-0">
+                                <div class="table-custom m-3 shadow-sm">
+                                    <table class="table table-dark table-hover table-borderless align-middle mb-0">
+                                        <thead class="border-bottom border-secondary text-muted">
+                                            <tr>
+                                                <th class="py-3 px-4">Студент</th>
+                                                <th class="py-3">Фак. Номер</th>
+                                                <th class="py-3 text-center">Оценка</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="enrolled-students-tbody">
+                                            </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -223,47 +250,47 @@
 
             // Функция за зареждане на данните на Преподавателя
             function loadProfessorDashboard() {
-    // Използваме credentials: 'include', за да изпратим сесийната бисквитка на Spring Security
-    fetch('/api/professors/me/courses', { 
-        credentials: 'include' 
-    })
-    .then(res => {
-        if (!res.ok) throw new Error("Грешка при зареждане: " + res.status);
-        return res.json();
-    })
-    .then(courses => {
-        let tbody = document.getElementById('prof-courses-tbody');
-        tbody.innerHTML = '';
-        
-        if (courses.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Все още нямате възложени специалности.</td></tr>';
-            return;
-        }
-        
-        courses.forEach(c => {
-            let scheduleText = (c.dayOfWeek && c.startTime && c.endTime) 
-                ? `<span class="text-info"><i class="bi bi-calendar-event me-1"></i>${c.dayOfWeek}</span> <br><small class="text-muted"><i class="bi bi-clock me-1"></i>${c.startTime} - ${c.endTime}</small>`
-                : `<span class="text-muted small fst-italic">Не е зададен график</span>`;
+                // Използваме credentials: 'include', за да изпратим сесийната бисквитка на Spring Security
+                fetch('/api/professors/me/courses', { 
+                    credentials: 'include' 
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error("Грешка при зареждане: " + res.status);
+                    return res.json();
+                })
+                .then(courses => {
+                    let tbody = document.getElementById('prof-courses-tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (courses.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Все още нямате възложени специалности.</td></tr>';
+                        return;
+                    }
+                    
+                    courses.forEach(c => {
+                        let scheduleText = (c.dayOfWeek && c.startTime && c.endTime) 
+                            ? `<span class="text-info"><i class="bi bi-calendar-event me-1"></i>${c.dayOfWeek}</span> <br><small class="text-muted"><i class="bi bi-clock me-1"></i>${c.startTime} - ${c.endTime}</small>`
+                            : `<span class="text-muted small fst-italic">Не е зададен график</span>`;
 
-            tbody.innerHTML += `
-                <tr class="border-bottom border-dark">
-                    <td class="px-4 py-3 fw-bold text-warning"><i class="bi bi-journal-code me-2"></i> ${c.name}</td>
-                    <td class="text-center"><span class="badge bg-dark border border-secondary">${c.credits}</span></td>
-                    <td>${scheduleText}</td>
-                    <td class="text-end px-4">
-                        <button class="btn btn-sm btn-outline-warning rounded-pill px-3 shadow-sm" onclick="viewEnrolledStudents(${c.id}, '${c.name}')">
-                            <i class="bi bi-people-fill me-1"></i> Оцени студенти
-                        </button>
-                    </td>
-                </tr>
-            `;
-        });
-    })
-    .catch(err => {
-        console.error(err);
-        document.getElementById('prof-courses-tbody').innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">Възникна грешка при връзката със сървъра.</td></tr>`;
-    });
-}
+                        tbody.innerHTML += `
+                            <tr class="border-bottom border-dark">
+                                <td class="px-4 py-3 fw-bold text-warning"><i class="bi bi-journal-code me-2"></i> ${c.name}</td>
+                                <td class="text-center"><span class="badge bg-dark border border-secondary">${c.credits}</span></td>
+                                <td>${scheduleText}</td>
+                                <td class="text-end px-4">
+                                    <button class="btn btn-sm btn-outline-warning rounded-pill px-3 shadow-sm" onclick="viewEnrolledStudents(${c.id}, '${c.name.replace(/'/g, "\\'")}')">
+                                        <i class="bi bi-people-fill me-1"></i> Оцени студенти
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('prof-courses-tbody').innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">Възникна грешка при връзката със сървъра.</td></tr>`;
+                });
+            }
 
             // --- ДОЛУ ОСТАВАТ СТАРИТЕ ФУНКЦИИ ЗА АДМИН И СТУДЕНТ ---
             function loadAdminCharts() {
@@ -371,6 +398,80 @@
                         document.getElementById('my-grades-tbody').innerHTML = `<tr><td colspan="4" class="text-center text-danger py-4">${err.message}</td></tr>`;
                     });
             }
+
+            // --- НОВИ ФУНКЦИИ ЗА ОЦЕНЯВАНЕ ОТ ПРЕПОДАВАТЕЛ ---
+            
+            // 1. Отваря прозореца и зарежда студентите
+            window.viewEnrolledStudents = function(courseId, courseName) {
+                document.getElementById('gradeModalCourseName').textContent = courseName;
+                let tbody = document.getElementById('enrolled-students-tbody');
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-4">Зареждане на студенти...</td></tr>';
+                
+                new bootstrap.Modal(document.getElementById('gradeModal')).show();
+
+                // Извикваме списъка със студенти, записани за този курс
+                fetch(`/api/courses/${courseId}/students`, { credentials: 'include' })
+                    .then(res => {
+                        if(!res.ok) throw new Error("Моля, проверете дали методът /api/courses/{id}/students съществува в бекенда.");
+                        return res.json();
+                    })
+                    .then(enrollments => {
+                        tbody.innerHTML = '';
+                        if(enrollments.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-4">Все още няма записани студенти в тази специалност.</td></tr>';
+                            return;
+                        }
+
+                        enrollments.forEach(en => {
+                            let student = en.student;
+                            tbody.innerHTML += `
+                                <tr class="border-bottom border-dark">
+                                    <td class="px-4 py-3 fw-bold"><i class="bi bi-person-circle text-info me-2"></i> ${student.firstName} ${student.lastName}</td>
+                                    <td class="text-muted">${student.facultyNumber || '-'}</td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center align-items-center">
+                                            <input type="number" step="0.1" min="2" max="6" id="grade-${student.id}-${courseId}" class="form-control form-control-sm bg-dark text-white border-secondary me-2" style="width: 75px" value="${en.grade || ''}">
+                                            <button class="btn btn-sm btn-success shadow-sm" onclick="saveProfGrade(${student.id}, ${courseId})" title="Запази оценка"><i class="bi bi-check-lg"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    })
+                    .catch(err => {
+                        tbody.innerHTML = `<tr><td colspan="3" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle-fill me-2"></i> ${err.message}</td></tr>`;
+                    });
+            };
+
+            // 2. Запазва въведената оценка
+            window.saveProfGrade = function(studentId, courseId) {
+                let gradeInput = document.getElementById(`grade-${studentId}-${courseId}`);
+                let grade = gradeInput.value;
+
+                if (!grade || grade < 2 || grade > 6) {
+                    alert("Моля, въведете валидна оценка между 2.00 и 6.00.");
+                    return;
+                }
+
+                // Викаме вече съществуващия метод за писане на оценка
+                fetch(`/api/students/${studentId}/courses/${courseId}/grade?grade=${grade}`, {
+                    method: 'PUT',
+                    credentials: 'include'
+                })
+                .then(res => {
+                    if(res.ok) {
+                        let btn = gradeInput.nextElementSibling;
+                        btn.classList.replace('btn-success', 'btn-outline-success');
+                        btn.innerHTML = '<i class="bi bi-check2-all"></i>';
+                        setTimeout(() => {
+                            btn.classList.replace('btn-outline-success', 'btn-success');
+                            btn.innerHTML = '<i class="bi bi-check-lg"></i>';
+                        }, 2000);
+                    } else {
+                        alert("Възникна грешка при запазването.");
+                    }
+                });
+            };
 
         });
     </script>
