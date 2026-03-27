@@ -55,39 +55,13 @@
 
                 <div class="px-3 mt-auto pb-3">
                     <hr class="border-secondary">
-                    
-                    <div class="dropup mb-2">
-                        <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-moon-stars me-1"></i> <span data-i18n="theme">Тема</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-dark w-100 shadow mb-1">
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="bi bi-sun me-2 text-warning"></i> <span data-i18n="theme_light">Светла тема</span></a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="bi bi-moon-stars me-2 text-info"></i> <span data-i18n="theme_dark">Тъмна тема</span></a></li>
-                        </ul>
-                    </div>
-
-                    <div class="dropup mb-3">
-                        <button class="btn btn-sm btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-globe me-1"></i> <span data-i18n="lang_title">Език</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-dark w-100 shadow mb-1">
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('bg')">🇧🇬 Български</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('en')">🇬🇧 English</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('fr')">🇫🇷 Français</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('es')">🇪🇸 Español</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('de')">🇩🇪 Deutsch</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('it')">🇮🇹 Italiano</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setLanguage('ru')">🇷🇺 Русский</a></li>
-                        </ul>
-                    </div>
-
                     <a href="/logout" class="btn btn-outline-danger w-100 btn-sm"><i class="bi bi-box-arrow-left me-2"></i><span data-i18n="nav_logout">Изход</span></a>
                 </div>
             </nav>
 
             <main class="col-md-10 ms-sm-auto px-md-5 py-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom border-secondary">
-                    <h1 class="h2 fw-light"><i class="bi bi-speedometer2 me-2"></i> <span data-i18n="nav_dashboard">Главно табло</span></h1>
+                    <h1 class="h2 fw-light" id="dashboard-title"><i class="bi bi-speedometer2 me-2"></i> <span data-i18n="nav_dashboard">Главно табло</span></h1>
                 </div>
 
                 <div class="row mb-4">
@@ -165,6 +139,28 @@
                     </div>
                 </div>
 
+                <div class="row d-none" id="professor-dashboard">
+                    <div class="col-12 mb-4">
+                        <div class="chart-container h-100 border border-warning border-opacity-50">
+                            <h5 class="fw-light mb-4"><i class="bi bi-person-workspace me-2 text-warning"></i> <span>Специалности, които водя</span></h5>
+                            <div class="table-custom p-1 shadow-sm">
+                                <table class="table table-dark table-hover table-borderless align-middle mb-0">
+                                    <thead class="border-bottom border-secondary text-muted">
+                                        <tr>
+                                            <th class="py-3 px-4">Специалност</th>
+                                            <th class="py-3 text-center">Кредити</th>
+                                            <th class="py-3">График</th>
+                                            </tr>
+                                    </thead>
+                                    <tbody id="prof-courses-tbody">
+                                        <tr><td colspan="3" class="text-center text-muted py-4" data-i18n="loading">Зареждане...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
     </div>
@@ -176,10 +172,12 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             
+            // --- ПРОВЕРКА НА ПРАВАТА И РОЛИТЕ ---
             fetch('/api/auth/me')
                 .then(res => res.json())
                 .then(user => {
                     let isAdmin = user.roles && user.roles.includes('ROLE_ADMIN');
+                    let isProf = user.roles && user.roles.includes('ROLE_PROFESSOR');
                     
                     if (isAdmin) {
                         let navDept = document.getElementById('nav-departments');
@@ -190,8 +188,15 @@
 
                         document.getElementById('admin-dashboard').classList.remove('d-none');
                         loadAdminCharts();
-                    } else {
-                        // АКО Е СТУДЕНТ - ПОКАЗВАМЕ БУТОНА ЗА ГРАФИКА
+                    } 
+                    else if (isProf) {
+                        // ПРОФЕСОРСКА ЛОГИКА
+                        document.getElementById('dashboard-title').innerHTML = '<i class="bi bi-person-workspace me-2 text-warning"></i> <span>Преподавателско Табло</span>';
+                        document.getElementById('professor-dashboard').classList.remove('d-none');
+                        loadProfessorDashboard();
+                    }
+                    else {
+                        // СТУДЕНТСКА ЛОГИКА
                         let navSchedule = document.getElementById('nav-schedule');
                         if (navSchedule) navSchedule.classList.remove('d-none');
                         
@@ -201,6 +206,7 @@
                 })
                 .catch(err => console.warn("Аутентикация грешка:", err));
 
+            // Зареждане на горните статистики
             Promise.all([
                 fetch('/api/students?size=1').then(res => res.json()), 
                 fetch('/api/courses').then(res => res.json()),
@@ -215,6 +221,42 @@
             })
             .catch(err => console.error("Грешка при горните статистики:", err));
 
+            // Функция за зареждане на данните на Преподавателя
+            function loadProfessorDashboard() {
+                fetch('/api/professors/me/courses')
+                    .then(res => {
+                        if(!res.ok) throw new Error("Възникна грешка при зареждане на курсовете Ви.");
+                        return res.json();
+                    })
+                    .then(courses => {
+                        let tbody = document.getElementById('prof-courses-tbody');
+                        tbody.innerHTML = '';
+                        
+                        if(courses.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-4">Все още нямате възложени специалности.</td></tr>';
+                            return;
+                        }
+                        
+                        courses.forEach(c => {
+                            let scheduleText = (c.dayOfWeek && c.startTime && c.endTime) 
+                                ? `<span class="text-info"><i class="bi bi-calendar-event me-1"></i>${c.dayOfWeek}</span> <br><small class="text-muted"><i class="bi bi-clock me-1"></i>${c.startTime} - ${c.endTime}</small>`
+                                : `<span class="text-muted small fst-italic">Не е зададен график</span>`;
+
+                            tbody.innerHTML += `
+                                <tr class="border-bottom border-dark">
+                                    <td class="px-4 py-3 fw-bold text-warning"><i class="bi bi-journal-code me-2"></i> ${c.name}</td>
+                                    <td class="text-center"><span class="badge bg-dark border border-secondary">${c.credits}</span></td>
+                                    <td>${scheduleText}</td>
+                                </tr>
+                            `;
+                        });
+                    })
+                    .catch(err => {
+                        document.getElementById('prof-courses-tbody').innerHTML = `<tr><td colspan="3" class="text-center text-danger py-4">${err.message}</td></tr>`;
+                    });
+            }
+
+            // --- ДОЛУ ОСТАВАТ СТАРИТЕ ФУНКЦИИ ЗА АДМИН И СТУДЕНТ ---
             function loadAdminCharts() {
                 fetch('/api/students?size=10') 
                 .then(res => res.json())
