@@ -118,6 +118,10 @@ public class StudentController {
         }
     }
     
+    // ==========================================
+    // НОВО: ОБНОВЕН МЕТОД ЗА ОЦЕНЯВАНЕ 
+    // (Пуска и Админ, и Преподавател)
+    // ==========================================
     @PutMapping("/{studentId}/courses/{courseId}/grade")
     public ResponseEntity<?> updateStudentGrade(
             @PathVariable Long studentId,
@@ -125,12 +129,25 @@ public class StudentController {
             @RequestParam Double grade,
             Authentication authentication) {
             
-        
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isProfessor = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_PROFESSOR"));
                 
-        if (!isAdmin) {
-            return ResponseEntity.status(403).body(Map.of("message", "Само администратори могат да пишат оценки!"));
+        if (!isAdmin && !isProfessor) {
+            return ResponseEntity.status(403).body(Map.of("message", "Нямате права да въвеждате оценки!"));
+        }
+
+        // ЗАЩИТА: Ако е преподавател, проверяваме дали преподава точно този курс!
+        if (isProfessor && !isAdmin) {
+            User currentUser = userRepository.findByUsername(authentication.getName()).orElse(null);
+            Course course = courseRepository.findById(courseId).orElse(null);
+
+            if (currentUser == null || currentUser.getProfessor() == null || course == null || 
+                course.getProfessor() == null || 
+                !course.getProfessor().getId().equals(currentUser.getProfessor().getId())) {
+                return ResponseEntity.status(403).body(Map.of("message", "Можете да оценявате само студенти във Вашите специалности!"));
+            }
         }
 
         Optional<Enrollment> enrollmentOpt = enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId);
@@ -169,7 +186,7 @@ public class StudentController {
         
         Student student = user.getStudent();
         if (student == null) {
-            return ResponseEntity.status(403).body(Map.of("message", "Вие сте администратор и нямате студентски профил."));
+            return ResponseEntity.status(403).body(Map.of("message", "Вие сте администратор/преподавател и нямате студентски профил."));
         }
 
         // 🔒 ЗАЩИТА: Студентът може да променя само имейла и адреса си!
