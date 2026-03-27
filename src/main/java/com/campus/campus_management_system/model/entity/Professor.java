@@ -2,16 +2,14 @@ package com.campus.campus_management_system.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name = "professor")
 @Data
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Professor {
@@ -34,4 +32,11 @@ public class Professor {
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
+
+    // --- НОВО: Връзка с акаунта (User) ---
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User user;
 }
