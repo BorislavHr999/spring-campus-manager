@@ -8,9 +8,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.CascadeType;
-
 
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users") // Внимавай: "user" е запазена дума в някои бази данни, затова ползваме "users"
+@Table(name = "users")
 public class User implements UserDetails {
 
     @Id
@@ -34,13 +31,21 @@ public class User implements UserDetails {
     private String password;
 
     @Column(nullable = false)
-    private String role; // Например "ROLE_ADMIN" или "ROLE_USER"
+    private String role; // "ROLE_ADMIN", "ROLE_USER" или вече и "ROLE_PROFESSOR"
+
+    // Връзка със Студент
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Student student;
+
+    // --- НОВО: Връзка с Преподавател ---
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Professor professor;
+
 
     // --- Методи от UserDetails (Spring Security) ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Връщаме ролята на потребителя като обект GrantedAuthority
         return List.of(new SimpleGrantedAuthority(role));
     }
 
@@ -55,7 +60,4 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() { return true; }
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Student student;
 }
