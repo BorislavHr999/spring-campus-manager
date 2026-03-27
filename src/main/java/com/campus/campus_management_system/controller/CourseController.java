@@ -74,15 +74,22 @@ public class CourseController {
         return courseService.removeProfessor(courseId);
     }
 
-    // 6. Обновяване на курс (ТУК БЕШЕ ГРЕШКА 500)
+    // 6. Обновяване на курс
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCourse(@PathVariable Long id, @RequestBody Course courseDetails) {
         try {
             Optional<Course> courseOpt = courseRepository.findById(id);
             if (courseOpt.isPresent()) {
                 Course existingCourse = courseOpt.get();
+                
+                // --- ЗАПАМЕТЯВАМЕ ВСИЧКИ ДАННИ ---
                 existingCourse.setName(courseDetails.getName());
                 existingCourse.setCredits(courseDetails.getCredits());
+                
+                // НОВИ ПОЛЕТА ЗА ГРАФИКА
+                existingCourse.setDayOfWeek(courseDetails.getDayOfWeek());
+                existingCourse.setStartTime(courseDetails.getStartTime());
+                existingCourse.setEndTime(courseDetails.getEndTime());
 
                 // Ръчно и безопасно закачане на професора
                 if (courseDetails.getProfessor() != null && courseDetails.getProfessor().getId() != null) {
@@ -96,8 +103,8 @@ public class CourseController {
                     existingCourse.setProfessor(null); // Ако потребителят е избрал "Няма"
                 }
 
-                courseRepository.save(existingCourse);
-                return ResponseEntity.ok(existingCourse);
+                Course updatedCourse = courseRepository.save(existingCourse);
+                return ResponseEntity.ok(updatedCourse);
             }
             return ResponseEntity.status(404).body(Map.of("message", "Курсът не е намерен!"));
         } catch (Exception e) {
@@ -105,5 +112,4 @@ public class CourseController {
         }
     }
 }
-
 
