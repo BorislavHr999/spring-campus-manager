@@ -54,23 +54,41 @@
                 </div>
 
                 <div class="px-3 mt-auto pb-3">
-                    <div class="btn-group w-100 mb-2 shadow-sm" role="group">
-                        <button type="button" class="btn btn-sm btn-outline-light w-50" onclick="setTheme('light')" title="Светла тема"><i class="bi bi-sun-fill"></i></button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary w-50" onclick="setTheme('dark')" title="Тъмна тема"><i class="bi bi-moon-stars-fill"></i></button>
+                    <hr class="border-secondary opacity-50 mb-4">
+                    
+                    <div class="dropdown w-100 mb-2">
+                        <button class="btn btn-outline-secondary w-100 d-flex justify-content-center align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #adb5bd; border-color: #495057;">
+                            <i class="bi bi-moon-stars"></i> 
+                            <span data-i18n="theme">Тема</span> 
+                            <i class="bi bi-caret-down-fill" style="font-size: 0.6rem;"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark w-100 shadow border-secondary text-center">
+                            <li><button class="dropdown-item text-light" onclick="setTheme('light')"><i class="bi bi-sun me-2 text-warning"></i> <span data-i18n="theme_light">Светла тема</span></button></li>
+                            <li><button class="dropdown-item text-light" onclick="setTheme('dark')"><i class="bi bi-moon-stars me-2 text-info"></i> <span data-i18n="theme_dark">Тъмна тема</span></button></li>
+                        </ul>
                     </div>
                     
-                    <select class="form-select form-select-sm bg-dark text-white border-secondary mb-3 shadow-sm" onchange="setLanguage(this.value)" id="lang-select">
-                        <option value="bg">🇧🇬 Български</option>
-                        <option value="en">🇬🇧 English</option>
-                        <option value="fr">🇫🇷 Français</option>
-                        <option value="es">🇪🇸 Español</option>
-                        <option value="de">🇩🇪 Deutsch</option>
-                        <option value="it">🇮🇹 Italiano</option>
-                        <option value="ru">🇷🇺 Русский</option>
-                    </select>
+                    <div class="dropdown w-100 mb-4">
+                        <button class="btn btn-outline-secondary w-100 d-flex justify-content-center align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #adb5bd; border-color: #495057;">
+                            <i class="bi bi-globe"></i> 
+                            <span data-i18n="lang_title">Език</span> 
+                            <i class="bi bi-caret-down-fill" style="font-size: 0.6rem;"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark w-100 shadow border-secondary text-center">
+                            <li><button class="dropdown-item text-light" onclick="setLanguage('bg')">🇧🇬 Български</button></li>
+                            <li><button class="dropdown-item text-light" onclick="setLanguage('en')">🇬🇧 English</button></li>
+                            <li><button class="dropdown-item text-light" onclick="setLanguage('fr')">🇫🇷 Français</button></li>
+                            <li><button class="dropdown-item text-light" onclick="setLanguage('es')">🇪🇸 Español</button></li>
+                            <li><button class="dropdown-item text-light" onclick="setLanguage('de')">🇩🇪 Deutsch</button></li>
+                            <li><button class="dropdown-item text-light" onclick="setLanguage('it')">🇮🇹 Italiano</button></li>
+                            <li><button class="dropdown-item text-light" onclick="setLanguage('ru')">🇷🇺 Русский</button></li>
+                        </ul>
+                    </div>
 
-                    <hr class="border-secondary">
-                    <a href="/logout" class="btn btn-outline-danger w-100 btn-sm shadow-sm"><i class="bi bi-box-arrow-left me-2"></i><span data-i18n="nav_logout">Изход</span></a>
+                    <a href="/logout" class="btn btn-outline-danger w-100 d-flex justify-content-center align-items-center gap-2 p-2 shadow-sm">
+                        <i class="bi bi-box-arrow-left"></i> 
+                        <span data-i18n="nav_logout">Изход</span>
+                    </a>
                 </div>
             </nav>
 
@@ -248,11 +266,6 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             
-            // НОВО: Избираме правилния език в падащото меню при зареждане
-            let savedLang = localStorage.getItem('campus_lang') || 'bg';
-            let langSelect = document.getElementById('lang-select');
-            if(langSelect) langSelect.value = savedLang;
-
             // --- ПРОВЕРКА НА ПРАВАТА И РОЛИТЕ ---
             fetch('/api/auth/me')
                 .then(res => res.json())
