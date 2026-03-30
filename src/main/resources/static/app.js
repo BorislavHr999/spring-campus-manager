@@ -1,7 +1,7 @@
 // 1. ПЪЛЕН РЕЧНИК ЗА ЦЯЛОТО ПРИЛОЖЕНИЕ
 const translations = {
     bg: {
-        nav_dashboard: "Главно табло", nav_profile: "Моят профил", nav_students: "Студенти", 
+        nav_dashboard: "Главно табло", nav_profile: "Моят профил", nav_schedule: "Моят График", nav_students: "Студенти", 
         nav_departments: "Факултети", nav_users: "Акаунти", nav_courses: "Специалности", 
         nav_prof: "Преподаватели", nav_clubs: "Студентски Клубове", nav_logout: "Изход",
         theme: "Тема", theme_light: "Светла тема", theme_dark: "Тъмна тема", lang_title: "Език",
@@ -45,7 +45,7 @@ const translations = {
         day_понеделник: "Понеделник", day_вторник: "Вторник", day_сряда: "Сряда", day_четвъртък: "Четвъртък", day_петък: "Петък"
     },
     en: {
-        nav_dashboard: "Dashboard", nav_profile: "My Profile", nav_students: "Students", 
+        nav_dashboard: "Dashboard", nav_profile: "My Profile", nav_schedule: "My Schedule", nav_students: "Students", 
         nav_departments: "Departments", nav_users: "Accounts", nav_courses: "Courses", 
         nav_prof: "Professors", nav_clubs: "Student Clubs", nav_logout: "Logout",
         theme: "Theme", theme_light: "Light Mode", theme_dark: "Dark Mode", lang_title: "Language",
@@ -89,7 +89,7 @@ const translations = {
         day_понеделник: "Monday", day_вторник: "Tuesday", day_сряда: "Wednesday", day_четвъртък: "Thursday", day_петък: "Friday"
     },
     fr: {
-        nav_dashboard: "Tableau de bord", nav_profile: "Mon Profil", nav_students: "Étudiants", 
+        nav_dashboard: "Tableau de bord", nav_profile: "Mon Profil", nav_schedule: "Mon Emploi du temps", nav_students: "Étudiants", 
         nav_departments: "Départements", nav_users: "Comptes", nav_courses: "Cours", 
         nav_prof: "Professeurs", nav_clubs: "Clubs Étudiants", nav_logout: "Déconnexion",
         theme: "Thème", theme_light: "Mode Clair", theme_dark: "Mode Sombre", lang_title: "Langue",
@@ -133,7 +133,7 @@ const translations = {
         day_понеделник: "Lundi", day_вторник: "Mardi", day_сряда: "Mercredi", day_четвъртък: "Jeudi", day_петък: "Vendredi"
     },
     es: {
-        nav_dashboard: "Tablero", nav_profile: "Mi Perfil", nav_students: "Estudiantes", 
+        nav_dashboard: "Tablero", nav_profile: "Mi Perfil", nav_schedule: "Mi Horario", nav_students: "Estudiantes", 
         nav_departments: "Departamentos", nav_users: "Cuentas", nav_courses: "Cursos", 
         nav_prof: "Profesores", nav_clubs: "Clubes Estudiantiles", nav_logout: "Cerrar sesión",
         theme: "Tema", theme_light: "Modo Claro", theme_dark: "Modo Oscuro", lang_title: "Idioma",
@@ -177,7 +177,7 @@ const translations = {
         day_понеделник: "Lunes", day_вторник: "Martes", day_сряда: "Miércoles", day_четвъртък: "Jueves", day_петък: "Viernes"
     },
     de: {
-        nav_dashboard: "Dashboard", nav_profile: "Mein Profil", nav_students: "Studenten", 
+        nav_dashboard: "Dashboard", nav_profile: "Mein Profil", nav_schedule: "Mein Stundenplan", nav_students: "Studenten", 
         nav_departments: "Abteilungen", nav_users: "Benutzerkonten", nav_courses: "Kurse", 
         nav_prof: "Professoren", nav_clubs: "Studentenclubs", nav_logout: "Abmelden",
         theme: "Thema", theme_light: "Heller Modus", theme_dark: "Dunkler Modus", lang_title: "Sprache",
@@ -221,7 +221,7 @@ const translations = {
         day_понеделник: "Montag", day_вторник: "Dienstag", day_сряда: "Mittwoch", day_четвъртък: "Donnerstag", day_петък: "Freitag"
     },
     it: {
-        nav_dashboard: "Bacheca", nav_profile: "Il mio profilo", nav_students: "Studenti", 
+        nav_dashboard: "Bacheca", nav_profile: "Il mio profilo", nav_schedule: "Il mio Orario", nav_students: "Studenti", 
         nav_departments: "Dipartimenti", nav_users: "Account", nav_courses: "Corsi", 
         nav_prof: "Professori", nav_clubs: "Club Studenteschi", nav_logout: "Esci",
         theme: "Tema", theme_light: "Tema Chiaro", theme_dark: "Tema Scuro", lang_title: "Lingua",
@@ -261,11 +261,11 @@ const translations = {
         exam_type: "Tipo di Esame", exam_type_regular: "Esame Regolare", exam_type_retake: "Esame di Riparazione", 
         exam_type_midterm: "Prova Intermedia", exam_type_project: "Difesa del Progetto", exam_save_btn: "Salva Esame", 
         btn_exam: "Esame", upcoming_exams: "Prossimi Esami", no_exams_msg: "Non ci sono ancora esami programmati per i tuoi corsi.",
-        my_schedule_title: "Orario Settimanale", unscheduled_courses: "Corsi non programmati", no_classes: "Giorno libero",
+        my_schedule_title: "Orario Settimanale", unscheduled_courses: "Cursos non programmati", no_classes: "Giorno libero",
         day_понеделник: "Lunedì", day_вторник: "Martedì", day_сряда: "Mercoledì", day_четвъртък: "Giovedì", day_петък: "Venerdì"
     },
     ru: {
-        nav_dashboard: "Главная панель", nav_profile: "Мой профиль", nav_students: "Студенты", 
+        nav_dashboard: "Главная панель", nav_profile: "Мой профиль", nav_schedule: "Мое Расписание", nav_students: "Студенты", 
         nav_departments: "Кафедры", nav_users: "Аккаунты", nav_courses: "Специальности", 
         nav_prof: "Преподаватели", nav_clubs: "Студенческие клубы", nav_logout: "Выход",
         theme: "Тема", theme_light: "Светлая тема", theme_dark: "Темная тема", lang_title: "Язык",
