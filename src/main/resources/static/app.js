@@ -29,13 +29,20 @@ const translations = {
         th_course_name: "Име на специалността", th_course: "Специалности", th_credits: "Кредити", th_professor: "Преподавател", th_prof: "Преподавател", th_grade: "Оценка",
         btn_new_course: "Нова Специалност", search_course: "Търси курс по име...", btn_assign_prof: "Преподавател", enroll_btn: "Запиши се",
         
-        // НОВИ ЗА УЧЕБНИЯ ГРАФИК
         th_schedule: "График", course_schedule_title: "Учебен График", course_day: "Ден", course_day_placeholder: "Избери...", 
         course_start_time: "Начало", course_end_time: "Край",
         
         dept_manage_title: "Управление на Факултети", btn_new_dept: "Нов Факултет", th_dept_name: "Име на Факултет", 
         th_dept_office: "Офис (Кабинет)", dept_modal_title: "Данни за Факултет", dept_office_hint: "Това ще се показва в падащите менюта.",
-        btn_new_club: "Нов Клуб", th_club_name: "Име на Клуба", th_club_desc: "Описание", club_modal_title: "Данни за Клуб"
+        btn_new_club: "Нов Клуб", th_club_name: "Име на Клуба", th_club_desc: "Описание", club_modal_title: "Данни за Клуб",
+
+        // НОВИ ЗА ИЗПИТИ И ГРАФИК
+        exam_schedule_title: "Насрочи изпит:", exam_date: "Дата и час", exam_room: "Зала", 
+        exam_type: "Тип на изпита", exam_type_regular: "Редовен изпит", exam_type_retake: "Поправителен изпит", 
+        exam_type_midterm: "Междинен тест", exam_type_project: "Защита на проект", exam_save_btn: "Запази изпита", 
+        btn_exam: "Изпит", upcoming_exams: "Предстоящи изпити", no_exams_msg: "Все още няма насрочени изпити за Вашите специалности.",
+        my_schedule_title: "Седмичен График", unscheduled_courses: "Курсове без зададен час", no_classes: "Свободен ден",
+        day_понеделник: "Понеделник", day_вторник: "Вторник", day_сряда: "Сряда", day_четвъртък: "Четвъртък", day_петък: "Петък"
     },
     en: {
         nav_dashboard: "Dashboard", nav_profile: "My Profile", nav_students: "Students", 
@@ -71,7 +78,15 @@ const translations = {
         
         dept_manage_title: "Manage Departments", btn_new_dept: "New Department", th_dept_name: "Department Name", 
         th_dept_office: "Office (Room)", dept_modal_title: "Department Data", dept_office_hint: "This will be shown in dropdown menus.",
-        btn_new_club: "New Club", th_club_name: "Club Name", th_club_desc: "Description", club_modal_title: "Club Data"
+        btn_new_club: "New Club", th_club_name: "Club Name", th_club_desc: "Description", club_modal_title: "Club Data",
+
+        // NEW FOR EXAMS AND SCHEDULE
+        exam_schedule_title: "Schedule Exam:", exam_date: "Date and Time", exam_room: "Room", 
+        exam_type: "Exam Type", exam_type_regular: "Regular Exam", exam_type_retake: "Retake Exam", 
+        exam_type_midterm: "Midterm Exam", exam_type_project: "Project Defense", exam_save_btn: "Save Exam", 
+        btn_exam: "Exam", upcoming_exams: "Upcoming Exams", no_exams_msg: "No exams scheduled for your courses yet.",
+        my_schedule_title: "Weekly Schedule", unscheduled_courses: "Unscheduled Courses", no_classes: "Free day",
+        day_понеделник: "Monday", day_вторник: "Tuesday", day_сряда: "Wednesday", day_четвъртък: "Thursday", day_петък: "Friday"
     },
     fr: {
         nav_dashboard: "Tableau de bord", nav_profile: "Mon Profil", nav_students: "Étudiants", 
@@ -107,7 +122,15 @@ const translations = {
         
         dept_manage_title: "Gérer les Départements", btn_new_dept: "Nouveau Département", th_dept_name: "Nom du Département", 
         th_dept_office: "Bureau (Salle)", dept_modal_title: "Données du Département", dept_office_hint: "Sera affiché dans les menus déroulants.",
-        btn_new_club: "Nouveau Club", th_club_name: "Nom du Club", th_club_desc: "Description", club_modal_title: "Données du Club"
+        btn_new_club: "Nouveau Club", th_club_name: "Nom du Club", th_club_desc: "Description", club_modal_title: "Données du Club",
+
+        // NOUVEAU POUR LES EXAMENS ET L'EMPLOI DU TEMPS
+        exam_schedule_title: "Programmer un examen:", exam_date: "Date et Heure", exam_room: "Salle", 
+        exam_type: "Type d'examen", exam_type_regular: "Examen régulier", exam_type_retake: "Examen de rattrapage", 
+        exam_type_midterm: "Examen partiel", exam_type_project: "Soutenance de projet", exam_save_btn: "Enregistrer l'examen", 
+        btn_exam: "Examen", upcoming_exams: "Examens à venir", no_exams_msg: "Aucun examen programmé pour vos cours pour le moment.",
+        my_schedule_title: "Emploi du temps", unscheduled_courses: "Cours non programmés", no_classes: "Jour libre",
+        day_понеделник: "Lundi", day_вторник: "Mardi", day_сряда: "Mercredi", day_четвъртък: "Jeudi", day_петък: "Vendredi"
     },
     es: {
         nav_dashboard: "Tablero", nav_profile: "Mi Perfil", nav_students: "Estudiantes", 
@@ -143,7 +166,15 @@ const translations = {
         
         dept_manage_title: "Gestionar Departamentos", btn_new_dept: "Nuevo Departamento", th_dept_name: "Nombre del Departamento", 
         th_dept_office: "Oficina (Sala)", dept_modal_title: "Datos del Departamento", dept_office_hint: "Se mostrará en los menús desplegables.",
-        btn_new_club: "Nuevo Club", th_club_name: "Nombre del Club", th_club_desc: "Descripción", club_modal_title: "Datos del Club"
+        btn_new_club: "Nuevo Club", th_club_name: "Nombre del Club", th_club_desc: "Descripción", club_modal_title: "Datos del Club",
+
+        // NUEVO PARA EXÁMENES Y HORARIO
+        exam_schedule_title: "Programar Examen:", exam_date: "Fecha y Hora", exam_room: "Aula", 
+        exam_type: "Tipo de Examen", exam_type_regular: "Examen Regular", exam_type_retake: "Examen de Recuperación", 
+        exam_type_midterm: "Examen Parcial", exam_type_project: "Defensa de Proyecto", exam_save_btn: "Guardar Examen", 
+        btn_exam: "Examen", upcoming_exams: "Próximos Exámenes", no_exams_msg: "Aún no hay exámenes programados para sus cursos.",
+        my_schedule_title: "Horario Semanal", unscheduled_courses: "Cursos sin programar", no_classes: "Día libre",
+        day_понеделник: "Lunes", day_вторник: "Martes", day_сряда: "Miércoles", day_четвъртък: "Jueves", day_петък: "Viernes"
     },
     de: {
         nav_dashboard: "Dashboard", nav_profile: "Mein Profil", nav_students: "Studenten", 
@@ -157,7 +188,7 @@ const translations = {
         login_subtitle: "Bitte geben Sie Ihre Anmeldedaten ein", login_error: "Ungültiger Benutzername oder Passwort!", 
         login_btn: "Anmelden", login_no_account: "Kein Konto?", login_register_link: "Hier registrieren",
         reg_title: "Registrierung", reg_subtitle: "Erstellen Sie Ihr neues Konto", reg_firstname: "Vorname", reg_lastname: "Nachname", 
-        reg_email: "E-Mail", reg_username: "Benutzername", reg_password: "Passwort", reg_department: "Abteilung", 
+        reg_email: "E-mail", reg_username: "Benutzername", reg_password: "Passwort", reg_department: "Abteilung", 
         reg_dept_placeholder: "-- Abteilung wählen --", reg_address: "Adresse", reg_city: "Stadt", reg_street: "Straße", 
         reg_btn: "Registrieren", reg_have_account: "Haben Sie bereits ein Konto?", reg_login_link: "Hier anmelden",
         prof_settings: "Profileinstellungen", prof_personal_data: "Persönliche Daten", prof_firstname_readonly: "Vorname (Schreibgeschützt)", 
@@ -179,7 +210,15 @@ const translations = {
         
         dept_manage_title: "Abteilungen verwalten", btn_new_dept: "Neue Abteilung", th_dept_name: "Abteilungsname", 
         th_dept_office: "Büro (Raum)", dept_modal_title: "Abteilungsdaten", dept_office_hint: "Wird in Dropdown-Menüs angezeigt.",
-        btn_new_club: "Neuer Club", th_club_name: "Clubname", th_club_desc: "Beschreibung", club_modal_title: "Clubdaten"
+        btn_new_club: "Neuer Club", th_club_name: "Clubname", th_club_desc: "Beschreibung", club_modal_title: "Clubdaten",
+
+        // NEU FÜR PRÜFUNGEN UND STUNDENPLAN
+        exam_schedule_title: "Prüfung planen:", exam_date: "Datum und Uhrzeit", exam_room: "Raum", 
+        exam_type: "Prüfungsart", exam_type_regular: "Reguläre Prüfung", exam_type_retake: "Wiederholungsprüfung", 
+        exam_type_midterm: "Zwischenprüfung", exam_type_project: "Projektverteidigung", exam_save_btn: "Prüfung speichern", 
+        btn_exam: "Prüfung", upcoming_exams: "Anstehende Prüfungen", no_exams_msg: "Es sind noch keine Prüfungen für Ihre Kurse geplant.",
+        my_schedule_title: "Wochenplan", unscheduled_courses: "Nicht geplante Kurse", no_classes: "Freier Tag",
+        day_понеделник: "Montag", day_вторник: "Dienstag", day_сряда: "Mittwoch", day_четвъртък: "Donnerstag", day_петък: "Freitag"
     },
     it: {
         nav_dashboard: "Bacheca", nav_profile: "Il mio profilo", nav_students: "Studenti", 
@@ -215,7 +254,15 @@ const translations = {
         
         dept_manage_title: "Gestisci Dipartimenti", btn_new_dept: "Nuovo Dipartimento", th_dept_name: "Nome Dipartimento", 
         th_dept_office: "Ufficio (Stanza)", dept_modal_title: "Dati Dipartimento", dept_office_hint: "Verrà mostrato nei menu a discesa.",
-        btn_new_club: "Nuovo Club", th_club_name: "Nome del Club", th_club_desc: "Descrizione", club_modal_title: "Dati del Club"
+        btn_new_club: "Nuovo Club", th_club_name: "Nome del Club", th_club_desc: "Descrizione", club_modal_title: "Dati del Club",
+
+        // NUOVO PER ESAMI E ORARIO
+        exam_schedule_title: "Programma Esame:", exam_date: "Data e Ora", exam_room: "Aula", 
+        exam_type: "Tipo di Esame", exam_type_regular: "Esame Regolare", exam_type_retake: "Esame di Riparazione", 
+        exam_type_midterm: "Prova Intermedia", exam_type_project: "Difesa del Progetto", exam_save_btn: "Salva Esame", 
+        btn_exam: "Esame", upcoming_exams: "Prossimi Esami", no_exams_msg: "Non ci sono ancora esami programmati per i tuoi corsi.",
+        my_schedule_title: "Orario Settimanale", unscheduled_courses: "Corsi non programmati", no_classes: "Giorno libero",
+        day_понеделник: "Lunedì", day_вторник: "Martedì", day_сряда: "Mercoledì", day_четвъртък: "Giovedì", day_петък: "Venerdì"
     },
     ru: {
         nav_dashboard: "Главная панель", nav_profile: "Мой профиль", nav_students: "Студенты", 
@@ -251,7 +298,15 @@ const translations = {
         
         dept_manage_title: "Управление кафедрами", btn_new_dept: "Новая кафедра", th_dept_name: "Название кафедры", 
         th_dept_office: "Офис (Кабинет)", dept_modal_title: "Данные кафедры", dept_office_hint: "Это будет отображаться в выпадающих списках.",
-        btn_new_club: "Новый клуб", th_club_name: "Название клуба", th_club_desc: "Описание", club_modal_title: "Данные клуба"
+        btn_new_club: "Новый клуб", th_club_name: "Название клуба", th_club_desc: "Описание", club_modal_title: "Данные клуба",
+
+        // НОВОЕ ДЛЯ ЭКЗАМЕНОВ И РАСПИСАНИЯ
+        exam_schedule_title: "Назначить экзамен:", exam_date: "Дата и время", exam_room: "Аудитория", 
+        exam_type: "Тип экзамена", exam_type_regular: "Обычный экзамен", exam_type_retake: "Пересдача", 
+        exam_type_midterm: "Промежуточный тест", exam_type_project: "Защита проекта", exam_save_btn: "Сохранить экзамен", 
+        btn_exam: "Экзамен", upcoming_exams: "Предстоящие экзамены", no_exams_msg: "Для ваших курсов пока нет назначенных экзаменов.",
+        my_schedule_title: "Недельное расписание", unscheduled_courses: "Курсы без расписания", no_classes: "Свободный день",
+        day_понеделник: "Понедельник", day_вторник: "Вторник", day_сряда: "Среда", day_четвъртък: "Четверг", day_петък: "Пятница"
     }
 };
 

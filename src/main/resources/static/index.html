@@ -188,6 +188,40 @@
                     </div>
                 </div>
 
+                <div class="modal fade" id="scheduleExamModal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content shadow-lg border-info">
+                            <div class="modal-header border-secondary bg-dark">
+                                <h5 class="modal-title text-info"><i class="bi bi-calendar-plus me-2"></i> Насрочи изпит: <span id="examCourseName" class="text-white"></span></h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body bg-dark text-white">
+                                <form id="examForm">
+                                    <input type="hidden" id="examCourseId">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Дата и час</label>
+                                        <input type="datetime-local" id="examDate" class="form-control bg-dark text-white border-secondary" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Зала</label>
+                                        <input type="text" id="examRoom" class="form-control bg-dark text-white border-secondary" placeholder="напр. Зала 314" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Тип на изпита</label>
+                                        <select id="examType" class="form-select bg-dark text-white border-secondary">
+                                            <option value="Редовен изпит">Редовен изпит</option>
+                                            <option value="Поправителен изпит">Поправителен изпит</option>
+                                            <option value="Междинен тест">Междинен тест</option>
+                                            <option value="Защита на проект">Защита на проект</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-info w-100 fw-bold shadow-sm"><i class="bi bi-calendar-check me-2"></i> Запази изпита</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
     </div>
@@ -278,6 +312,9 @@
                                 <td class="text-center"><span class="badge bg-dark border border-secondary">${c.credits}</span></td>
                                 <td>${scheduleText}</td>
                                 <td class="text-end px-4">
+                                    <button class="btn btn-sm btn-outline-info rounded-pill px-3 shadow-sm me-2" onclick="openExamModal(${c.id}, '${c.name.replace(/'/g, "\\'")}')">
+                                        <i class="bi bi-calendar-plus me-1"></i> Изпит
+                                    </button>
                                     <button class="btn btn-sm btn-outline-warning rounded-pill px-3 shadow-sm" onclick="viewEnrolledStudents(${c.id}, '${c.name.replace(/'/g, "\\'")}')">
                                         <i class="bi bi-people-fill me-1"></i> Оцени студенти
                                     </button>
@@ -472,6 +509,44 @@
                     }
                 });
             };
+
+            // --- НОВО: ФУНКЦИИ ЗА СЪЗДАВАНЕ НА ИЗПИТИ ---
+            window.openExamModal = function(courseId, courseName) {
+                document.getElementById('examCourseName').textContent = courseName;
+                document.getElementById('examCourseId').value = courseId;
+                document.getElementById('examForm').reset();
+                new bootstrap.Modal(document.getElementById('scheduleExamModal')).show();
+            };
+
+            document.getElementById('examForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                let courseId = document.getElementById('examCourseId').value;
+                
+                let examData = {
+                    examDate: document.getElementById('examDate').value,
+                    room: document.getElementById('examRoom').value,
+                    examType: document.getElementById('examType').value
+                };
+
+                fetch(`/api/exams/course/${courseId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(examData),
+                    credentials: 'include' // Задължително, за да се разпознае професора от Spring Security
+                })
+                .then(res => {
+                    if(res.ok) {
+                        alert("Изпитът е насрочен успешно в системата!");
+                        // Затваряме модала след успех
+                        let modalElement = document.getElementById('scheduleExamModal');
+                        let modalInstance = bootstrap.Modal.getInstance(modalElement);
+                        if(modalInstance) modalInstance.hide();
+                    } else {
+                        alert("Възникна грешка. Може би нямате права за тази специалност.");
+                    }
+                })
+                .catch(err => alert("Грешка при връзката със сървъра."));
+            });
 
         });
     </script>

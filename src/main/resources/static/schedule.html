@@ -21,10 +21,15 @@
         .course-time { font-size: 0.8rem; color: #d63384; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; }
         .course-title { font-weight: bold; font-size: 1rem; margin-bottom: 5px; line-height: 1.2; }
         .course-prof { font-size: 0.75rem; color: #adb5bd; }
+
+        /* НОВО: Стилове за изпитните карти */
+        .exam-card { background-color: #1e1e1e; border-left: 5px solid #0dcaf0; border-radius: 10px; transition: transform 0.2s; }
+        .exam-card:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(13, 202, 240, 0.2); }
         
         [data-bs-theme="light"] .day-column { background-color: #ffffff; border-color: #dee2e6; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         [data-bs-theme="light"] .course-card { background-color: #f8f9fa; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         [data-bs-theme="light"] .day-header { color: #495057; }
+        [data-bs-theme="light"] .exam-card { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -69,12 +74,23 @@
 
                 <div id="schedule-alert" class="alert alert-warning d-none" role="alert"></div>
 
-                <div class="schedule-grid" id="schedule-container">
-                    </div>
+                <div class="schedule-grid mb-5" id="schedule-container">
+                </div>
 
-                <div id="unscheduled-container" class="mt-4 d-none">
+                <div id="unscheduled-container" class="mt-4 mb-5 d-none">
                     <h5 class="fw-light mb-3 text-muted"><i class="bi bi-info-circle me-2"></i> <span data-i18n="unscheduled_courses">Курсове без зададен час</span></h5>
                     <div class="row" id="unscheduled-list"></div>
+                </div>
+
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 mt-5 border-bottom border-secondary">
+                    <h1 class="h2 fw-light"><i class="bi bi-journal-bookmark-fill me-2 text-info"></i> <span>Предстоящи изпити</span></h1>
+                </div>
+
+                <div class="row" id="exams-container">
+                    <div class="col-12 text-center text-muted py-4" id="exams-loading-msg">
+                        <div class="spinner-border text-info mb-3 spinner-border-sm" role="status"></div>
+                        <p>Зареждане на изпитите...</p>
+                    </div>
                 </div>
 
             </main>
@@ -100,10 +116,12 @@
                         // Админът няма личен график, показваме му съобщение
                         document.getElementById('schedule-alert').classList.remove('d-none');
                         document.getElementById('schedule-alert').innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i> Администраторите нямат личен учебен график.';
+                        document.getElementById('exams-loading-msg').style.display = 'none'; // Скриваме лоудъра за изпити
                     } else {
                         // Студентът вижда бутона
                         document.getElementById('nav-schedule')?.classList.remove('d-none');
                         loadStudentSchedule();
+                        loadStudentExams(); // НОВО: Зареждаме изпитите
                     }
                 })
                 .catch(err => console.error("Аутентикация грешка:", err));
@@ -203,6 +221,69 @@
                     .catch(err => {
                         document.getElementById('schedule-alert').classList.remove('d-none');
                         document.getElementById('schedule-alert').innerHTML = `<i class="bi bi-info-circle me-2"></i> ${err.message}`;
+                    });
+            }
+
+            // --- НОВО: Функция за зареждане на изпитите на студента ---
+            function loadStudentExams() {
+                let examsContainer = document.getElementById('exams-container');
+                let loadingMsg = document.getElementById('exams-loading-msg');
+
+                fetch('/api/students/me')
+                    .then(res => {
+                        if(!res.ok) throw new Error("Акаунтът Ви не е свързан със студентски профил.");
+                        return res.json();
+                    })
+                    .then(student => fetch(`/api/students/${student.id}/courses`))
+                    .then(res => res.json())
+                    .then(enrollments => {
+                        if(enrollments.length === 0) {
+                            examsContainer.innerHTML = '<div class="col-12"><div class="alert alert-dark border-secondary text-center text-muted py-3">Нямате записани специалности, следователно нямате и изпити.</div></div>';
+                            return;
+                        }
+
+                        // Взимаме изпитите за всеки записан курс
+                        let fetchPromises = enrollments.map(en => 
+                            fetch(`/api/exams/course/${en.course.id}`).then(r => r.json())
+                        );
+
+                        Promise.all(fetchPromises)
+                            .then(results => {
+                                let allExams = results.flat();
+                                loadingMsg.style.display = 'none';
+
+                                if(allExams.length === 0) {
+                                    examsContainer.innerHTML = '<div class="col-12"><div class="alert alert-dark border-secondary text-center text-muted py-4"><i class="bi bi-cup-hot fs-3 d-block mb-2"></i>Все още няма насрочени изпити за Вашите специалности.</div></div>';
+                                    return;
+                                }
+
+                                // Сортираме ги по дата
+                                allExams.sort((a, b) => new Date(a.examDate) - new Date(b.examDate));
+
+                                // Рендерираме ги
+                                allExams.forEach(exam => {
+                                    let dateObj = new Date(exam.examDate);
+                                    let formattedDate = dateObj.toLocaleDateString('bg-BG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                                    let formattedTime = dateObj.toLocaleTimeString('bg-BG', { hour: '2-digit', minute: '2-digit' });
+
+                                    examsContainer.innerHTML += `
+                                        <div class="col-md-6 col-lg-4 mb-4">
+                                            <div class="card exam-card h-100 shadow p-3">
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <span class="badge bg-dark border border-secondary text-info">${exam.examType}</span>
+                                                </div>
+                                                <h5 class="fw-bold mb-3">${exam.course.name}</h5>
+                                                <p class="mb-1 text-light"><i class="bi bi-calendar-event me-2 text-muted"></i> ${formattedDate}</p>
+                                                <p class="mb-1 text-light"><i class="bi bi-clock me-2 text-muted"></i> ${formattedTime} ч.</p>
+                                                <p class="mb-0 text-light"><i class="bi bi-geo-alt me-2 text-muted"></i> ${exam.room}</p>
+                                            </div>
+                                        </div>
+                                    `;
+                                });
+                            });
+                    })
+                    .catch(err => {
+                        examsContainer.innerHTML = `<div class="col-12 text-center text-danger py-4">${err.message}</div>`;
                     });
             }
         });
